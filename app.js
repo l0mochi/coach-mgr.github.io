@@ -25,6 +25,60 @@ let state = {
     skillMetrics: ['シュート', 'パス', 'ドリブル', '守備', 'フィジカル', 'メンタル'],
     positions: ['FW', 'MF', 'DF', 'GK'],
     teamInfo: { name: 'My Team', color: '#f23932' },
+    customFormations: [
+        {
+            name: '3-3-1',
+            coords: [
+                { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+                { role: 'DF', label: 'LCB', top: '72%', left: '25%' },
+                { role: 'DF', label: 'CCB', top: '75%', left: '50%' },
+                { role: 'DF', label: 'RCB', top: '72%', left: '75%' },
+                { role: 'MF', label: 'LM', top: '48%', left: '20%' },
+                { role: 'MF', label: 'CM', top: '50%', left: '50%' },
+                { role: 'MF', label: 'RM', top: '48%', left: '80%' },
+                { role: 'FW', label: 'ST', top: '22%', left: '50%' }
+            ]
+        },
+        {
+            name: '2-4-1',
+            coords: [
+                { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+                { role: 'DF', label: 'LCB', top: '74%', left: '35%' },
+                { role: 'DF', label: 'RCB', top: '74%', left: '65%' },
+                { role: 'MF', label: 'LM', top: '50%', left: '15%' },
+                { role: 'MF', label: 'LCM', top: '52%', left: '38%' },
+                { role: 'MF', label: 'RCM', top: '52%', left: '62%' },
+                { role: 'MF', label: 'RM', top: '50%', left: '85%' },
+                { role: 'FW', label: 'ST', top: '22%', left: '50%' }
+            ]
+        },
+        {
+            name: '3-2-2',
+            coords: [
+                { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+                { role: 'DF', label: 'LCB', top: '72%', left: '25%' },
+                { role: 'DF', label: 'CCB', top: '75%', left: '50%' },
+                { role: 'DF', label: 'RCB', top: '72%', left: '75%' },
+                { role: 'MF', label: 'LCM', top: '48%', left: '35%' },
+                { role: 'MF', label: 'RCM', top: '48%', left: '65%' },
+                { role: 'FW', label: 'LST', top: '22%', left: '35%' },
+                { role: 'FW', label: 'RST', top: '22%', left: '65%' }
+            ]
+        },
+        {
+            name: '2-3-2',
+            coords: [
+                { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+                { role: 'DF', label: 'LCB', top: '74%', left: '35%' },
+                { role: 'DF', label: 'RCB', top: '74%', left: '65%' },
+                { role: 'MF', label: 'LM', top: '50%', left: '20%' },
+                { role: 'MF', label: 'CM', top: '52%', left: '50%' },
+                { role: 'MF', label: 'RM', top: '50%', left: '80%' },
+                { role: 'FW', label: 'LST', top: '22%', left: '35%' },
+                { role: 'FW', label: 'RST', top: '22%', left: '65%' }
+            ]
+        }
+    ],
     currentRoute: 'dashboard'
 };
 
@@ -52,6 +106,7 @@ function loadData() {
         state.skillMetrics = parsed.skillMetrics || ['シュート', 'パス', 'ドリブル', '守備', 'フィジカル', 'メンタル'];
         state.positions = parsed.positions || ['FW', 'MF', 'DF', 'GK'];
         state.teamInfo = parsed.teamInfo || { name: 'My Team', color: '#f23932' };
+        state.customFormations = parsed.customFormations || state.customFormations;
 
         state.menuLibrary = parsed.menuLibrary || [
             { id: 201, focus: 'ポゼッション 4vs4+フリーマン', organize: '20m x 20m グリッド\n4 vs 4 + 1フリーマン', keyfactor: '・ボールを受ける前の首振り\n・サポートの角度と距離', options: '・パスが5本繋がったら1点\n・慣れたら2タッチ制限', category: 'ポゼッション', frames: null }
@@ -127,7 +182,8 @@ function saveData() {
         menuCategories: state.menuCategories,
         skillMetrics: state.skillMetrics,
         positions: state.positions,
-        teamInfo: state.teamInfo
+        teamInfo: state.teamInfo,
+        customFormations: state.customFormations
     }));
 }
 
@@ -355,6 +411,11 @@ function setupModals() {
             commentsStr = '【ポジティブ】\n' + goodStr + '\n\n【ネクストステップ】\n' + improveStr;
         }
         
+        let resultStr = "";
+        if (scoreUs !== "" && scoreThem !== "") {
+            resultStr = `${scoreUs}-${scoreThem}`;
+        }
+
         // Collect goal records and generate scorers string
         const goalRecords = [];
         const rows = document.querySelectorAll('#goal-records-list .goal-record-row');
@@ -390,7 +451,8 @@ function setupModals() {
                 match.date = document.getElementById('match-date').value;
                 match.opponent = document.getElementById('match-opponent').value;
                 match.type = document.getElementById('match-type').value;
-                match.result = `${scoreUs}-${scoreThem}`;
+                match.tournament = document.getElementById('match-tournament').value;
+                match.result = resultStr;
                 match.scorers = scorersStr;
                 match.goalRecords = goalRecords;
                 match.comments = commentsStr;
@@ -402,7 +464,8 @@ function setupModals() {
                 date: document.getElementById('match-date').value,
                 opponent: document.getElementById('match-opponent').value,
                 type: document.getElementById('match-type').value,
-                result: `${scoreUs}-${scoreThem}`,
+                tournament: document.getElementById('match-tournament').value,
+                result: resultStr,
                 scorers: scorersStr,
                 goalRecords: goalRecords,
                 comments: commentsStr,
@@ -677,15 +740,19 @@ function setupModals() {
             
             if(match) {
                 const name = document.getElementById('formation-name').value;
-                const system = document.getElementById('formation-system').value;
+                const system = document.getElementById('formation-system-select').value;
                 
-                const selects = document.querySelectorAll('.formation-pos-select');
+                const nodes = document.querySelectorAll('#tactical-formation-pitch .pitch-node');
                 const lineup = [];
-                selects.forEach(sel => {
-                    const role = sel.value;
-                    const playerId = parseInt(sel.dataset.playerId);
-                    if (role) {
-                        lineup.push({ playerId, role });
+                nodes.forEach(node => {
+                    const playerId = node.dataset.playerId ? parseInt(node.dataset.playerId, 10) : null;
+                    if (playerId) {
+                        lineup.push({
+                            playerId,
+                            role: node.dataset.role,
+                            roleLabel: node.dataset.label,
+                            roleIndex: parseInt(node.dataset.index, 10)
+                        });
                     }
                 });
 
@@ -719,20 +786,7 @@ function setupModals() {
         });
     }
 
-    const btnAnimFormation = document.getElementById('btn-anim-formation');
-    if(btnAnimFormation) {
-        btnAnimFormation.addEventListener('click', () => {
-            const matchId = document.getElementById('formation-match-id').value;
-            const formationId = document.getElementById('formation-id').value;
-            if(!formationId) {
-                alert('先に「保存する」ボタンを押してピリオドを作成してください。');
-                return;
-            }
-            document.getElementById('modal-formation').classList.add('hidden');
-            document.getElementById('modal-match-detail').classList.add('hidden');
-            navigate('animation', { matchId: parseInt(matchId), formId: parseInt(formationId) });
-        });
-    }
+
 
     const formPlayerAssessment = document.getElementById('form-player-assessment');
     if(formPlayerAssessment) {
@@ -783,9 +837,13 @@ function openModal(id) {
 }
 
 function initDashboard() {
+    // Separate completed and upcoming matches
+    const completedMatches = state.matches.filter(m => m.result && /^\d+-\d+$/.test(m.result));
+    const upcomingMatches = state.matches.filter(m => !m.result || !/^\d+-\d+$/.test(m.result));
+
     // 1. Calculate overall stats
     let wins = 0, losses = 0, draws = 0;
-    state.matches.forEach(m => {
+    completedMatches.forEach(m => {
         const [us, them] = m.result.split('-').map(Number);
         if (us > them) wins++;
         else if (us < them) losses++;
@@ -799,22 +857,50 @@ function initDashboard() {
     if (dbRecord) dbRecord.innerHTML = `${wins}勝 ${losses}敗 ${draws}分 <span style="font-size:0.75rem; font-weight:normal; color:var(--text-secondary); margin-left:0.25rem;">(勝率:${winRate}%)</span>`;
     if (dbRecordBar) dbRecordBar.style.width = `${winRate}%`;
 
-    // 2. Set count cards
-    const dbPractices = document.getElementById('dash-db-practices');
-    if (dbPractices) dbPractices.textContent = `${state.practices.length}回`;
+    // Calculate stats by match type
+    const statsByType = {};
+    completedMatches.forEach(m => {
+        const type = m.type || 'その他';
+        if (!statsByType[type]) {
+            statsByType[type] = { wins: 0, losses: 0, draws: 0, total: 0 };
+        }
+        const [us, them] = m.result.split('-').map(Number);
+        if (us > them) statsByType[type].wins++;
+        else if (us < them) statsByType[type].losses++;
+        else statsByType[type].draws++;
+        statsByType[type].total++;
+    });
 
-    const dbPlayers = document.getElementById('dash-db-players');
-    if (dbPlayers) dbPlayers.textContent = `${state.players.length}名`;
+    const dbMatchTypes = document.getElementById('dash-db-match-types');
+    if (dbMatchTypes) {
+        let html = '';
+        const sortedTypes = Object.keys(statsByType).sort((a, b) => {
+            const idxA = state.matchTypes.indexOf(a);
+            const idxB = state.matchTypes.indexOf(b);
+            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+        });
+
+        sortedTypes.forEach(type => {
+            const stats = statsByType[type];
+            if (stats.total > 0) {
+                const rate = Math.round((stats.wins / stats.total) * 100);
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.1rem 0; font-weight: 500;">
+                        <span>${type}</span>
+                        <span>${stats.wins}勝 ${stats.losses}敗 ${stats.draws}分 <span style="color:var(--text-secondary); margin-left:0.25rem; font-weight:normal;">(${rate}%)</span></span>
+                    </div>
+                `;
+            }
+        });
+        dbMatchTypes.innerHTML = html || '<div style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">試合記録なし</div>';
+    }
 
     // Click handlers for stats cards to jump to corresponding views
     const cardMatches = document.getElementById('dash-card-matches');
     if (cardMatches) cardMatches.onclick = () => navigate('matches');
-    
-    const cardPractices = document.getElementById('dash-card-practices');
-    if (cardPractices) cardPractices.onclick = () => navigate('practices');
-    
-    const cardPlayers = document.getElementById('dash-card-players');
-    if (cardPlayers) cardPlayers.onclick = () => navigate('players');
 
     // Button navigations
     const btnGoPractices = document.getElementById('dash-btn-go-practices');
@@ -885,11 +971,56 @@ function initDashboard() {
         }
     }
 
-    // 4. Render recent matches (latest 3)
+    // 3. Render upcoming matches (latest 3)
+    const upcomingMatchesCard = document.getElementById('dash-upcoming-matches-card');
+    const upcomingMatchesContent = document.getElementById('dash-upcoming-matches-content');
+    if (upcomingMatchesCard && upcomingMatchesContent) {
+        if (upcomingMatches.length > 0) {
+            upcomingMatchesCard.style.display = 'block';
+            const sortedUpcoming = [...upcomingMatches].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0, 3);
+            upcomingMatchesContent.innerHTML = sortedUpcoming.map(m => `
+                <div class="feedback-box" style="display:flex; justify-content:space-between; align-items:center; padding:0.6rem 0.8rem; cursor:pointer;" onclick="openMatchDetail(${m.id})">
+                    <div style="display:flex; align-items:center; gap:0.6rem;">
+                        <span class="player-position badge-sub" style="width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; font-size:0.75rem; font-weight:bold; padding:0;"><i class="fa-solid fa-clock"></i></span>
+                        <div>
+                            <strong style="font-size:0.9rem;">vs ${m.opponent}</strong>
+                            <div style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-regular fa-calendar"></i> ${m.date} | ${m.type}${m.tournament ? ` (${m.tournament})` : ''}</div>
+                        </div>
+                    </div>
+                    <div style="font-size:0.85rem; color:var(--text-secondary); font-weight:bold; background:rgba(0,0,0,0.05); padding:0.2rem 0.5rem; border-radius:4px;">予定</div>
+                </div>
+            `).join('');
+        } else {
+            upcomingMatchesCard.style.display = 'none';
+        }
+    }
+
+    // 4. Render Form Guide & Recent completed matches (latest 3)
+    const formGuideContainer = document.getElementById('dash-form-guide-container');
+    const formGuideEl = document.getElementById('dash-db-form-guide');
+    if (formGuideContainer && formGuideEl) {
+        if (completedMatches.length > 0) {
+            formGuideContainer.style.display = 'flex';
+            const sortedCompletedForForm = [...completedMatches].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const last5Matches = sortedCompletedForForm.slice(-5);
+            formGuideEl.innerHTML = last5Matches.map(m => {
+                const [us, them] = m.result.split('-').map(Number);
+                let badgeClass = 'draw';
+                let label = '分';
+                let tooltipResult = '引分';
+                if (us > them) { badgeClass = 'win'; label = '勝'; tooltipResult = '勝ち'; }
+                else if (us < them) { badgeClass = 'loss'; label = '敗'; tooltipResult = '負け'; }
+                return `<span class="form-badge ${badgeClass}" title="vs ${m.opponent} (${m.result}) - ${tooltipResult}">${label}</span>`;
+            }).join('');
+        } else {
+            formGuideContainer.style.display = 'none';
+        }
+    }
+
     const matchesContent = document.getElementById('dash-matches-content');
     if (matchesContent) {
-        if (state.matches.length > 0) {
-            const sortedMatches = [...state.matches].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+        if (completedMatches.length > 0) {
+            const sortedMatches = [...completedMatches].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
             matchesContent.innerHTML = sortedMatches.map(m => {
                 const [us, them] = m.result.split('-').map(Number);
                 let badgeClass = 'badge-sub';
@@ -903,7 +1034,7 @@ function initDashboard() {
                             <span class="player-position ${badgeClass}" style="width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; font-size:0.75rem; font-weight:bold; padding:0;">${resultLabel}</span>
                             <div>
                                 <strong style="font-size:0.9rem;">vs ${m.opponent}</strong>
-                                <div style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-regular fa-calendar"></i> ${m.date} | ${m.type}</div>
+                                <div style="font-size:0.75rem; color:var(--text-secondary);"><i class="fa-regular fa-calendar"></i> ${m.date} | ${m.type}${m.tournament ? ` (${m.tournament})` : ''}</div>
                             </div>
                         </div>
                         <div style="font-size:1.1rem; font-weight:bold; color:var(--primary);">${m.result}</div>
@@ -993,7 +1124,9 @@ function initMatches() {
 
     // Stats Update
     let wins = 0, losses = 0, draws = 0, goals = 0;
-    filteredMatches.forEach(m => {
+    const completedMatches = filteredMatches.filter(m => m.result && /^\d+-\d+$/.test(m.result));
+
+    completedMatches.forEach(m => {
         const [us, them] = m.result.split('-').map(Number);
         goals += us;
         if(us > them) wins++;
@@ -1007,6 +1140,47 @@ function initMatches() {
     if (elGoals) elGoals.textContent = goals;
     const bar = document.getElementById('dash-record-bar');
     if (bar) bar.style.width = `${winRate}%`;
+
+    // Calculate stats by match type
+    const statsByType = {};
+    completedMatches.forEach(m => {
+        const type = m.type || 'その他';
+        if (!statsByType[type]) {
+            statsByType[type] = { wins: 0, losses: 0, draws: 0, total: 0 };
+        }
+        const [us, them] = m.result.split('-').map(Number);
+        if (us > them) statsByType[type].wins++;
+        else if (us < them) statsByType[type].losses++;
+        else statsByType[type].draws++;
+        statsByType[type].total++;
+    });
+
+    const elMatchTypes = document.getElementById('dash-match-types');
+    if (elMatchTypes) {
+        let html = '';
+        const sortedTypes = Object.keys(statsByType).sort((a, b) => {
+            const idxA = state.matchTypes.indexOf(a);
+            const idxB = state.matchTypes.indexOf(b);
+            if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+            if (idxA === -1) return 1;
+            if (idxB === -1) return -1;
+            return idxA - idxB;
+        });
+
+        sortedTypes.forEach(type => {
+            const stats = statsByType[type];
+            if (stats.total > 0) {
+                const rate = Math.round((stats.wins / stats.total) * 100);
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding: 0.1rem 0; font-weight: 500;">
+                        <span>${type}</span>
+                        <span>${stats.wins}勝 ${stats.losses}敗 ${stats.draws}分 <span style="color:var(--text-secondary); margin-left:0.25rem; font-weight:normal;">(${rate}%)</span></span>
+                    </div>
+                `;
+            }
+        });
+        elMatchTypes.innerHTML = html || '<div style="font-size:0.75rem; color:var(--text-secondary); font-style:italic;">試合記録なし</div>';
+    }
 
     // Top 3 Scorers & Assists calculation
     const scorerCounts = {};
@@ -1075,18 +1249,22 @@ function initMatches() {
                     <div class="library-grid">
             `;
             grouped[month].forEach(m => {
+                const isCompleted = m.result && /^\d+-\d+$/.test(m.result);
+                const resultText = isCompleted ? m.result : '<span style="font-weight:normal; color:var(--text-secondary); font-size:0.9rem;">試合予定</span>';
                 html += `
                     <div class="card match-card">
                         <div class="match-card-header">
                             <div>
-                                <div class="match-card-date"><i class="fa-regular fa-calendar"></i> ${m.date} | ${m.type}</div>
+                                <div class="match-card-date"><i class="fa-regular fa-calendar"></i> ${m.date} | ${m.type}${m.tournament ? ` (${m.tournament})` : ''}</div>
                                 <div class="match-card-opponent">vs ${m.opponent}</div>
                             </div>
-                            <div class="match-card-result">${m.result}</div>
+                            <div class="match-card-result">${resultText}</div>
                         </div>
+                        ${isCompleted ? `
                         <div class="match-card-scorers" title="${m.scorers || '記録なし'}">
                             <i class="fa-solid fa-futbol" style="font-size:0.8rem;"></i> ${m.scorers || '記録なし'}
                         </div>
+                        ` : ''}
                         <div class="match-card-actions">
                             <button class="btn btn-secondary btn-detail-match" data-id="${m.id}"><i class="fa-solid fa-circle-info"></i> 詳細</button>
                             <button class="btn btn-danger btn-delete-match" data-id="${m.id}"><i class="fa-solid fa-trash"></i></button>
@@ -1212,8 +1390,8 @@ function openMatchDetail(id) {
 
         const content = document.getElementById('match-detail-content');
         content.innerHTML = `
-            <div style="font-size:1.2rem; font-weight:bold;">${m.date} | ${m.type}</div>
-            <div style="font-size:1.5rem; color:var(--primary); margin-bottom:1rem;">vs ${m.opponent} (${m.result})</div>
+            <div style="font-size:1.2rem; font-weight:bold;">${m.date} | ${m.type}${m.tournament ? ` (${m.tournament})` : ''}</div>
+            <div style="font-size:1.5rem; color:var(--primary); margin-bottom:1rem;">vs ${m.opponent} ${m.result ? `(${m.result})` : '(試合予定)'}</div>
             <div class="detail-box">
                 <h4><i class="fa-solid fa-futbol"></i> 得点者・アシスト</h4>
                 <div style="font-size:0.95rem; line-height:1.4;">${scorersHtml}</div>
@@ -1341,20 +1519,16 @@ function openMatchDetail(id) {
             document.getElementById('formation-match-id').value = m.id;
             document.getElementById('formation-id').value = '';
             
-            const pList = document.getElementById('formation-player-list');
-            pList.innerHTML = state.players.map(p => `
-                <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.05); padding:0.4rem; border-radius:4px;">
-                    <span style="font-size:0.9rem; flex:1;">${p.number} ${p.name}</span>
-                    <select class="form-control formation-pos-select" data-player-id="${p.id}" style="width:70px; padding:0.2rem;">
-                        <option value="">-</option>
-                        <option value="FW">FW</option>
-                        <option value="MF">MF</option>
-                        <option value="DF">DF</option>
-                        <option value="GK">GK</option>
-                        <option value="SUB">SUB</option>
-                    </select>
-                </div>
-            `).join('');
+            const sysSelect = document.getElementById('formation-system-select');
+            sysSelect.innerHTML = state.customFormations.map(cf => `<option value="${cf.name}">${cf.name} (${cf.coords.length}人制)</option>`).join('');
+            
+            const defaultSys = state.customFormations.length > 0 ? state.customFormations[0].name : '3-3-1';
+            sysSelect.value = defaultSys;
+            sysSelect.onchange = (e) => {
+                renderFormationPitch(e.target.value, []);
+            };
+            
+            renderFormationPitch(defaultSys, []);
 
             openModal('modal-formation');
         };
@@ -1371,9 +1545,16 @@ function openMatchDetail(id) {
                 select.innerHTML = state.matchTypes.map(t => `<option value="${t}">${t}</option>`).join('');
                 select.value = m.type;
                 
-                const scores = m.result.split('-');
-                document.getElementById('match-score-us').value = scores[0] || 0;
-                document.getElementById('match-score-them').value = scores[1] || 0;
+                document.getElementById('match-tournament').value = m.tournament || '';
+                
+                if (m.result && m.result.includes('-')) {
+                    const scores = m.result.split('-');
+                    document.getElementById('match-score-us').value = scores[0];
+                    document.getElementById('match-score-them').value = scores[1];
+                } else {
+                    document.getElementById('match-score-us').value = '';
+                    document.getElementById('match-score-them').value = '';
+                }
                 
                 // Clear and repopulate goal records list
                 const goalRecordsList = document.getElementById('goal-records-list');
@@ -1709,6 +1890,165 @@ function initPractices() {
     });
 }
 
+const formationCoords = {
+    '4-3-3': [
+        { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+        { role: 'DF', label: 'LB', top: '70%', left: '15%' },
+        { role: 'DF', label: 'LCB', top: '74%', left: '38%' },
+        { role: 'DF', label: 'RCB', top: '74%', left: '62%' },
+        { role: 'DF', label: 'RB', top: '70%', left: '85%' },
+        { role: 'MF', label: 'DM', top: '52%', left: '50%' },
+        { role: 'MF', label: 'LCM', top: '42%', left: '30%' },
+        { role: 'MF', label: 'RCM', top: '42%', left: '70%' },
+        { role: 'FW', label: 'LW', top: '22%', left: '18%' },
+        { role: 'FW', label: 'ST', top: '15%', left: '50%' },
+        { role: 'FW', label: 'RW', top: '22%', left: '82%' }
+    ],
+    '4-4-2': [
+        { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+        { role: 'DF', label: 'LB', top: '70%', left: '15%' },
+        { role: 'DF', label: 'LCB', top: '74%', left: '38%' },
+        { role: 'DF', label: 'RCB', top: '74%', left: '62%' },
+        { role: 'DF', label: 'RB', top: '70%', left: '85%' },
+        { role: 'MF', label: 'LM', top: '45%', left: '15%' },
+        { role: 'MF', label: 'LCM', top: '48%', left: '38%' },
+        { role: 'MF', label: 'RCM', top: '48%', left: '62%' },
+        { role: 'MF', label: 'RM', top: '45%', left: '85%' },
+        { role: 'FW', label: 'LST', top: '20%', left: '35%' },
+        { role: 'FW', label: 'RST', top: '20%', left: '65%' }
+    ],
+    '3-5-2': [
+        { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+        { role: 'DF', label: 'LCB', top: '74%', left: '25%' },
+        { role: 'DF', label: 'CCB', top: '76%', left: '50%' },
+        { role: 'DF', label: 'RCB', top: '74%', left: '75%' },
+        { role: 'MF', label: 'LDM', top: '55%', left: '35%' },
+        { role: 'MF', label: 'RDM', top: '55%', left: '65%' },
+        { role: 'MF', label: 'LWB', top: '48%', left: '12%' },
+        { role: 'MF', label: 'RWB', top: '48%', left: '88%' },
+        { role: 'MF', label: 'AM', top: '35%', left: '50%' },
+        { role: 'FW', label: 'LST', top: '18%', left: '35%' },
+        { role: 'FW', label: 'RST', top: '18%', left: '65%' }
+    ],
+    '3-4-3': [
+        { role: 'GK', label: 'GK', top: '88%', left: '50%' },
+        { role: 'DF', label: 'LCB', top: '74%', left: '25%' },
+        { role: 'DF', label: 'CCB', top: '76%', left: '50%' },
+        { role: 'DF', label: 'RCB', top: '74%', left: '75%' },
+        { role: 'MF', label: 'LM', top: '50%', left: '15%' },
+        { role: 'MF', label: 'LCM', top: '52%', left: '38%' },
+        { role: 'MF', label: 'RCM', top: '52%', left: '62%' },
+        { role: 'MF', label: 'RM', top: '50%', left: '85%' },
+        { role: 'FW', label: 'LW', top: '22%', left: '18%' },
+        { role: 'FW', label: 'ST', top: '15%', left: '50%' },
+        { role: 'FW', label: 'RW', top: '22%', left: '82%' }
+    ]
+};
+
+function renderFormationPitch(systemName, existingLineup = []) {
+    const pitch = document.getElementById('tactical-formation-pitch');
+    if (!pitch) return;
+    
+    // Clear old nodes
+    const oldNodes = pitch.querySelectorAll('.pitch-node');
+    oldNodes.forEach(node => node.remove());
+    
+    const customForm = state.customFormations.find(cf => cf.name === systemName);
+    const coords = customForm ? customForm.coords : (formationCoords[systemName] || (state.customFormations.length > 0 ? state.customFormations[0].coords : []));
+    
+    coords.forEach((coord, index) => {
+        const nodeEl = document.createElement('div');
+        nodeEl.className = 'pitch-node';
+        nodeEl.style.top = coord.top;
+        nodeEl.style.left = coord.left;
+        nodeEl.dataset.index = index;
+        nodeEl.dataset.role = coord.role;
+        nodeEl.dataset.label = coord.label;
+        
+        // Find if a player is assigned to this index/label
+        const assigned = existingLineup.find(l => l.roleLabel === coord.label || (existingLineup.length === coords.length && l.roleIndex === index));
+        let playerText = '';
+        let numberText = coord.label;
+        
+        if (assigned) {
+            const p = state.players.find(pl => pl.id === assigned.playerId);
+            if (p) {
+                playerText = `<div class="pitch-node-name">${p.number} ${p.name}</div>`;
+                numberText = p.number;
+                nodeEl.dataset.playerId = p.id;
+            }
+        }
+        
+        nodeEl.innerHTML = `
+            <span class="pitch-node-role">${coord.label}</span>
+            <span class="pitch-node-number">${numberText}</span>
+            ${playerText}
+        `;
+        
+        nodeEl.onclick = (e) => {
+            e.stopPropagation();
+            openFormationPlayerPicker(nodeEl);
+        };
+        
+        pitch.appendChild(nodeEl);
+    });
+
+    // Close picker if click on pitch
+    pitch.onclick = () => {
+        const picker = document.getElementById('formation-player-picker');
+        if (picker) picker.style.display = 'none';
+    };
+}
+
+function openFormationPlayerPicker(nodeEl) {
+    const picker = document.getElementById('formation-player-picker');
+    const select = document.getElementById('formation-picker-select');
+    if (!picker || !select) return;
+    
+    const sorted = [...state.players].sort((a,b) => (parseInt(a.number,10)||0) - (parseInt(b.number,10)||0));
+    select.innerHTML = '<option value="">-- 未選択 --</option>' + sorted.map(p => `
+        <option value="${p.id}">${p.number} ${p.name} (${(Array.isArray(p.position) ? p.position : [p.position]).join('/')})</option>
+    `).join('');
+    
+    select.value = nodeEl.dataset.playerId || '';
+    
+    picker.style.display = 'block';
+    picker.style.top = `calc(${nodeEl.style.top} + 25px)`;
+    picker.style.left = `calc(${nodeEl.style.left} - 70px)`;
+    
+    document.getElementById('btn-formation-picker-ok').onclick = () => {
+        const val = select.value;
+        if (val) {
+            const playerId = parseInt(val, 10);
+            const p = state.players.find(pl => pl.id === playerId);
+            if (p) {
+                nodeEl.dataset.playerId = p.id;
+                nodeEl.innerHTML = `
+                    <span class="pitch-node-role">${nodeEl.dataset.label}</span>
+                    <span class="pitch-node-number">${p.number}</span>
+                    <div class="pitch-node-name">${p.number} ${p.name}</div>
+                `;
+            }
+        } else {
+            nodeEl.removeAttribute('data-player-id');
+            nodeEl.innerHTML = `
+                <span class="pitch-node-role">${nodeEl.dataset.label}</span>
+                <span class="pitch-node-number">${nodeEl.dataset.label}</span>
+            `;
+        }
+        picker.style.display = 'none';
+    };
+    
+    document.getElementById('btn-formation-picker-clear').onclick = () => {
+        nodeEl.removeAttribute('data-player-id');
+        nodeEl.innerHTML = `
+            <span class="pitch-node-role">${nodeEl.dataset.label}</span>
+            <span class="pitch-node-number">${nodeEl.dataset.label}</span>
+        `;
+        picker.style.display = 'none';
+    };
+}
+
 function editFormation(matchId, formId) {
     const match = state.matches.find(m => m.id === matchId);
     if (!match) return;
@@ -1718,27 +2058,18 @@ function editFormation(matchId, formId) {
     document.getElementById('formation-match-id').value = match.id;
     document.getElementById('formation-id').value = formObj.id;
     document.getElementById('formation-name').value = formObj.name;
-    document.getElementById('formation-system').value = formObj.system || '';
+    
+    const sysSelect = document.getElementById('formation-system-select');
+    sysSelect.innerHTML = state.customFormations.map(cf => `<option value="${cf.name}">${cf.name} (${cf.coords.length}人制)</option>`).join('');
+    
+    const systemName = formObj.system || (state.customFormations.length > 0 ? state.customFormations[0].name : '3-3-1');
+    sysSelect.value = systemName;
+    
+    sysSelect.onchange = (e) => {
+        renderFormationPitch(e.target.value, []);
+    };
 
-    const pList = document.getElementById('formation-player-list');
-    pList.innerHTML = state.players.map(p => {
-        const lineup = formObj.lineup || [];
-        const lineItem = lineup.find(l => l.playerId === p.id);
-        const selVal = lineItem ? lineItem.role : '';
-        return `
-            <div style="display:flex; align-items:center; gap:0.5rem; background:rgba(0,0,0,0.05); padding:0.4rem; border-radius:4px;">
-                <span style="font-size:0.9rem; flex:1;">${p.number} ${p.name}</span>
-                <select class="form-control formation-pos-select" data-player-id="${p.id}" style="width:70px; padding:0.2rem;">
-                    <option value="" ${selVal === '' ? 'selected' : ''}>-</option>
-                    <option value="FW" ${selVal === 'FW' ? 'selected' : ''}>FW</option>
-                    <option value="MF" ${selVal === 'MF' ? 'selected' : ''}>MF</option>
-                    <option value="DF" ${selVal === 'DF' ? 'selected' : ''}>DF</option>
-                    <option value="GK" ${selVal === 'GK' ? 'selected' : ''}>GK</option>
-                    <option value="SUB" ${selVal === 'SUB' ? 'selected' : ''}>SUB</option>
-                </select>
-            </div>
-        `;
-    }).join('');
+    renderFormationPitch(systemName, formObj.lineup || []);
 
     openModal('modal-formation');
 }
@@ -1864,6 +2195,12 @@ function initLibrary() {
 
     const elLibrary = document.getElementById('dash-library');
     if (elLibrary) elLibrary.textContent = filteredMenus.length + '個';
+    
+    // Show count in topbar title
+    const topbarTitleEl = document.getElementById('topbar-title');
+    if (topbarTitleEl && topbarTitleEl.textContent.includes('メニュー管理')) {
+        topbarTitleEl.innerHTML = `メニュー管理 <span style="font-size:0.75rem; font-weight:500; background:var(--primary); color:#fff; border-radius:9999px; padding:0.1rem 0.55rem; margin-left:0.4rem; vertical-align:middle;">${state.menuLibrary.length}件</span>`;
+    }
 
     const libraryList = document.getElementById('library-list');
     
@@ -2160,18 +2497,26 @@ function initSettings() {
     function renderList(listId, stateArray, itemLabelFunc = (x)=>x) {
         const list = document.getElementById(listId);
         if(!list) return;
-        list.innerHTML = stateArray.map((item, index) => `
-            <li style="display:flex; justify-content:space-between; align-items:center;">
-                <span>${itemLabelFunc(item)}</span>
-                <button class="btn btn-danger btn-delete-item" data-list="${listId}" data-index="${index}" style="padding:0.2rem 0.5rem;"><i class="fa-solid fa-trash"></i></button>
-            </li>
-        `).join('');
+        list.innerHTML = stateArray.map((item, index) => {
+            const isCustomForm = listId === 'custom-formation-list';
+            const editBtn = isCustomForm ? `<button type="button" class="btn btn-secondary btn-edit-custom-formation" data-index="${index}" style="padding:0.2rem 0.5rem; margin-right:0.3rem;"><i class="fa-solid fa-edit"></i> 編集</button>` : '';
+            return `
+                <li style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>${itemLabelFunc(item)}</span>
+                    <div>
+                        ${editBtn}
+                        <button type="button" class="btn btn-danger btn-delete-item" data-list="${listId}" data-index="${index}" style="padding:0.2rem 0.5rem;"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </li>
+            `;
+        }).join('');
     }
 
     renderList('match-type-list', state.matchTypes);
     renderList('menu-category-list', state.menuCategories);
     renderList('skill-metric-list', state.skillMetrics);
     renderList('position-list', state.positions);
+    renderList('custom-formation-list', state.customFormations, (item) => `${item.name} (${item.coords.length}人制)`);
 
     // Generic delete handler
     document.querySelectorAll('.btn-delete-item').forEach(btn => {
@@ -2198,6 +2543,9 @@ function initSettings() {
                     const posList = Array.isArray(p.position) ? p.position : [p.position];
                     return posList.includes(label);
                 });
+            } else if (listId === 'custom-formation-list') {
+                label = state.customFormations[idx].name;
+                inUse = state.matches.some(m => m.formations && m.formations.some(f => f.system === label));
             }
 
             if (inUse) {
@@ -2214,9 +2562,239 @@ function initSettings() {
             if(listId === 'menu-category-list') state.menuCategories.splice(idx, 1);
             if(listId === 'skill-metric-list') state.skillMetrics.splice(idx, 1);
             if(listId === 'position-list') state.positions.splice(idx, 1);
+            if(listId === 'custom-formation-list') state.customFormations.splice(idx, 1);
             saveData();
             initSettings();
         });
+    });
+
+    // Custom Formation visual builder & editor
+    const openCustomFormationModal = (editIndex = null) => {
+        document.getElementById('form-custom-formation').reset();
+        
+        const titleEl = document.querySelector('#modal-custom-formation h2');
+        if (titleEl) {
+            titleEl.innerHTML = editIndex !== null 
+                ? `<i class="fa-solid fa-street-view"></i> カスタムフォーメーション編集`
+                : `<i class="fa-solid fa-street-view"></i> カスタムフォーメーション作成`;
+        }
+
+        const pitchCanvas = document.getElementById('custom-formation-pitch-canvas');
+        pitchCanvas.querySelectorAll('.pitch-node').forEach(n => n.remove());
+        
+        const editorList = document.getElementById('custom-formation-nodes-editor-list');
+        editorList.innerHTML = `<p class="text-secondary" style="font-size:0.85rem; font-style:italic;">ピッチをクリックしてポジションを追加してください。</p>`;
+        
+        const selectCount = document.getElementById('custom-formation-player-count');
+        const maxCountLabel = document.getElementById('custom-formation-max-count');
+        
+        let placedNodes = [];
+        
+        const drawAndBindNode = (node) => {
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'pitch-node';
+            nodeEl.id = `custom-pitch-node-${node.index}`;
+            nodeEl.style.top = node.top;
+            nodeEl.style.left = node.left;
+            nodeEl.style.cursor = 'grab';
+            nodeEl.innerHTML = `
+                <span class="pitch-node-role" id="custom-pitch-node-label-span-${node.index}">${node.label}</span>
+                <span class="pitch-node-number" id="custom-pitch-node-role-span-${node.index}" style="font-size:0.6rem;">${node.role}</span>
+            `;
+            pitchCanvas.appendChild(nodeEl);
+            
+            if (placedNodes.length === 1) {
+                editorList.innerHTML = '';
+            }
+            
+            const row = document.createElement('div');
+            row.className = 'custom-formation-node-row';
+            row.id = `custom-node-editor-row-${node.index}`;
+            row.innerHTML = `
+                <strong style="font-size:0.8rem; min-width:20px;">#${node.index + 1}</strong>
+                <input type="text" class="form-control custom-node-label-input" value="${node.label}" placeholder="表示名 (例: LCB)" style="font-size:0.8rem; padding:0.2rem; height:auto; flex:1;" required>
+                <select class="form-control custom-node-role-select" style="font-size:0.8rem; padding:0.2rem; height:auto; width:70px;">
+                    <option value="GK" ${node.role === 'GK' ? 'selected' : ''}>GK</option>
+                    <option value="DF" ${node.role === 'DF' ? 'selected' : ''}>DF</option>
+                    <option value="MF" ${node.role === 'MF' ? 'selected' : ''}>MF</option>
+                    <option value="FW" ${node.role === 'FW' ? 'selected' : ''}>FW</option>
+                </select>
+            `;
+            
+            const labelInput = row.querySelector('.custom-node-label-input');
+            const roleSelect = row.querySelector('.custom-node-role-select');
+            
+            labelInput.oninput = (ev) => {
+                node.label = ev.target.value;
+                const span = document.getElementById(`custom-pitch-node-label-span-${node.index}`);
+                if (span) span.textContent = ev.target.value || '?';
+            };
+            
+            roleSelect.onchange = (ev) => {
+                node.role = ev.target.value;
+                const span = document.getElementById(`custom-pitch-node-role-span-${node.index}`);
+                if (span) span.textContent = ev.target.value;
+            };
+            
+            editorList.appendChild(row);
+            
+            let isDragging = false;
+            
+            const handleStart = (e) => {
+                isDragging = true;
+                nodeEl.style.cursor = 'grabbing';
+                e.stopPropagation();
+                e.preventDefault();
+            };
+            
+            const handleMove = (e) => {
+                if (!isDragging) return;
+                const rect = pitchCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                
+                let leftPercent = Math.round((x / rect.width) * 100);
+                let topPercent = Math.round((y / rect.height) * 100);
+                leftPercent = Math.max(0, Math.min(100, leftPercent));
+                topPercent = Math.max(0, Math.min(100, topPercent));
+                
+                nodeEl.style.left = `${leftPercent}%`;
+                nodeEl.style.top = `${topPercent}%`;
+                node.left = `${leftPercent}%`;
+                node.top = `${topPercent}%`;
+            };
+            
+            const handleEnd = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    nodeEl.style.cursor = 'grab';
+                }
+            };
+            
+            nodeEl.addEventListener('mousedown', handleStart);
+            window.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
+            
+            nodeEl.addEventListener('touchstart', handleStart, { passive: false });
+            window.addEventListener('touchmove', handleMove, { passive: false });
+            window.addEventListener('touchend', handleEnd);
+        };
+
+        if (editIndex !== null) {
+            const formObj = state.customFormations[editIndex];
+            document.getElementById('custom-formation-name').value = formObj.name;
+            selectCount.value = formObj.coords.length;
+            maxCountLabel.textContent = formObj.coords.length;
+            
+            formObj.coords.forEach((coord, i) => {
+                const node = {
+                    index: i,
+                    top: coord.top,
+                    left: coord.left,
+                    label: coord.label,
+                    role: coord.role
+                };
+                placedNodes.push(node);
+                drawAndBindNode(node);
+            });
+        } else {
+            maxCountLabel.textContent = selectCount.value;
+        }
+
+        const clearBoard = () => {
+            placedNodes = [];
+            pitchCanvas.querySelectorAll('.pitch-node').forEach(n => n.remove());
+            editorList.innerHTML = `<p class="text-secondary" style="font-size:0.85rem; font-style:italic;">ピッチをクリックしてポジションを追加してください。</p>`;
+        };
+
+        selectCount.onchange = () => {
+            maxCountLabel.textContent = selectCount.value;
+            clearBoard();
+        };
+        
+        document.getElementById('btn-custom-formation-clear-all').onclick = clearBoard;
+        
+        pitchCanvas.onclick = (e) => {
+            const maxCount = parseInt(selectCount.value, 10);
+            if (placedNodes.length >= maxCount) {
+                alert(`ポジションは最大 ${maxCount} 箇所まで設定可能です。`);
+                return;
+            }
+            
+            const rect = pitchCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const leftPercent = Math.round((x / rect.width) * 100);
+            const topPercent = Math.round((y / rect.height) * 100);
+            
+            const nodeIndex = placedNodes.length;
+            const defaultLabel = nodeIndex === 0 ? 'GK' : `P${nodeIndex}`;
+            const defaultRole = nodeIndex === 0 ? 'GK' : 'DF';
+            
+            const newNode = {
+                index: nodeIndex,
+                top: `${topPercent}%`,
+                left: `${leftPercent}%`,
+                label: defaultLabel,
+                role: defaultRole
+            };
+            
+            placedNodes.push(newNode);
+            drawAndBindNode(newNode);
+        };
+        
+        const formCustomForm = document.getElementById('form-custom-formation');
+        formCustomForm.onsubmit = (e) => {
+            e.preventDefault();
+            const name = document.getElementById('custom-formation-name').value.trim();
+            const maxCount = parseInt(selectCount.value, 10);
+            
+            if (placedNodes.length !== maxCount) {
+                alert(`指定された人数（${maxCount}人）分のポジションを設定してください。（現在: ${placedNodes.length}箇所）`);
+                return;
+            }
+            
+            const finalCoords = placedNodes.map(node => {
+                const rowEl = document.getElementById(`custom-node-editor-row-${node.index}`);
+                const label = rowEl.querySelector('.custom-node-label-input').value.trim() || node.label;
+                const role = rowEl.querySelector('.custom-node-role-select').value;
+                return {
+                    role,
+                    label,
+                    top: node.top,
+                    left: node.left
+                };
+            });
+            
+            if (editIndex !== null) {
+                state.customFormations[editIndex] = { name, coords: finalCoords };
+                showToast(`フォーメーション「${name}」を更新しました`);
+            } else {
+                state.customFormations.push({ name, coords: finalCoords });
+                showToast(`フォーメーション「${name}」を登録しました`);
+            }
+            
+            saveData();
+            document.getElementById('modal-custom-formation').classList.add('hidden');
+            initSettings();
+        };
+        
+        openModal('modal-custom-formation');
+    };
+
+    const btnAddCustomForm = document.getElementById('btn-add-custom-formation');
+    if (btnAddCustomForm) {
+        btnAddCustomForm.onclick = () => openCustomFormationModal();
+    }
+
+    document.querySelectorAll('.btn-edit-custom-formation').forEach(btn => {
+        btn.onclick = (e) => {
+            const index = parseInt(e.currentTarget.dataset.index, 10);
+            openCustomFormationModal(index);
+        };
     });
 
     // Generic add handler
@@ -2435,7 +3013,7 @@ function openPlayerDetail(id) {
         if(m.playerFeedback) {
             m.playerFeedback.forEach(fb => {
                 if(fb.playerId === p.id) {
-                    timeline.push({ type: 'match', date: m.date, matchDetails: `${m.type} vs ${m.opponent}`, comment: fb.comment, matchId: m.id });
+                    timeline.push({ type: 'match', date: m.date, matchDetails: `${m.type}${m.tournament ? ` (${m.tournament})` : ''} vs ${m.opponent}`, comment: fb.comment, matchId: m.id });
                 }
             });
         }
@@ -2560,6 +3138,119 @@ function openPlayerDetail(id) {
             initPlayers();
         }
     };
+
+    // --- Proposal 4: Player Goals (IDP) and 1on1 Timeline ---
+    // IDP Goals Population
+    document.getElementById('goals-player-id').value = p.id;
+    document.getElementById('player-goal-short').value = (p.goals && p.goals.shortTerm) ? p.goals.shortTerm : '';
+    document.getElementById('player-goal-long').value = (p.goals && p.goals.longTerm) ? p.goals.longTerm : '';
+
+    // 1on1 Notes Population
+    document.getElementById('1on1-player-id').value = p.id;
+    document.getElementById('player-1on1-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('player-1on1-note').value = '';
+    render1on1List(p);
+
+    // Setup tab switching
+    const tabs = document.querySelectorAll('#modal-player-detail .player-detail-tab');
+    const panes = document.querySelectorAll('#modal-player-detail .player-detail-tab-pane');
+    
+    // Reset to first tab
+    tabs.forEach(tab => {
+        if (tab.dataset.tab === 'pd-tab-history') tab.classList.add('active');
+        else tab.classList.remove('active');
+    });
+    panes.forEach(pane => {
+        if (pane.id === 'pd-tab-history') pane.classList.add('active');
+        else pane.classList.remove('active');
+    });
+
+    tabs.forEach(tab => {
+        tab.onclick = () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            panes.forEach(pane => pane.classList.remove('active'));
+            
+            tab.classList.add('active');
+            const targetPane = document.getElementById(tab.dataset.tab);
+            if (targetPane) targetPane.classList.add('active');
+        };
+    });
+
+    // Form Submissions
+    const formGoals = document.getElementById('form-player-goals');
+    if (formGoals) {
+        formGoals.onsubmit = (e) => {
+            e.preventDefault();
+            const plId = parseInt(document.getElementById('goals-player-id').value, 10);
+            const player = state.players.find(pl => pl.id === plId);
+            if (player) {
+                player.goals = {
+                    shortTerm: document.getElementById('player-goal-short').value.trim(),
+                    longTerm: document.getElementById('player-goal-long').value.trim()
+                };
+                saveData();
+                showToast('個人目標を保存しました');
+            }
+        };
+    }
+
+    const form1on1 = document.getElementById('form-player-1on1');
+    if (form1on1) {
+        form1on1.onsubmit = (e) => {
+            e.preventDefault();
+            const plId = parseInt(document.getElementById('1on1-player-id').value, 10);
+            const player = state.players.find(pl => pl.id === plId);
+            if (player) {
+                if (!player.notes1on1) player.notes1on1 = [];
+                player.notes1on1.push({
+                    id: Date.now(),
+                    date: document.getElementById('player-1on1-date').value,
+                    content: document.getElementById('player-1on1-note').value.trim()
+                });
+                saveData();
+                showToast('面談記録を追加しました');
+                document.getElementById('player-1on1-note').value = '';
+                render1on1List(player);
+            }
+        };
+    }
+}
+
+function render1on1List(p) {
+    const listEl = document.getElementById('pd-1on1-list');
+    if (!listEl) return;
+    
+    if (p.notes1on1 && p.notes1on1.length > 0) {
+        const sorted = [...p.notes1on1].sort((a, b) => new Date(b.date) - new Date(a.date));
+        listEl.innerHTML = sorted.map(note => `
+            <div class="feedback-box" style="position:relative; padding:0.6rem 0.8rem; background:rgba(0,0,0,0.01); border:1px solid var(--surface-border); border-radius:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                    <strong style="font-size:0.8rem; color:var(--text-secondary);"><i class="fa-regular fa-calendar"></i> ${note.date}</strong>
+                    <button class="btn btn-danger btn-delete-1on1" data-player-id="${p.id}" data-note-id="${note.id}" style="padding:0.15rem 0.35rem; font-size:0.65rem; height:20px; min-width:auto; display:inline-flex; align-items:center; justify-content:center;"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <p style="font-size:0.85rem; color:var(--text-primary); white-space:pre-wrap; margin:0; line-height:1.4;">${note.content}</p>
+            </div>
+        `).join('');
+        
+        listEl.querySelectorAll('.btn-delete-1on1').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('この面談記録を削除しますか？')) {
+                    const plId = parseInt(e.currentTarget.dataset.playerId, 10);
+                    const noteId = parseInt(e.currentTarget.dataset.noteId, 10);
+                    const player = state.players.find(pl => pl.id === plId);
+                    if (player && player.notes1on1) {
+                        player.notes1on1 = player.notes1on1.filter(n => n.id !== noteId);
+                        saveData();
+                        showToast('面談記録を削除しました');
+                        render1on1List(player);
+                    }
+                }
+            };
+        });
+    } else {
+        listEl.innerHTML = '<p class="text-secondary" style="font-size:0.85rem; font-style:italic; text-align:center; padding:1rem 0; margin:0;">面談記録はありません。</p>';
+    }
 }
 
 function drawRadarChart(canvasId, skills, prevSkills = null) {

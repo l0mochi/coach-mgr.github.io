@@ -44,40 +44,53 @@
 
     <!-- Templates -->
     <template id="tpl-dashboard">
-        <div class="dashboard-grid" style="margin-bottom: 2rem;">
+        <!-- Top Row: stats & record side-by-side -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
             <!-- Stats card 1: W-L-D Record -->
-            <div class="card stat-card" style="cursor: pointer;" id="dash-card-matches">
-                <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
-                <div class="stat-info">
-                    <h3>通算成績 (勝率)</h3>
-                    <p id="dash-db-record">0勝 0敗 0分</p>
-                    <div class="progress-bar-container" title="勝率">
-                        <div class="progress-bar-fill" id="dash-db-record-bar"></div>
+            <div class="card stat-card" style="cursor: pointer; height: auto; min-height: 100px; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; padding: 0.8rem 1.2rem;" id="dash-card-matches">
+                <div style="display: flex; align-items: center; width: 100%;">
+                    <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
+                    <div class="stat-info">
+                        <h3>通算成績 (全体)</h3>
+                        <p id="dash-db-record">0勝 0敗 0分</p>
+                        <div class="progress-bar-container" title="勝率">
+                            <div class="progress-bar-fill" id="dash-db-record-bar"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Stats card 2: Practice count -->
-            <div class="card stat-card" style="cursor: pointer;" id="dash-card-practices">
-                <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                <div class="stat-info">
-                    <h3>練習日数</h3>
-                    <p id="dash-db-practices">0回</p>
+                <div id="dash-db-match-types" style="margin-top: 0.6rem; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 0.5rem; font-size: 0.75rem; display: flex; flex-direction: column; gap: 0.25rem; color: var(--text-secondary);">
+                    <!-- Dynamically populated match type stats -->
                 </div>
             </div>
-            <!-- Stats card 3: Players count -->
-            <div class="card stat-card" style="cursor: pointer;" id="dash-card-players">
-                <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-                <div class="stat-info">
-                    <h3>登録選手数</h3>
-                    <p id="dash-db-players">0名</p>
+
+            <!-- Section: Top Scorers / Star Players (Stats) -->
+            <div class="card" style="height: 100%; display: flex; flex-direction: column; justify-content: flex-start; padding: 0.8rem 1.2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.8rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.3rem; width: 100%;">
+                    <h3 style="font-size:0.85rem; color:var(--text-secondary); font-weight:600; margin:0;"><i class="fa-solid fa-star" style="color:var(--primary);"></i> チームリーダー (スタッツ)</h3>
+                    <button class="btn btn-secondary" id="dash-btn-go-players" style="padding:0.15rem 0.4rem; font-size:0.7rem;"><i class="fa-solid fa-chevron-right"></i> 選手一覧</button>
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; flex:1;">
+                    <div class="detail-box">
+                        <h4 style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.3rem; margin-top:0;"><i class="fa-solid fa-fire" style="color:#ef4444;"></i> 得点王 (Top 3)</h4>
+                        <ol id="dash-top-scorers" style="padding-left:1.2rem; font-size:0.8rem; line-height:1.4; margin:0;">
+                            <!-- Injected -->
+                        </ol>
+                    </div>
+                    <div class="detail-box">
+                        <h4 style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.3rem; margin-top:0;"><span style="display:inline-block; transform:rotate(45deg); color:#22c55e;"><i class="fa-solid fa-shoe-prints"></i></span> アシスト王 (Top 3)</h4>
+                        <ol id="dash-top-assists" style="padding-left:1.2rem; font-size:0.8rem; line-height:1.4; margin:0;">
+                            <!-- Injected -->
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="dashboard-layout-row" style="display:grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
-            <!-- Left Panel: Practice & Matches -->
+        <!-- Bottom Row: Schedules & Match Results -->
+        <div class="dashboard-layout-row" style="display:grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <!-- Left Column: Practice & Match Schedules -->
             <div style="display:flex; flex-direction:column; gap:1.5rem;">
-                
                 <!-- Section: Next Practice -->
                 <div class="card" id="dash-next-practice-card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">
@@ -89,83 +102,38 @@
                     </div>
                 </div>
 
-                <!-- Section: Recent Matches -->
+                <!-- Section: Upcoming Matches -->
+                <div class="card" id="dash-upcoming-matches-card" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">
+                        <h3 style="font-size:1.1rem; color:var(--primary); font-weight:600;"><i class="fa-solid fa-calendar-days"></i> 今後の試合予定</h3>
+                    </div>
+                    <div id="dash-upcoming-matches-content" style="display:flex; flex-direction:column; gap:0.8rem;">
+                        <!-- Injected -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Recent Match Results -->
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
                 <div class="card">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">
                         <h3 style="font-size:1.1rem; color:var(--primary); font-weight:600;"><i class="fa-solid fa-trophy"></i> 直近の試合結果 (最新3試合)</h3>
                         <button class="btn btn-secondary" id="dash-btn-go-matches" style="padding:0.2rem 0.5rem; font-size:0.75rem;"><i class="fa-solid fa-chevron-right"></i> 試合一覧</button>
                     </div>
+                    <!-- Form Guide Container -->
+                    <div id="dash-form-guide-container" style="display:none; align-items:center; gap:0.5rem; margin-bottom:1rem; background:rgba(0,0,0,0.02); padding:0.5rem 0.8rem; border-radius:8px; border:1px solid var(--surface-border);">
+                        <span style="font-size:0.8rem; font-weight:bold; color:var(--text-secondary);">直近5試合 of 調子:</span>
+                        <div id="dash-db-form-guide" style="display:flex; gap:0.35rem; align-items:center;"></div>
+                    </div>
                     <div id="dash-matches-content" style="display:flex; flex-direction:column; gap:0.8rem;">
                         <!-- Injected -->
                     </div>
                 </div>
-
-            </div>
-
-            <!-- Right Panel: Players and Leaders -->
-            <div style="display:flex; flex-direction:column; gap:1.5rem;">
-                
-                <!-- Section: Top Scorers / Star Players -->
-                <div class="card" style="height:100%;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">
-                        <h3 style="font-size:1.1rem; color:var(--primary); font-weight:600;"><i class="fa-solid fa-star"></i> チームリーダー (スタッツ)</h3>
-                        <button class="btn btn-secondary" id="dash-btn-go-players" style="padding:0.2rem 0.5rem; font-size:0.75rem;"><i class="fa-solid fa-chevron-right"></i> 選手一覧</button>
-                    </div>
-                    
-                    <div style="display:grid; grid-template-columns:1fr; gap:1rem;">
-                        <div class="detail-box">
-                            <h4 style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;"><i class="fa-solid fa-fire" style="color:#ef4444;"></i> 得点王 (Top 3)</h4>
-                            <ol id="dash-top-scorers" style="padding-left:1.2rem; font-size:0.9rem; line-height:1.6;">
-                                <!-- Injected -->
-                            </ol>
-                        </div>
-                        <div class="detail-box">
-                            <h4 style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem;"><span style="display:inline-block; transform:rotate(45deg); color:#22c55e;"><i class="fa-solid fa-shoe-prints"></i></span> アシスト王 (Top 3)</h4>
-                            <ol id="dash-top-assists" style="padding-left:1.2rem; font-size:0.9rem; line-height:1.6;">
-                                <!-- Injected -->
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </div>
     </template>
 
     <template id="tpl-matches">
-        <div class="dashboard-grid" style="margin-bottom:2rem;">
-            <div class="card stat-card">
-                <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
-                <div class="stat-info">
-                    <h3>通算成績</h3>
-                    <p id="dash-record">0勝 0敗 0分</p>
-                    <div class="progress-bar-container" title="勝率">
-                        <div class="progress-bar-fill" id="dash-record-bar"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="card stat-grid-card">
-                <div style="display:flex; align-items:center; gap:0.6rem; width:100%; justify-content:flex-start;">
-                    <div class="stat-icon"><i class="fa-solid fa-futbol"></i></div>
-                    <div class="stat-info" style="margin-left:0.5rem;">
-                        <h3 style="font-size:0.8rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">総得点</h3>
-                        <p id="dash-goals">0</p>
-                    </div>
-                </div>
-                <div class="top-scorers-column">
-                    <div class="top-scorers-title"><i class="fa-solid fa-fire" style="color:#ef4444;"></i> 得点王 (Top 3)</div>
-                    <ol id="top-scorers-list" class="top-scorers-ol">
-                        <!-- Injected -->
-                    </ol>
-                </div>
-                <div class="top-scorers-column">
-                    <div class="top-scorers-title"><span style="display:inline-block; transform:rotate(45deg); color:#22c55e;"><i class="fa-solid fa-shoe-prints"></i></span> アシスト王 (Top 3)</div>
-                    <ol id="top-assists-list" class="top-scorers-ol">
-                        <!-- Injected -->
-                    </ol>
-                </div>
-            </div>
-        </div>
         <div class="header-actions">
             <div class="filter-box">
                 <i class="fa-solid fa-filter" style="color:var(--text-secondary);"></i>
@@ -175,21 +143,12 @@
             </div>
             <button class="btn btn-primary" id="btn-add-match"><i class="fa-solid fa-plus"></i> 試合を追加</button>
         </div>
-        <div id="match-list" style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div id="match-list" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:1.5rem;">
             <!-- Grouped by month cards injected here -->
         </div>
     </template>
 
     <template id="tpl-practices">
-        <div class="dashboard-grid" style="margin-bottom:2rem;">
-            <div class="card stat-card">
-                <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
-                <div class="stat-info">
-                    <h3>練習日数</h3>
-                    <p id="dash-practices">0</p>
-                </div>
-            </div>
-        </div>
         <div class="header-actions">
             <div class="filter-box">
                 <i class="fa-solid fa-filter" style="color:var(--text-secondary);"></i>
@@ -202,7 +161,7 @@
             </div>
             <button class="btn btn-primary" id="btn-add-practice"><i class="fa-solid fa-plus"></i> 練習日を追加</button>
         </div>
-        <div id="practice-list" style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div id="practice-list" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:1.5rem;">
             <!-- Grouped by date cards injected here -->
         </div>
     </template>
@@ -226,15 +185,6 @@
     </template>
 
     <template id="tpl-library">
-        <div class="dashboard-grid" style="margin-bottom:2rem;">
-            <div class="card stat-card">
-                <div class="stat-icon"><i class="fa-solid fa-book"></i></div>
-                <div class="stat-info">
-                    <h3>登録メニュー数</h3>
-                    <p id="dash-library">0個</p>
-                </div>
-            </div>
-        </div>
         <div class="header-actions">
             <div class="filter-box">
                 <i class="fa-solid fa-filter" style="color:var(--text-secondary);"></i>
@@ -244,97 +194,125 @@
             </div>
             <button class="btn btn-primary" id="btn-add-library-menu"><i class="fa-solid fa-plus"></i> 新規ライブラリ作成</button>
         </div>
-        <div id="library-list" style="display:flex; flex-direction:column; gap:1.5rem;">
+        <div id="library-list" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:1.5rem;">
             <!-- Library items grouped by category injected here -->
         </div>
     </template>
 
     <template id="tpl-settings">
-        <div style="max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem;">
-            
-            <div class="card">
-                <h3 style="margin-bottom: 1rem; color: var(--primary);"><i class="fa-solid fa-building-flag"></i> チーム基本情報</h3>
-                <form id="form-team-info">
-                    <div class="form-group">
-                        <label>チーム名</label>
-                        <input type="text" id="team-info-name" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>テーマカラー</label>
-                        <div style="display:flex; gap:1rem;">
-                            <input type="color" id="team-info-color" class="form-control" style="width:100px; padding:0; height:42px;" required>
-                            <button type="submit" class="btn btn-primary">保存</button>
+        <div class="sl-settings">
+
+            <!-- Section: Team Info -->
+            <div class="sl-section">
+                <div class="sl-section-label"><i class="fa-solid fa-building-flag"></i> チーム基本情報</div>
+                <div class="sl-section-body">
+                    <form id="form-team-info">
+                        <div class="sl-row">
+                            <span class="sl-row-label">チーム名</span>
+                            <input type="text" id="team-info-name" class="sl-input" required>
                         </div>
-                    </div>
-                </form>
-            </div>
-
-
-            <div class="card">
-                <h3 style="margin-bottom: 1rem; color: var(--primary);"><i class="fa-solid fa-list"></i> 試合種別マスタ管理</h3>
-                <form id="form-add-match-type" style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
-                    <input type="text" id="new-match-type" class="form-control" placeholder="新しい試合種別を入力" required>
-                    <button type="submit" class="btn btn-primary">追加</button>
-                </form>
-                <ul id="match-type-list" class="item-list"></ul>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-bottom: 1rem; color: var(--primary);"><i class="fa-solid fa-tags"></i> 練習カテゴリマスタ管理</h3>
-                <form id="form-add-menu-category" style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
-                    <input type="text" id="new-menu-category" class="form-control" placeholder="新しいカテゴリを入力" required>
-                    <button type="submit" class="btn btn-primary">追加</button>
-                </form>
-                <ul id="menu-category-list" class="item-list"></ul>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-bottom: 1rem; color: var(--primary);"><i class="fa-solid fa-chart-pie"></i> 選手評価項目(スキル)マスタ管理</h3>
-                <p class="text-secondary" style="font-size:0.8rem; margin-bottom:1rem;">※3項目以上に設定してください。レーダーチャートの軸になります。</p>
-                <form id="form-add-skill-metric" style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
-                    <input type="text" id="new-skill-metric" class="form-control" placeholder="新しい評価項目を入力" required>
-                    <button type="submit" class="btn btn-primary">追加</button>
-                </form>
-                <ul id="skill-metric-list" class="item-list"></ul>
-            </div>
-
-            <div class="card">
-                <h3 style="margin-bottom: 1rem; color: var(--primary);"><i class="fa-solid fa-street-view"></i> ポジションマスタ管理</h3>
-                <form id="form-add-position" style="display:flex; gap:0.5rem; margin-bottom: 1rem;">
-                    <input type="text" id="new-position" class="form-control" placeholder="新しいポジションを入力" required>
-                    <button type="submit" class="btn btn-primary">追加</button>
-                </form>
-                <ul id="position-list" class="item-list"></ul>
-            </div>
-
-            <div class="card" id="data-management-card">
-                <h3 style="margin-bottom: 0.5rem; color: var(--primary);"><i class="fa-solid fa-database"></i> データ管理</h3>
-                <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1.2rem;">全データをJSONファイルとしてエクスポート・インポートできます。デバイス間のデータ移行やバックアップに使用してください。</p>
-
-                <div style="display:flex; flex-direction:column; gap:1rem;">
-                    <!-- Export -->
-                    <div style="background:rgba(0,0,0,0.03); border:1px solid var(--surface-border); border-radius:8px; padding:1rem;">
-                        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
-                            <i class="fa-solid fa-file-export" style="color:var(--primary);"></i>
-                            <strong style="font-size:0.95rem;">エクスポート（バックアップ）</strong>
+                        <div class="sl-row sl-row-last">
+                            <span class="sl-row-label">テーマカラー</span>
+                            <div style="display:flex; align-items:center; gap:0.75rem; margin-left:auto;">
+                                <input type="color" id="team-info-color" style="width:52px; height:32px; border:none; border-radius:6px; cursor:pointer; background:none; padding:0;">
+                                <button type="submit" class="btn btn-primary btn-sm">保存</button>
+                            </div>
                         </div>
-                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.8rem;">現在のすべてのデータをJSONファイルとしてダウンロードします。</p>
-                        <button class="btn btn-primary" id="btn-export-data" style="width:100%; box-sizing:border-box;">
-                            <i class="fa-solid fa-download"></i> データをエクスポート
-                        </button>
-                    </div>
+                    </form>
+                </div>
+            </div>
 
-                    <!-- Import -->
-                    <div style="background:rgba(0,0,0,0.03); border:1px solid var(--surface-border); border-radius:8px; padding:1rem;">
-                        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
-                            <i class="fa-solid fa-file-import" style="color:#f59e0b;"></i>
-                            <strong style="font-size:0.95rem;">インポート（復元）</strong>
+            <!-- Section: 試合種別 -->
+            <div class="sl-section">
+                <div class="sl-section-label"><i class="fa-solid fa-list"></i> 試合種別</div>
+                <div class="sl-section-body">
+                    <div class="sl-row sl-add-row">
+                        <form id="form-add-match-type" style="display:flex; gap:0.5rem; flex:1; align-items:center;">
+                            <input type="text" id="new-match-type" class="sl-input" placeholder="新しい試合種別を入力" required>
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 追加</button>
+                        </form>
+                    </div>
+                    <ul id="match-type-list" class="sl-list"></ul>
+                </div>
+            </div>
+
+            <!-- Section: 練習カテゴリ -->
+            <div class="sl-section">
+                <div class="sl-section-label"><i class="fa-solid fa-tags"></i> 練習カテゴリ</div>
+                <div class="sl-section-body">
+                    <div class="sl-row sl-add-row">
+                        <form id="form-add-menu-category" style="display:flex; gap:0.5rem; flex:1; align-items:center;">
+                            <input type="text" id="new-menu-category" class="sl-input" placeholder="新しいカテゴリを入力" required>
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 追加</button>
+                        </form>
+                    </div>
+                    <ul id="menu-category-list" class="sl-list"></ul>
+                </div>
+            </div>
+
+            <!-- Section: スキル評価項目 -->
+            <div class="sl-section">
+                <div class="sl-section-label"><i class="fa-solid fa-chart-pie"></i> スキル評価項目 <span style="font-weight:400; font-style:italic;">（3項目以上でレーダーチャートが有効）</span></div>
+                <div class="sl-section-body">
+                    <div class="sl-row sl-add-row">
+                        <form id="form-add-skill-metric" style="display:flex; gap:0.5rem; flex:1; align-items:center;">
+                            <input type="text" id="new-skill-metric" class="sl-input" placeholder="新しい評価項目を入力" required>
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 追加</button>
+                        </form>
+                    </div>
+                    <ul id="skill-metric-list" class="sl-list"></ul>
+                </div>
+            </div>
+
+            <!-- Section: ポジション -->
+            <div class="sl-section">
+                <div class="sl-section-label"><i class="fa-solid fa-street-view"></i> ポジション</div>
+                <div class="sl-section-body">
+                    <div class="sl-row sl-add-row">
+                        <form id="form-add-position" style="display:flex; gap:0.5rem; flex:1; align-items:center;">
+                            <input type="text" id="new-position" class="sl-input" placeholder="新しいポジションを入力" required>
+                            <button type="submit" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> 追加</button>
+                        </form>
+                    </div>
+                    <ul id="position-list" class="sl-list"></ul>
+                </div>
+            </div>
+
+            <!-- Section: フォーメーション -->
+            <div class="sl-section">
+                <div class="sl-section-label" style="display:flex; justify-content:space-between; align-items:center;">
+                    <span><i class="fa-solid fa-chess-board"></i> フォーメーション</span>
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-add-custom-formation"><i class="fa-solid fa-plus"></i> 新規作成</button>
+                </div>
+                <div class="sl-section-body">
+                    <ul id="custom-formation-list" class="sl-list"></ul>
+                </div>
+            </div>
+
+            <!-- Section: データ管理 -->
+            <div class="sl-section" id="data-management-card">
+                <div class="sl-section-label"><i class="fa-solid fa-database"></i> データ管理</div>
+                <div class="sl-section-body">
+                    <div class="sl-row" style="gap:1rem; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:220px;">
+                            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-file-export" style="color:var(--primary); font-size:0.85rem;"></i>
+                                <strong style="font-size:0.85rem;">エクスポート（バックアップ）</strong>
+                            </div>
+                            <p class="text-secondary" style="font-size:0.75rem; margin-bottom:0.6rem;">現在のすべてのデータをJSONとしてダウンロードします。</p>
+                            <button class="btn btn-primary btn-sm" id="btn-export-data" style="width:100%;"><i class="fa-solid fa-download"></i> エクスポート</button>
                         </div>
-                        <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.8rem;">⚠️ 現在のデータはすべて上書きされます。エクスポートしたJSONファイルを選択してください。</p>
-                        <label class="btn btn-secondary" style="width:100%; cursor:pointer; justify-content:center; display:flex; align-items:center; gap:0.5rem; box-sizing:border-box;">
-                            <i class="fa-solid fa-upload"></i> JSONファイルを選択してインポート
-                            <input type="file" id="input-import-data" accept=".json" style="display:none;">
-                        </label>
+                        <div style="flex:1; min-width:220px;">
+                            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                                <i class="fa-solid fa-file-import" style="color:#f59e0b; font-size:0.85rem;"></i>
+                                <strong style="font-size:0.85rem;">インポート（復元）</strong>
+                            </div>
+                            <p class="text-secondary" style="font-size:0.75rem; margin-bottom:0.6rem;">⚠️ 現在のデータはすべて上書きされます。</p>
+                            <label class="btn btn-secondary btn-sm" style="width:100%; cursor:pointer; justify-content:center; display:flex; align-items:center; gap:0.5rem;">
+                                <i class="fa-solid fa-upload"></i> インポート
+                                <input type="file" id="input-import-data" accept=".json" style="display:none;">
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -513,15 +491,19 @@
                         <!-- Populated dynamically -->
                     </select>
                 </div>
-                <div class="form-group" style="display:flex; gap:1rem; align-items:center;">
+                <div class="form-group">
+                    <label>大会名・リーグ名等</label>
+                    <input type="text" id="match-tournament" class="form-control" placeholder="例: 大会名、リーグ名など（任意）">
+                </div>
+                 <div class="form-group" style="display:flex; gap:1rem; align-items:center;">
                     <div style="flex:1;">
-                        <label>自チーム得点</label>
-                        <input type="number" id="match-score-us" class="form-control" min="0" required>
+                        <label>自チーム得点 (予定時は空欄)</label>
+                        <input type="number" id="match-score-us" class="form-control" min="0">
                     </div>
                     <span>-</span>
                     <div style="flex:1;">
-                        <label>相手チーム得点</label>
-                        <input type="number" id="match-score-them" class="form-control" min="0" required>
+                        <label>相手チーム得点 (予定時は空欄)</label>
+                        <input type="number" id="match-score-them" class="form-control" min="0">
                     </div>
                 </div>
                 <input type="hidden" id="match-scorers" value="">
@@ -622,22 +604,46 @@
                         <input type="text" id="formation-name" class="form-control" required>
                     </div>
                     <div style="flex:1;">
-                        <label>システム (例: 3-3-1)</label>
-                        <input type="text" id="formation-system" class="form-control" placeholder="任意">
+                        <label>システム</label>
+                        <select id="formation-system-select" class="form-control">
+                            <!-- Populated dynamically -->
+                        </select>
                     </div>
                 </div>
                 
-                <div style="margin-bottom:1.5rem;">
-                    <button type="button" class="btn btn-secondary" id="btn-anim-formation" style="width:100%;"><i class="fa-solid fa-person-running"></i> 戦術ボードで配置を作図</button>
-                    <p class="text-secondary" style="font-size:0.8rem; margin-top:0.3rem;">※先に「保存する」ボタンでピリオドを作成してから作図してください。</p>
+                <div style="position:relative; margin-bottom:1.5rem;">
+                    <label style="font-weight:bold; margin-bottom:0.5rem; display:block;"><i class="fa-solid fa-street-view"></i> ポジション配置（円をクリックして選手をアサイン）</label>
+                    <div class="tactical-pitch" id="tactical-formation-pitch">
+                        <div class="penalty-area-top"></div>
+                        <div class="goal-area-top"></div>
+                        <div class="penalty-arc-top"></div>
+                        <div class="penalty-spot-top"></div>
+                        <div class="penalty-area-bottom"></div>
+                        <div class="goal-area-bottom"></div>
+                        <div class="penalty-arc-bottom"></div>
+                        <div class="penalty-spot-bottom"></div>
+                        <div class="center-spot"></div>
+                        <div class="corner-arc-tl"></div>
+                        <div class="corner-arc-tr"></div>
+                        <div class="corner-arc-bl"></div>
+                        <div class="corner-arc-br"></div>
+                        <!-- nodes injected dynamically -->
+                    </div>
+                    
+                    <!-- Floating player picker overlay -->
+                    <div id="formation-player-picker" style="display:none; position:absolute; z-index:100; background:#ffffff; border:1px solid var(--surface-border); border-radius:8px; padding:0.6rem; box-shadow:0 8px 24px rgba(0,0,0,0.25); width:180px;">
+                        <label style="font-size:0.75rem; font-weight:bold; color:var(--text-secondary); display:block; margin-bottom:0.25rem;">選手を割り当て:</label>
+                        <select id="formation-picker-select" class="form-control" style="font-size:0.85rem; padding:0.25rem; height:auto; width:100%; margin-bottom:0.4rem;">
+                            <!-- populated dynamically -->
+                        </select>
+                        <div style="display:flex; justify-content:flex-end; gap:0.25rem;">
+                            <button type="button" class="btn btn-secondary" id="btn-formation-picker-clear" style="padding:0.2rem 0.4rem; font-size:0.7rem;">解除</button>
+                            <button type="button" class="btn btn-primary" id="btn-formation-picker-ok" style="padding:0.2rem 0.4rem; font-size:0.7rem;">決定</button>
+                        </div>
+                    </div>
                 </div>
 
-                <h3 style="margin-top:1.5rem; margin-bottom:1rem; font-size:1.1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.5rem;">テキスト配置設定（任意）</h3>
-                <p class="text-secondary" style="font-size:0.85rem; margin-bottom:1rem;">全選手リストからポジションを選択してください。「-」の選手は表示されません。</p>
-                
-                <div id="formation-player-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
-                    <!-- Player selects injected here -->
-                </div>
+
 
                 <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem;">
                     <button type="button" class="btn btn-secondary btn-close-modal">キャンセル</button>
@@ -807,9 +813,52 @@
                     <button class="btn btn-primary" id="btn-add-assessment" style="width:100%; margin-top:1rem;"><i class="fa-solid fa-plus"></i> 新しい評価を記録</button>
                 </div>
                 <div>
-                    <h3 style="margin-bottom:1rem;"><i class="fa-solid fa-clock-rotate-left"></i> 成長履歴＆フィードバック</h3>
-                    <div id="pd-history-list" style="max-height: 400px; overflow-y: auto; padding-right:1rem;">
-                        <!-- Timeline injected here -->
+                    <!-- Tabs Navigation -->
+                    <div class="player-detail-tabs">
+                        <button class="player-detail-tab active" data-tab="pd-tab-history"><i class="fa-solid fa-clock-rotate-left"></i> 成長履歴</button>
+                        <button class="player-detail-tab" data-tab="pd-tab-goals"><i class="fa-solid fa-bullseye"></i> 個人目標 (IDP)</button>
+                        <button class="player-detail-tab" data-tab="pd-tab-1on1"><i class="fa-solid fa-comments"></i> 1on1面談記録</button>
+                    </div>
+
+                    <!-- Tab Pane 1: History -->
+                    <div id="pd-tab-history" class="player-detail-tab-pane active">
+                        <div id="pd-history-list" style="max-height: 400px; overflow-y: auto; padding-right:1rem;">
+                            <!-- Timeline injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Tab Pane 2: Individual Development Goals (IDP) -->
+                    <div id="pd-tab-goals" class="player-detail-tab-pane">
+                        <form id="form-player-goals" style="display:flex; flex-direction:column; gap:1rem;">
+                            <input type="hidden" id="goals-player-id">
+                            <div class="form-group">
+                                <label style="font-weight:bold; color:var(--text-primary);">短期目標（数ヶ月で達成したい課題・スキル）</label>
+                                <textarea id="player-goal-short" class="form-control" rows="3" placeholder="例: 左足でのパス精度を高める、守備のファーストディフェンダーの決定を早くする"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label style="font-weight:bold; color:var(--text-primary);">長期目標（シーズン終了時や将来達成したいレベル）</label>
+                                <textarea id="player-goal-long" class="form-control" rows="3" placeholder="例: チームの得点王になる、都大会ベスト4進出に貢献する"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="align-self:flex-end;"><i class="fa-solid fa-save"></i> 目標を保存</button>
+                        </form>
+                    </div>
+
+                    <!-- Tab Pane 3: 1on1 Meeting Notes -->
+                    <div id="pd-tab-1on1" class="player-detail-tab-pane">
+                        <!-- Add 1on1 Form -->
+                        <form id="form-player-1on1" style="background:rgba(0,0,0,0.02); border:1px solid var(--surface-border); padding:0.8rem; border-radius:8px; display:flex; flex-direction:column; gap:0.6rem; margin-bottom:1rem;">
+                            <input type="hidden" id="1on1-player-id">
+                            <div style="display:flex; gap:0.5rem; align-items:center;">
+                                <label style="font-size:0.8rem; font-weight:bold; margin:0; white-space:nowrap;">面談日:</label>
+                                <input type="date" id="player-1on1-date" class="form-control" style="font-size:0.8rem; padding:0.25rem 0.5rem; height:auto; width:130px;" required>
+                                <strong style="font-size:0.85rem; color:var(--primary); margin-left:auto;"><i class="fa-solid fa-comment-medical"></i> 面談メモを追加</strong>
+                            </div>
+                            <textarea id="player-1on1-note" class="form-control" rows="2" placeholder="面談で話した内容、本人の振り返り、アドバイス..." style="font-size:0.85rem;" required></textarea>
+                            <button type="submit" class="btn btn-primary" style="font-size:0.8rem; padding:0.3rem 0.6rem; align-self:flex-end;"><i class="fa-solid fa-plus"></i> 面談記録を追加</button>
+                        </form>
+                        <div id="pd-1on1-list" style="max-height: 250px; overflow-y: auto; display:flex; flex-direction:column; gap:0.6rem;">
+                            <!-- 1on1 notes history logs -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -881,6 +930,65 @@
                 <button type="button" class="btn btn-secondary" id="btn-assign-add-practice" style="font-size:0.85rem;"><i class="fa-solid fa-plus"></i> 新しい練習日を追加</button>
                 <button type="button" class="btn btn-secondary btn-close-modal">キャンセル</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Custom Formation Visual Creator Modal -->
+    <div id="modal-custom-formation" class="modal-overlay hidden" style="z-index: 1001;">
+        <div class="modal" style="max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto;">
+            <h2 style="margin-bottom:1.5rem;"><i class="fa-solid fa-street-view"></i> カスタムフォーメーション作成</h2>
+            <form id="form-custom-formation">
+                <div class="form-group" style="display:flex; gap:1rem; margin-bottom:1rem;">
+                    <div style="flex:2;">
+                        <label>フォーメーション名 (例: 3-3-1, 2-4-1)</label>
+                        <input type="text" id="custom-formation-name" class="form-control" placeholder="例: 3-3-1" required>
+                    </div>
+                    <div style="flex:1;">
+                        <label>選手人数</label>
+                        <select id="custom-formation-player-count" class="form-control">
+                            <option value="8">8人制</option>
+                            <option value="11">11人制</option>
+                            <option value="5">5人制（フットサル）</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button type="button" class="btn btn-secondary" id="btn-custom-formation-clear-all" style="height:42px; font-size:0.85rem;"><i class="fa-solid fa-arrow-rotate-left"></i> 配置クリア</button>
+                    </div>
+                </div>
+
+                <div class="custom-formation-editor-layout">
+                    <div>
+                        <label style="font-weight:bold; margin-bottom:0.5rem; display:block;">ピッチをクリックして配置を設定（最大 <span id="custom-formation-max-count">8</span> 箇所）</label>
+                        <div class="tactical-pitch" id="custom-formation-pitch-canvas" style="cursor:crosshair;">
+                            <div class="penalty-area-top"></div>
+                            <div class="goal-area-top"></div>
+                            <div class="penalty-arc-top"></div>
+                            <div class="penalty-spot-top"></div>
+                            <div class="penalty-area-bottom"></div>
+                            <div class="goal-area-bottom"></div>
+                            <div class="penalty-arc-bottom"></div>
+                            <div class="penalty-spot-bottom"></div>
+                            <div class="center-spot"></div>
+                            <div class="corner-arc-tl"></div>
+                            <div class="corner-arc-tr"></div>
+                            <div class="corner-arc-bl"></div>
+                            <div class="corner-arc-br"></div>
+                            <!-- visual nodes placed by user -->
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-weight:bold; margin-bottom:0.5rem; display:block;">各配置の役割設定</label>
+                        <div id="custom-formation-nodes-editor-list" class="custom-formation-nodes-list">
+                            <p class="text-secondary" style="font-size:0.85rem; font-style:italic;">ピッチをクリックしてポジションを追加してください。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:2rem;">
+                    <button type="button" class="btn btn-secondary btn-close-modal">キャンセル</button>
+                    <button type="submit" class="btn btn-primary">マスタに保存する</button>
+                </div>
+            </form>
         </div>
     </div>
 
