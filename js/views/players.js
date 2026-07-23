@@ -386,6 +386,12 @@ export function openPlayerDetail(id) {
         };
     });
 
+    // Add Assessment Button
+    const btnAddAssessment = document.getElementById('btn-add-assessment');
+    if (btnAddAssessment) {
+        btnAddAssessment.onclick = () => openPlayerAssessmentModal(p.id);
+    }
+
     // Edit and Delete Buttons
     const btnEdit = document.getElementById('btn-edit-player-detail');
     if (btnEdit) {
@@ -409,6 +415,34 @@ export function openPlayerDetail(id) {
     }
 
     openModal('modal-player-detail');
+}
+
+export function openPlayerAssessmentModal(playerId) {
+    const p = state.players.find(pl => pl.id === playerId);
+    if (!p) return;
+
+    const modal = document.getElementById('modal-player-assessment');
+    const inpPlayerId = document.getElementById('assessment-player-id');
+    const inpDate = document.getElementById('assessment-date');
+    const container = document.getElementById('assessment-skills-inputs');
+    const inpComment = document.getElementById('assessment-comment');
+
+    if (!modal || !container) return;
+
+    if (inpPlayerId) inpPlayerId.value = p.id;
+    if (inpDate) inpDate.value = new Date().toISOString().split('T')[0];
+    if (inpComment) inpComment.value = '';
+
+    const latestSkills = (p.history && p.history.length > 0) ? p.history[0].skills : [3, 3, 3, 3, 3, 3];
+
+    container.innerHTML = state.skillMetrics.map((metric, idx) => `
+        <div style="background:rgba(0,0,0,0.02); padding:0.4rem 0.6rem; border-radius:6px; border:1px solid var(--surface-border); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.8rem; font-weight:600;">${metric}</span>
+            <input type="number" class="assessment-skill-val form-control" data-idx="${idx}" min="1" max="5" value="${latestSkills[idx] || 3}" style="width:60px; text-align:center; padding:0.2rem;" required>
+        </div>
+    `).join('');
+
+    openModal('modal-player-assessment');
 }
 
 export function openPlayerModal(playerId = null) {
@@ -597,5 +631,77 @@ export function initPlayers() {
     const btnImportCSV = document.getElementById('btn-import-players-csv');
     if (btnImportCSV) {
         btnImportCSV.onclick = () => openPlayerCSVImportModal();
+    }
+
+    // Form Submissions for Assessment, Goals, and 1on1
+    const formAssessment = document.getElementById('form-player-assessment');
+    if (formAssessment) {
+        formAssessment.onsubmit = (e) => {
+            e.preventDefault();
+            const playerId = parseInt(document.getElementById('assessment-player-id').value, 10);
+            const date = document.getElementById('assessment-date').value;
+            const comment = document.getElementById('assessment-comment').value;
+
+            const p = state.players.find(pl => pl.id === playerId);
+            if (!p) return;
+
+            const skills = [];
+            document.querySelectorAll('.assessment-skill-val').forEach(inp => {
+                skills.push(parseInt(inp.value, 10) || 1);
+            });
+
+            if (!p.history) p.history = [];
+            p.history.unshift({
+                id: Date.now(),
+                date,
+                comment,
+                skills
+            });
+
+            saveData();
+            showToast('スキル評価を追加記録しました');
+            document.getElementById('modal-player-assessment').classList.add('hidden');
+            openPlayerDetail(p.id);
+            initPlayers();
+        };
+    }
+
+    const formGoals = document.getElementById('form-player-goals');
+    if (formGoals) {
+        formGoals.onsubmit = (e) => {
+            e.preventDefault();
+            const playerId = parseInt(document.getElementById('goals-player-id').value, 10);
+            const p = state.players.find(pl => pl.id === playerId);
+            if (!p) return;
+
+            p.goals = {
+                shortTerm: document.getElementById('player-goal-short').value,
+                longTerm: document.getElementById('player-goal-long').value
+            };
+            saveData();
+            showToast('個人目標(IDP)を保存しました');
+        };
+    }
+
+    const form1on1 = document.getElementById('form-player-1on1');
+    if (form1on1) {
+        form1on1.onsubmit = (e) => {
+            e.preventDefault();
+            const playerId = parseInt(document.getElementById('1on1-player-id').value, 10);
+            const date = document.getElementById('player-1on1-date').value;
+            const note = document.getElementById('player-1on1-note').value;
+
+            const p = state.players.find(pl => pl.id === playerId);
+            if (!p) return;
+
+            if (!p.notes1on1) p.notes1on1 = [];
+            p.notes1on1.unshift({ id: Date.now(), date, content: note });
+
+            saveData();
+            showToast('1on1面談記録を追加しました');
+            const noteInp = document.getElementById('player-1on1-note');
+            if (noteInp) noteInp.value = '';
+            openPlayerDetail(p.id);
+        };
     }
 }

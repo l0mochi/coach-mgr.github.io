@@ -172,26 +172,41 @@ export function initDashboard() {
             : topAssists.slice(0, 3).map(item => `<div><strong>${item.player.name}</strong> (${item.count}回)</div>`).join('');
     }
 
-    // Recent Matches Content
+    // Recent Matches Content (Past matches only, sorted descending)
     if (elMatchesContent) {
-        const recentMatches = [...state.matches]
-            .filter(m => m.result)
+        const todayStr = new Date().toISOString().split('T')[0];
+        const pastMatches = [...state.matches]
+            .filter(m => m.result && m.date < todayStr)
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 3);
 
-        if (recentMatches.length === 0) {
-            elMatchesContent.innerHTML = '<div style="font-size:0.75rem; color:var(--text-secondary); font-style:italic; grid-column:1/-1; padding:0.5rem;">試合結果の記録がありません</div>';
+        if (pastMatches.length === 0) {
+            elMatchesContent.innerHTML = '<div style="font-size:0.75rem; color:var(--text-secondary); font-style:italic; grid-column:1/-1; padding:0.5rem; text-align:center;">過去の試合結果がありません</div>';
         } else {
-            elMatchesContent.innerHTML = recentMatches.map(m => `
-                <div class="glass dash-match-card-item" data-id="${m.id}" style="padding:0.6rem 0.75rem; border-radius:10px; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between;">
-                    <div style="font-size:0.7rem; color:var(--text-secondary); display:flex; justify-content:space-between;">
-                        <span>${m.date}</span>
-                        <span class="badge" style="font-size:0.65rem; background:rgba(242,57,50,0.1); color:var(--primary);">${m.type}</span>
+            elMatchesContent.innerHTML = pastMatches.map(m => {
+                let outcomeLabel = '';
+                let outcomeClass = '';
+                if (m.result && m.result.includes('-')) {
+                    const parts = m.result.split('-').map(s => parseInt(s.trim(), 10));
+                    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                        if (parts[0] > parts[1]) { outcomeLabel = '勝ち'; outcomeClass = 'win'; }
+                        else if (parts[0] < parts[1]) { outcomeLabel = '負け'; outcomeClass = 'loss'; }
+                        else { outcomeLabel = '引き分け'; outcomeClass = 'draw'; }
+                    }
+                }
+
+                return `
+                    <div class="glass dash-match-card-item" data-id="${m.id}" style="padding:0.75rem 0.8rem; border-radius:10px; cursor:pointer; display:flex; flex-direction:column; justify-content:space-between; align-items:center; text-align:center;">
+                        <div style="font-size:0.75rem; color:var(--text-secondary); width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+                            <span>${m.date}</span>
+                            ${outcomeLabel ? `<span class="schedule-badge ${outcomeClass}">${outcomeLabel}</span>` : ''}
+                        </div>
+                        <div style="font-size:0.75rem; font-weight:bold; color:var(--primary); margin:0.2rem 0 0.1rem 0;">${m.type}</div>
+                        <div style="font-size:1.4rem; font-weight:800; color:var(--text-primary); margin-bottom:0.2rem;">${m.result}</div>
+                        <div style="font-size:0.8rem; font-weight:600; color:var(--text-secondary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">vs ${m.opponent}</div>
                     </div>
-                    <div style="font-weight:bold; font-size:0.85rem; margin:0.3rem 0 0.1rem 0; text-align:center; color:var(--text-primary);">vs ${m.opponent}</div>
-                    <div style="font-size:1.2rem; font-weight:800; text-align:center; color:var(--primary);">${m.result}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             elMatchesContent.querySelectorAll('.dash-match-card-item').forEach(item => {
                 item.onclick = () => {

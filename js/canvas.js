@@ -518,9 +518,85 @@ export function initAnimation(params) {
     const btnInsert = document.getElementById('anim-insert-frame');
     if (btnInsert) btnInsert.onclick = insertFrame;
 
+    const btnDeleteFrame = document.getElementById('anim-delete-frame');
+    if (btnDeleteFrame) btnDeleteFrame.onclick = deleteFrame;
+
+    const btnPrevFrame = document.getElementById('anim-prev-frame');
+    if (btnPrevFrame) btnPrevFrame.onclick = prevFrame;
+
+    const btnNextFrame = document.getElementById('anim-next-frame');
+    if (btnNextFrame) btnNextFrame.onclick = nextFrame;
+
     const btnPlay = document.getElementById('anim-play');
     if (btnPlay) btnPlay.onclick = playAnimation;
 
     const btnStop = document.getElementById('anim-stop');
     if (btnStop) btnStop.onclick = stopAnimation;
+
+    // Tool selection buttons
+    const btnToolSelect = document.getElementById('tool-select');
+    const btnToolPlayer = document.getElementById('tool-player');
+    const btnToolBall = document.getElementById('tool-ball');
+    const btnToolUndo = document.getElementById('tool-undo');
+    const btnToolRedo = document.getElementById('tool-redo');
+    const btnToolDelete = document.getElementById('tool-delete');
+
+    if (btnToolSelect) btnToolSelect.onclick = () => { currentTool = 'select'; showToast('選択モード'); };
+    if (btnToolPlayer) btnToolPlayer.onclick = () => { currentTool = 'player'; showToast('選手配置モード'); };
+    if (btnToolBall) btnToolBall.onclick = () => { currentTool = 'ball'; showToast('ボール配置モード'); };
+    if (btnToolUndo) btnToolUndo.onclick = () => undoHistory();
+    if (btnToolRedo) btnToolRedo.onclick = () => redoHistory();
+    if (btnToolDelete) btnToolDelete.onclick = () => {
+        if (selectedObject) {
+            objects = objects.filter(o => o.id !== selectedObject.id);
+            selectedObject = null;
+            saveHistory();
+            drawPitch(objects);
+        }
+    };
+
+    // Save diagram button
+    const btnSaveDiagram = document.getElementById('anim-save-btn');
+    if (btnSaveDiagram) {
+        btnSaveDiagram.onclick = () => {
+            // Save current canvas objects to current frame
+            if (currentFrameIndex >= 0 && currentFrameIndex < frames.length) {
+                frames[currentFrameIndex] = JSON.parse(JSON.stringify(objects));
+            } else if (frames.length === 0 && objects.length > 0) {
+                frames.push(JSON.parse(JSON.stringify(objects)));
+            }
+
+            if (currentPracticeId && currentMenuId) {
+                const practice = state.practices.find(p => p.id === currentPracticeId);
+                if (practice) {
+                    const menu = practice.menus.find(m => m.id === currentMenuId);
+                    if (menu) {
+                        menu.frames = JSON.parse(JSON.stringify(frames));
+                        saveData();
+                        showToast('練習メニューの作図を保存しました');
+                    }
+                }
+            } else if (isLibraryMode && currentLibraryId) {
+                const menu = state.menuLibrary.find(m => m.id === currentLibraryId);
+                if (menu) {
+                    menu.frames = JSON.parse(JSON.stringify(frames));
+                    saveData();
+                    showToast('ライブラリメニューの作図を保存しました');
+                }
+            } else {
+                saveData();
+                showToast('作図を保存しました');
+            }
+        };
+    }
+
+    const btnBack = document.getElementById('anim-btn-back');
+    if (btnBack) {
+        btnBack.onclick = () => {
+            stopAnimation();
+            if (currentPracticeId) navigate('practices');
+            else if (isLibraryMode) navigate('library');
+            else navigate('dashboard');
+        };
+    }
 }
