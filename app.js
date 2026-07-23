@@ -1,4 +1,6 @@
-// App State & Data
+// Default Team GAS API URL (管理者で作成したWeb API URLを設定すると全ユーザーで自動共有可能)
+window.DEFAULT_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzu_skqiVnMCcA2SJZDhq9AbAhDmJudkH1KDnTP5d6kfK_6OA8O60nigEPKq94AHJvU1w/exec';
+
 let state = {
     matches: [],
     practices: [],
@@ -100,6 +102,9 @@ function loadData() {
         state.positionsCat2 = parsed.positionsCat2 || ['CB', 'SB', 'CH', 'SH', 'ST', 'WG', 'OH', 'DH'];
         state.teamInfo = parsed.teamInfo || { name: 'My Team', color: '#f23932', passcode: '7064' };
         if (!state.teamInfo.passcode) state.teamInfo.passcode = '7064';
+        if (!state.teamInfo.gasApiUrl && window.DEFAULT_GAS_API_URL) {
+            state.teamInfo.gasApiUrl = window.DEFAULT_GAS_API_URL;
+        }
         state.customFormations = parsed.customFormations || state.customFormations;
 
         // Migrate matches
