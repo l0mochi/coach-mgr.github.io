@@ -5065,6 +5065,7 @@ let currentPracticeId = null;
 let currentMenuId = null;
 let currentMatchId = null;
 let currentFormationId = null;
+let currentLibraryId = null;
 
 function initAnimation(params) {
     canvas = document.getElementById('pitch-canvas');
@@ -5074,7 +5075,7 @@ function initAnimation(params) {
     currentMenuId = params && params.menuId ? params.menuId : null;
     currentMatchId = params && params.matchId ? params.matchId : null;
     currentFormationId = params && params.formId ? params.formId : null;
-    let currentLibraryId = params && params.libraryId ? params.libraryId : null;
+    currentLibraryId = params && params.libraryId ? params.libraryId : null;
     
     let initialFrames = null;
     let isFormationMode = !!(currentMatchId && currentFormationId);
@@ -5200,7 +5201,12 @@ function initAnimation(params) {
     
     ctx = canvas.getContext('2d');
     frames = initialFrames || [];
-    objects = frames.length > 0 ? JSON.parse(JSON.stringify(frames[frames.length - 1])) : [];
+    if (frames.length === 0) {
+        frames = [{ objects: [], title: '' }];
+    }
+    currentFrameIndex = 0;
+    const activeFrame = frames[currentFrameIndex];
+    objects = JSON.parse(JSON.stringify(Array.isArray(activeFrame) ? activeFrame : (activeFrame.objects || [])));
     isPlaying = false;
     historyStack = [];
     saveHistory();
@@ -5243,7 +5249,7 @@ function initAnimation(params) {
     updateFrameCount();
     drawPitch(objects);
 
-    const tools = ['select', 'player', 'ball', 'marker', 'cone', 'ladder', 'minigoal', 'line-rect', 'text', 'line-move', 'line-pass', 'line-dribble'];
+    const tools = ['select', 'player', 'ball', 'marker', 'cone', 'ladder', 'minigoal', 'line-rect', 'line-circle', 'text', 'line-move', 'line-pass', 'line-dribble'];
     tools.forEach(tool => {
         const el = document.querySelector(`.tool-btn[data-tool="${tool}"]`);
         if (!el) return;
@@ -5261,12 +5267,11 @@ function initAnimation(params) {
         
         newEl.addEventListener('click', (e) => {
             currentTool = tool;
-            document.querySelectorAll('.canvas-toolbar .tool-btn').forEach(b => b.classList.remove('active'));
-            e.currentTarget.classList.add('active');
+            updateToolDockActive();
         });
     });
-    const selectTool = document.querySelector('.tool-btn[data-tool="select"]');
-    if(selectTool) selectTool.classList.add('active');
+    currentTool = 'select';
+    updateToolDockActive();
     
     const btnClear = document.getElementById('tool-clear');
     const newBtnClear = btnClear.cloneNode(true);
@@ -5314,8 +5319,26 @@ function initAnimation(params) {
         const newBtnRotate = btnRotate.cloneNode(true);
         btnRotate.parentNode.replaceChild(newBtnRotate, btnRotate);
         newBtnRotate.addEventListener('click', () => {
-            if (selectedObject && (selectedObject.type === 'minigoal' || selectedObject.type === 'player')) {
-                selectedObject.angle = ((selectedObject.angle || 0) + 45) % 360;
+            if (selectedObject) {
+                if (typeof selectedObject.x1 !== 'undefined' && typeof selectedObject.x2 !== 'undefined') {
+                    const rad = Math.PI / 4; // 45 degrees
+                    const cx = (selectedObject.x1 + selectedObject.x2) / 2;
+                    const cy = (selectedObject.y1 + selectedObject.y2) / 2;
+                    const rotatePt = (px, py) => {
+                        const dx = px - cx;
+                        const dy = py - cy;
+                        return {
+                            x: cx + dx * Math.cos(rad) - dy * Math.sin(rad),
+                            y: cy + dx * Math.sin(rad) + dy * Math.cos(rad)
+                        };
+                    };
+                    const p1 = rotatePt(selectedObject.x1, selectedObject.y1);
+                    const p2 = rotatePt(selectedObject.x2, selectedObject.y2);
+                    selectedObject.x1 = p1.x; selectedObject.y1 = p1.y;
+                    selectedObject.x2 = p2.x; selectedObject.y2 = p2.y;
+                } else {
+                    selectedObject.angle = ((selectedObject.angle || 0) + 45) % 360;
+                }
                 saveHistory();
                 drawPitch(objects);
             }
@@ -5361,6 +5384,13 @@ function initAnimation(params) {
         };
     }
 
+    const btnEditFrameTitle = document.getElementById('anim-edit-frame-title');
+    if (btnEditFrameTitle) {
+        btnEditFrameTitle.onclick = () => {
+            editFrameTitle();
+        };
+    }
+
     const btnDeleteFrame = document.getElementById('anim-delete-frame');
     if (btnDeleteFrame) {
         btnDeleteFrame.onclick = () => {
@@ -5379,6 +5409,14 @@ function initAnimation(params) {
     const newBtnStop = btnStop.cloneNode(true);
     btnStop.parentNode.replaceChild(newBtnStop, btnStop);
     newBtnStop.addEventListener('click', stopAnimation);
+    
+    // Video Export Button Handler (LINE sharing)
+    const btnExportVideo = document.getElementById('anim-export-video');
+    if (btnExportVideo) {
+        const newBtnExport = btnExportVideo.cloneNode(true);
+        btnExportVideo.parentNode.replaceChild(newBtnExport, btnExportVideo);
+        newBtnExport.addEventListener('click', exportAnimationVideo);
+    }
     
     const countEl = document.getElementById('frame-count');
 
@@ -5532,7 +5570,71 @@ function initAnimation(params) {
             drawPitch(objects);
         };
     }
-    
+    // Strict Theme Focus Title Display (from menu creation input)
+    const titleEl = document.getElementById('anim-menu-focus');
+    if (titleEl) {
+        if (targetMenu && (targetMenu.focus || targetMenu.name)) {
+            titleEl.textContent = targetMenu.focus || targetMenu.name;
+        } else if (isFormationMode) {
+            titleEl.textContent = 'フォーメーション作図';
+        } else {
+            titleEl.textContent = 'テーマ・フォーカス未設定';
+        }
+    }
+
+    // Right Side Panel Data Population & Toggle Handler
+    const sidePanel = document.getElementById('anim-detail-side-panel');
+    const sideToggleBtn = document.getElementById('anim-side-panel-toggle-btn');
+    if (sidePanel && sideToggleBtn) {
+        const sideFocus = document.getElementById('side-info-focus');
+        const sideOrg = document.getElementById('side-info-organize');
+        const sideKf = document.getElementById('side-info-keyfactor');
+        const sideOpt = document.getElementById('side-info-options');
+
+        if (targetMenu) {
+            if (sideFocus) sideFocus.textContent = targetMenu.focus || targetMenu.name || '未設定';
+            if (sideOrg) sideOrg.textContent = targetMenu.organize || 'なし';
+            if (sideKf) sideKf.textContent = targetMenu.keyfactor || 'なし';
+            if (sideOpt) sideOpt.textContent = targetMenu.options || 'なし';
+        } else {
+            if (sideFocus) sideFocus.textContent = '未設定';
+            if (sideOrg) sideOrg.textContent = 'なし';
+            if (sideKf) sideKf.textContent = 'なし';
+            if (sideOpt) sideOpt.textContent = 'なし';
+        }
+
+        sideToggleBtn.onclick = (e) => {
+            e.stopPropagation();
+            sidePanel.classList.toggle('collapsed');
+        };
+    }
+
+    // Settings Dropdown Popover Handler
+    const settingsBtn = document.getElementById('anim-settings-btn');
+    const settingsPopover = document.getElementById('anim-settings-popover');
+    if (settingsBtn && settingsPopover) {
+        settingsBtn.onclick = (e) => {
+            e.stopPropagation();
+            settingsPopover.classList.toggle('hidden');
+        };
+        document.addEventListener('click', (e) => {
+            if (settingsPopover && !settingsPopover.contains(e.target) && e.target !== settingsBtn) {
+                settingsPopover.classList.add('hidden');
+            }
+        });
+    }
+
+    // Timeline Collapse Toggle Handler
+    const timelineToggleBtn = document.getElementById('anim-timeline-toggle');
+    const timelineBar = document.getElementById('anim-timeline-bar');
+    if (timelineToggleBtn && timelineBar) {
+        timelineToggleBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isCollapsed = timelineBar.classList.toggle('collapsed');
+            timelineToggleBtn.textContent = isCollapsed ? '▲ 開く' : '▼ 隠す';
+        };
+    }
+
     drawPitch(objects);
 
     selectedObject = null; // Globals for canvas
@@ -5547,6 +5649,37 @@ function initAnimation(params) {
             }
         });
     }
+
+    const popoverColorDots = document.querySelectorAll('.color-dot');
+    popoverColorDots.forEach(dot => {
+        dot.onclick = (e) => {
+            e.stopPropagation();
+            const colorName = dot.dataset.color;
+            const colorSelect = document.getElementById('canvas-player-color');
+            if (colorSelect) colorSelect.value = colorName;
+
+            let hexColor = '#f23932';
+            if (colorName === 'blue') hexColor = '#3d79d5';
+            else if (colorName === 'green') hexColor = '#63a84d';
+            else if (colorName === 'orange') hexColor = '#f09f4d';
+
+            if (selectedObject) {
+                if (selectedObject.type === 'marker') {
+                    if (colorName === 'orange') hexColor = '#f97316';
+                    else if (colorName === 'blue') hexColor = '#3b82f6';
+                    else if (colorName === 'red') hexColor = '#ef4444';
+                    else if (colorName === 'green') hexColor = '#22c55e';
+                    selectedObject.color = hexColor;
+                    saveHistory();
+                    drawPitch(objects);
+                } else if (selectedObject.type === 'player') {
+                    selectedObject.color = hexColor;
+                    saveHistory();
+                    drawPitch(objects);
+                }
+            }
+        };
+    });
 
     if(elPlayerSelect) {
         const newEl = elPlayerSelect.cloneNode(true);
@@ -5633,7 +5766,7 @@ function updateFrameCount() {
     if (!selectEl) return;
 
     if (frames.length === 0) {
-        selectEl.innerHTML = '<option value="-1">シーン未作成 (0)</option>';
+        selectEl.innerHTML = '<option value="-1">1: </option>';
         selectEl.disabled = true;
         if (btnPrev) { btnPrev.disabled = true; btnPrev.style.opacity = '0.5'; }
         if (btnNext) { btnNext.disabled = true; btnNext.style.opacity = '0.5'; }
@@ -5642,9 +5775,10 @@ function updateFrameCount() {
     }
 
     selectEl.disabled = false;
-    selectEl.innerHTML = frames.map((f, idx) => `
-        <option value="${idx}" ${idx === currentFrameIndex ? 'selected' : ''}>シーン ${idx + 1} / ${frames.length}</option>
-    `).join('');
+    selectEl.innerHTML = frames.map((f, idx) => {
+        const titlePart = (f && typeof f === 'object' && f.title) ? f.title : '';
+        return `<option value="${idx}" ${idx === currentFrameIndex ? 'selected' : ''}>${idx + 1}: ${titlePart}</option>`;
+    }).join('');
 
     if (btnPrev) {
         btnPrev.disabled = currentFrameIndex <= 0;
@@ -5664,11 +5798,12 @@ function selectFrame(index) {
     if (isPlaying) return;
     if (index >= 0 && index < frames.length) {
         currentFrameIndex = index;
-        objects = JSON.parse(JSON.stringify(frames[index]));
+        const frameData = frames[index];
+        objects = JSON.parse(JSON.stringify(Array.isArray(frameData) ? frameData : (frameData.objects || [])));
         selectedObject = null;
         updateFrameCount();
         drawPitch(objects);
-        showToast(`シーン #${index + 1} を表示中`);
+        showToast(`シーン ${index + 1} を表示中`);
     }
 }
 
@@ -5678,37 +5813,60 @@ function deleteFrame(index) {
         frames.splice(index, 1);
         if (frames.length > 0) {
             currentFrameIndex = Math.min(index, frames.length - 1);
-            objects = JSON.parse(JSON.stringify(frames[currentFrameIndex]));
+            const frameData = frames[currentFrameIndex];
+            objects = JSON.parse(JSON.stringify(Array.isArray(frameData) ? frameData : (frameData.objects || [])));
         } else {
             currentFrameIndex = -1;
+            objects = [];
         }
         selectedObject = null;
         updateFrameCount();
         drawPitch(objects);
-        showToast(`シーン #${index + 1} を削除しました`);
+        showToast(`シーン ${index + 1} を削除しました`);
     }
 }
 
 function addFrame() {
-    frames.push(JSON.parse(JSON.stringify(objects)));
-    currentFrameIndex = frames.length - 1;
-    updateFrameCount();
-    showToast(`末尾にシーン #${frames.length} を追加しました`);
-}
-
-function insertFrame() {
     const insertIdx = (currentFrameIndex >= 0 && currentFrameIndex < frames.length) ? currentFrameIndex + 1 : frames.length;
-    frames.splice(insertIdx, 0, JSON.parse(JSON.stringify(objects)));
+    frames.splice(insertIdx, 0, { objects: JSON.parse(JSON.stringify(objects)), title: '' });
     currentFrameIndex = insertIdx;
     updateFrameCount();
-    showToast(`シーン #${insertIdx + 1} として間に挿入しました`);
+    drawPitch(objects);
+    showToast(`シーン ${insertIdx + 1} を追加しました`);
+}
+
+function editFrameTitle() {
+    if (frames.length === 0) {
+        frames = [{ objects: JSON.parse(JSON.stringify(objects)), title: '' }];
+        currentFrameIndex = 0;
+    }
+    if (currentFrameIndex < 0 || currentFrameIndex >= frames.length) {
+        currentFrameIndex = Math.max(0, frames.length - 1);
+    }
+    let f = frames[currentFrameIndex];
+    let currentTitle = (f && typeof f === 'object' && !Array.isArray(f) && f.title) ? f.title : '';
+    
+    const inputTitle = prompt(`シーン ${currentFrameIndex + 1} の見出しを入力してください\n（例: 初期配置、プレス回避、シュート体勢 など）:`, currentTitle);
+    if (inputTitle !== null) {
+        const trimmed = inputTitle.trim();
+        if (Array.isArray(f)) {
+            frames[currentFrameIndex] = { objects: f, title: trimmed };
+        } else if (typeof f === 'object' && f !== null) {
+            f.title = trimmed;
+        } else {
+            frames[currentFrameIndex] = { objects: [], title: trimmed };
+        }
+        updateFrameCount();
+        showToast(`シーン ${currentFrameIndex + 1} の見出しを「${trimmed || '(なし)'}」に更新しました`);
+    }
 }
 
 function stopAnimation() {
     isPlaying = false;
     if (animReqId) cancelAnimationFrame(animReqId);
     if (frames.length > 0) {
-        objects = JSON.parse(JSON.stringify(frames[frames.length - 1]));
+        const lastFrame = frames[frames.length - 1];
+        objects = JSON.parse(JSON.stringify(Array.isArray(lastFrame) ? lastFrame : (lastFrame.objects || [])));
     }
     if (canvas) {
         drawPitch(objects);
@@ -5740,8 +5898,11 @@ function playAnimation() {
             }
         }
 
-        const currentFrame = frames[currentFrameIdx];
-        const nextFrame = frames[currentFrameIdx + 1];
+        const rawCurrent = frames[currentFrameIdx];
+        const rawNext = frames[currentFrameIdx + 1];
+
+        const currentFrame = Array.isArray(rawCurrent) ? rawCurrent : ((rawCurrent && rawCurrent.objects) || []);
+        const nextFrame = Array.isArray(rawNext) ? rawNext : ((rawNext && rawNext.objects) || []);
         
         const isStaticType = (type) => ['line', 'ladder', 'rect', 'cone', 'marker', 'minigoal'].includes(type);
 
@@ -5769,6 +5930,168 @@ function playAnimation() {
     animReqId = requestAnimationFrame(animate);
 }
 
+function exportAnimationVideo() {
+    const pitchCanvas = document.getElementById('pitch-canvas');
+    if (!pitchCanvas) {
+        alert('キャンバスが見つかりません');
+        return;
+    }
+
+    let menuTitle = '戦術作図';
+    const focusEl = document.getElementById('side-info-focus');
+    if (focusEl && focusEl.textContent && focusEl.textContent.trim() !== '未設定') {
+        menuTitle = focusEl.textContent.trim();
+    }
+    const safeTitle = menuTitle.replace(/[/\\?%*:|"<>]/g, '_');
+
+    // Helper: Trigger direct browser file download
+    const downloadFile = (dataUrl, fileName) => {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = fileName;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(() => {
+            if (link.parentNode) link.parentNode.removeChild(link);
+        }, 400);
+    };
+
+    stopAnimation(); // Stop any existing animation playback
+
+    showToast('📹 .webm 動画ファイルを作成中...（完了まで数秒お待ちください）');
+
+    try {
+        const stream = pitchCanvas.captureStream(30);
+        let options = {};
+        const types = [
+            'video/webm;codecs=vp9',
+            'video/webm;codecs=vp8',
+            'video/webm',
+            'video/mp4'
+        ];
+        for (const t of types) {
+            if (MediaRecorder.isTypeSupported(t)) {
+                options = { mimeType: t };
+                break;
+            }
+        }
+
+        const recordedChunks = [];
+        let mediaRecorder;
+        try {
+            mediaRecorder = new MediaRecorder(stream, options);
+        } catch (e) {
+            mediaRecorder = new MediaRecorder(stream);
+        }
+
+        mediaRecorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) {
+                recordedChunks.push(e.data);
+            }
+        };
+
+        mediaRecorder.onstop = () => {
+            if (recordedChunks.length === 0) {
+                alert('動画の書き出しに失敗しました。もう一度お試しください。');
+                return;
+            }
+
+            const mime = mediaRecorder.mimeType || 'video/webm';
+            const blob = new Blob(recordedChunks, { type: mime });
+            const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+            const url = URL.createObjectURL(blob);
+
+            downloadFile(url, `【作図動画】${safeTitle}.${ext}`);
+            showToast('✅ 動画のダウンロードが完了しました！LINE等で送信できます。');
+            drawPitch(objects);
+        };
+
+        // Start recording with 100ms timeslice chunks
+        mediaRecorder.start(100);
+
+        const hasMultiFrames = frames && frames.length > 1;
+        const durationPerFrame = 1400; // ms per scene transition
+
+        let startTime = null;
+        let isRecording = true;
+
+        function recordLoop(timestamp) {
+            if (!isRecording) return;
+            if (!startTime) startTime = timestamp;
+
+            const elapsed = timestamp - startTime;
+
+            if (hasMultiFrames) {
+                let currentFrameIdx = Math.floor(elapsed / durationPerFrame);
+                let progress = (elapsed % durationPerFrame) / durationPerFrame;
+
+                if (currentFrameIdx >= frames.length - 1) {
+                    // Completed full sequence
+                    isRecording = false;
+                    try {
+                        if (mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.requestData();
+                            setTimeout(() => mediaRecorder.stop(), 150);
+                        }
+                    } catch (err) {
+                        mediaRecorder.stop();
+                    }
+                    return;
+                }
+
+                const rawCurrent = frames[currentFrameIdx];
+                const rawNext = frames[currentFrameIdx + 1];
+                const currentFrame = Array.isArray(rawCurrent) ? rawCurrent : ((rawCurrent && rawCurrent.objects) || []);
+                const nextFrame = Array.isArray(rawNext) ? rawNext : ((rawNext && rawNext.objects) || []);
+                const isStaticType = (type) => ['line', 'ladder', 'rect', 'cone', 'marker', 'minigoal'].includes(type);
+
+                const interpolatedObjects = currentFrame.map(obj1 => {
+                    if (isStaticType(obj1.type)) return obj1;
+                    const obj2 = nextFrame.find(o => o.id === obj1.id);
+                    if (!obj2) return obj1;
+                    const p = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+                    return {
+                        ...obj1,
+                        x: obj1.x + (obj2.x - obj1.x) * p,
+                        y: obj1.y + (obj2.y - obj1.y) * p
+                    };
+                });
+
+                const staticObjs = currentFrame.filter(o => isStaticType(o.type));
+                const drawList = [...interpolatedObjects.filter(o => !isStaticType(o.type)), ...staticObjs];
+                drawPitch(drawList);
+            } else {
+                // Single scene recording (2.0s duration)
+                drawPitch(objects);
+                if (elapsed >= 2000) {
+                    isRecording = false;
+                    try {
+                        if (mediaRecorder.state !== 'inactive') {
+                            mediaRecorder.requestData();
+                            setTimeout(() => mediaRecorder.stop(), 150);
+                        }
+                    } catch (err) {
+                        mediaRecorder.stop();
+                    }
+                    return;
+                }
+            }
+
+            requestAnimationFrame(recordLoop);
+        }
+
+        requestAnimationFrame(recordLoop);
+
+    } catch (err) {
+        console.error('MediaRecorder error:', err);
+        // Instant Fallback to PNG download
+        const dataUrl = pitchCanvas.toDataURL('image/png');
+        downloadFile(dataUrl, `【作図画像】${safeTitle}.png`);
+        showToast('📸 作図画像をダウンロードしました');
+    }
+}
+
 function drawPitch(renderObjects) {
     const templateEl = document.getElementById('canvas-pitch-template');
     const template = templateEl ? templateEl.value : 'full';
@@ -5776,21 +6099,139 @@ function drawPitch(renderObjects) {
     updateCanvasToolbar();
 }
 
-function drawPitchToCtx(renderObjects, targetCanvas, targetCtx, template = 'full') {
+function updateCanvasToolbar() {
+    updateContextPopover();
+    updateToolDockActive();
+}
+
+function updateToolDockActive() {
+    const dockBtns = document.querySelectorAll('.anim-tool-dock .tool-btn, .canvas-toolbar .tool-btn');
+    dockBtns.forEach(btn => {
+        if (btn.dataset.tool === currentTool) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+}
+
+function updateContextPopover() {
+    const popover = document.getElementById('anim-context-popover');
+    if (!popover || !canvas) return;
+
+    if (!selectedObject || isPlaying || draggedObject) {
+        popover.classList.add('hidden');
+        return;
+    }
+
+    let objX, objY;
+    if (typeof selectedObject.x !== 'undefined' && typeof selectedObject.y !== 'undefined') {
+        objX = selectedObject.x;
+        objY = selectedObject.y;
+    } else if (typeof selectedObject.x1 !== 'undefined') {
+        objX = (selectedObject.x1 + selectedObject.x2) / 2;
+        objY = Math.min(selectedObject.y1, selectedObject.y2);
+    }
+
+    if (typeof objX === 'undefined' || typeof objY === 'undefined') {
+        popover.classList.add('hidden');
+        return;
+    }
+
+    const canvasRect = canvas.getBoundingClientRect();
+    const wrapperRect = canvas.parentNode ? canvas.parentNode.getBoundingClientRect() : canvasRect;
+
+    const scaleX = canvasRect.width / canvas.width;
+    const scaleY = canvasRect.height / canvas.height;
+
+    const screenX = (objX * scaleX) + (canvasRect.left - wrapperRect.left);
+    const screenY = (objY * scaleY) + (canvasRect.top - wrapperRect.top);
+
+    popover.style.left = `${screenX}px`;
+    popover.style.top = `${screenY}px`;
+
+    // Smart flip: If object is near top of pitch, render popover BELOW the object so it never gets cut off!
+    if (screenY < 75 || objY < 80) {
+        popover.classList.add('popover-below');
+    } else {
+        popover.classList.remove('popover-below');
+    }
+
+    popover.classList.remove('hidden');
+
+    const playerControls = document.getElementById('popover-player-controls');
+    if (playerControls) {
+        if (selectedObject.type === 'player' || selectedObject.type === 'marker') {
+            playerControls.style.display = 'flex';
+            
+            const numInput = document.getElementById('canvas-player-number');
+            const numLabels = playerControls.querySelectorAll('.popover-label');
+            if (numInput) numInput.style.display = (selectedObject.type === 'player') ? 'inline-block' : 'none';
+            if (numLabels && numLabels[0]) numLabels[0].style.display = (selectedObject.type === 'player') ? 'inline-block' : 'none';
+
+            if (selectedObject.type === 'player' && numInput) {
+                numInput.value = selectedObject.number || '';
+            }
+
+            const colorDots = popover.querySelectorAll('.color-dot');
+            const currentColor = selectedObject.color || (selectedObject.type === 'marker' ? '#f97316' : 'red');
+            colorDots.forEach(dot => {
+                const c = dot.dataset.color;
+                if ((c === 'red' && (currentColor === '#f23932' || currentColor === 'red' || currentColor === '#ef4444')) ||
+                    (c === 'blue' && (currentColor === '#3d79d5' || currentColor === 'blue' || currentColor === '#3b82f6')) ||
+                    (c === 'green' && (currentColor === '#63a84d' || currentColor === 'green')) ||
+                    (c === 'orange' && (currentColor === '#f09f4d' || currentColor === 'orange' || currentColor === '#f97316')) ||
+                    currentColor === c) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        } else {
+            playerControls.style.display = 'none';
+        }
+    }
+
+    popover.classList.remove('hidden');
+}
+
+function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 'full') {
+    const renderObjects = Array.isArray(renderObjectsInput) ? renderObjectsInput : ((renderObjectsInput && renderObjectsInput.objects) || []);
+    // Dynamic High-DPI / DPR Resolution Scaling to eliminate blurriness
+    if (targetCanvas.id === 'pitch-canvas') {
+        const rect = targetCanvas.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+            const dpr = Math.max(window.devicePixelRatio || 1, 2); // Ultra HD DPR scaling
+            const targetW = Math.round(rect.width * dpr);
+            const targetH = Math.round(rect.height * dpr);
+            if (targetCanvas.width !== targetW || targetCanvas.height !== targetH) {
+                targetCanvas.width = targetW;
+                targetCanvas.height = targetH;
+            }
+        }
+    }
+
     const w = targetCanvas.width;
     const h = targetCanvas.height;
     
     targetCtx.clearRect(0, 0, w, h);
     
+    targetCtx.save();
+    
+    // Scale context from base 800x500 coordinate space to high-res canvas resolution!
+    const scaleX = w / 800;
+    const scaleY = h / 500;
+    targetCtx.scale(scaleX, scaleY);
+    
     // Background - modern grey-white
     targetCtx.fillStyle = '#f1f5f9';
-    targetCtx.fillRect(0, 0, w, h);
+    targetCtx.fillRect(0, 0, 800, 500);
     
-    // Proportions and Dimensions
-    const pitchX = 20;
-    const pitchY = 20;
-    const pitchW = w - 40;
-    const pitchH = h - 40;
+    // Proportions and Dimensions (Base 800x500 space, side margins fit goals completely)
+    const pitchX = 24;
+    const pitchY = 16;
+    const pitchW = 800 - 48;
+    const pitchH = 500 - 32;
     
     targetCtx.strokeStyle = '#334155';
     targetCtx.lineWidth = 1.5;
@@ -6131,14 +6572,43 @@ function drawPitchToCtx(renderObjects, targetCanvas, targetCtx, template = 'full
                 targetCtx.fillRect(obj.x1 - s/2, obj.y2 - s/2, s, s);
                 targetCtx.fillRect(obj.x2 - s/2, obj.y2 - s/2, s, s);
             }
-        } else if (obj.type === 'marker') {
+        } else if (obj.type === 'circle') {
+            const rx = Math.abs(obj.x2 - obj.x1) / 2;
+            const ry = Math.abs(obj.y2 - obj.y1) / 2;
+            const cx = Math.min(obj.x1, obj.x2) + rx;
+            const cy = Math.min(obj.y1, obj.y2) + ry;
+
             targetCtx.beginPath();
-            targetCtx.ellipse(obj.x, obj.y, 8, 4, 0, 0, Math.PI * 2);
-            targetCtx.fillStyle = obj.color;
+            targetCtx.ellipse(cx, cy, Math.max(1, rx), Math.max(1, ry), 0, 0, Math.PI * 2);
+            targetCtx.fillStyle = 'rgba(148, 163, 184, 0.25)'; // 透明度の高いグレー塗りつぶし
+            targetCtx.fill();
+            targetCtx.strokeStyle = 'rgba(100, 116, 139, 0.8)';
+            targetCtx.lineWidth = 1.5;
+            targetCtx.setLineDash([4, 4]); // 点線
+            targetCtx.stroke();
+            targetCtx.setLineDash([]);
+
+            if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
+                targetCtx.fillStyle = 'var(--primary)';
+                const s = 8;
+                targetCtx.fillRect(obj.x1 - s/2, obj.y1 - s/2, s, s);
+                targetCtx.fillRect(obj.x2 - s/2, obj.y1 - s/2, s, s);
+                targetCtx.fillRect(obj.x1 - s/2, obj.y2 - s/2, s, s);
+                targetCtx.fillRect(obj.x2 - s/2, obj.y2 - s/2, s, s);
+            }
+        } else if (obj.type === 'marker') {
+            targetCtx.save();
+            targetCtx.translate(obj.x, obj.y);
+            if (obj.angle) targetCtx.rotate((obj.angle * Math.PI) / 180);
+
+            targetCtx.beginPath();
+            targetCtx.ellipse(0, 0, 8, 4, 0, 0, Math.PI * 2);
+            targetCtx.fillStyle = obj.color || '#f97316';
             targetCtx.fill();
             targetCtx.strokeStyle = '#000000';
             targetCtx.lineWidth = 1;
             targetCtx.stroke();
+            targetCtx.restore();
             
             // Draw highlight if selected
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
@@ -6151,9 +6621,13 @@ function drawPitchToCtx(renderObjects, targetCanvas, targetCtx, template = 'full
                 targetCtx.setLineDash([]);
             }
         } else if (obj.type === 'cone') {
+            targetCtx.save();
+            targetCtx.translate(obj.x, obj.y);
+            if (obj.angle) targetCtx.rotate((obj.angle * Math.PI) / 180);
+
             // Cone base
             targetCtx.beginPath();
-            targetCtx.ellipse(obj.x, obj.y + obj.radius * 0.8, obj.radius * 0.8, 3, 0, 0, Math.PI * 2);
+            targetCtx.ellipse(0, obj.radius * 0.8, obj.radius * 0.8, 3, 0, 0, Math.PI * 2);
             targetCtx.fillStyle = '#eab308';
             targetCtx.fill();
             targetCtx.strokeStyle = '#000000';
@@ -6162,13 +6636,14 @@ function drawPitchToCtx(renderObjects, targetCanvas, targetCtx, template = 'full
 
             // Cone body
             targetCtx.beginPath();
-            targetCtx.moveTo(obj.x, obj.y - obj.radius * 1.2);
-            targetCtx.lineTo(obj.x + obj.radius * 0.7, obj.y + obj.radius * 0.8);
-            targetCtx.lineTo(obj.x - obj.radius * 0.7, obj.y + obj.radius * 0.8);
+            targetCtx.moveTo(0, -obj.radius * 1.2);
+            targetCtx.lineTo(obj.radius * 0.7, obj.radius * 0.8);
+            targetCtx.lineTo(-obj.radius * 0.7, obj.radius * 0.8);
             targetCtx.closePath();
-            targetCtx.fillStyle = obj.color;
+            targetCtx.fillStyle = obj.color || '#facc15';
             targetCtx.fill();
             targetCtx.stroke();
+            targetCtx.restore();
 
             // Draw highlight if selected
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
@@ -6241,11 +6716,16 @@ function drawPitchToCtx(renderObjects, targetCanvas, targetCtx, template = 'full
                 });
             }
         } else if (obj.type === 'text') {
-            targetCtx.fillStyle = obj.color;
+            targetCtx.save();
+            targetCtx.translate(obj.x, obj.y);
+            if (obj.angle) targetCtx.rotate((obj.angle * Math.PI) / 180);
+
+            targetCtx.fillStyle = obj.color || '#000000';
             targetCtx.font = 'bold 14px Inter, sans-serif';
             targetCtx.textAlign = 'center';
             targetCtx.textBaseline = 'middle';
-            targetCtx.fillText(obj.text || '', obj.x, obj.y);
+            targetCtx.fillText(obj.text || '', 0, 0);
+            targetCtx.restore();
 
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.beginPath();
@@ -6407,6 +6887,7 @@ function drawPitchToCtx(renderObjects, targetCanvas, targetCtx, template = 'full
             }
         }
     });
+    targetCtx.restore();
 }
 
 function drawArrowToCtx(x1, y1, x2, y2, lineType, targetCtx) {
@@ -6414,7 +6895,7 @@ function drawArrowToCtx(x1, y1, x2, y2, lineType, targetCtx) {
     const dx = x2 - x1;
     const dy = y2 - y1;
     const angle = Math.atan2(dy, dx);
-    const color = (lineType === 'pass' || lineType === 'dribble') ? '#ea580c' : '#334155';
+    const color = '#334155';
     
     targetCtx.beginPath();
     
@@ -6511,6 +6992,23 @@ function drawRectPreview(x1, y1, x2, y2) {
     ctx.setLineDash([]);
 }
 
+function drawCirclePreview(x1, y1, x2, y2) {
+    const rx = Math.abs(x2 - x1) / 2;
+    const ry = Math.abs(y2 - y1) / 2;
+    const cx = Math.min(x1, x2) + rx;
+    const cy = Math.min(y1, y2) + ry;
+
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, Math.max(1, rx), Math.max(1, ry), 0, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(148, 163, 184, 0.25)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
 function applyGridSnap(val, axis = 'x') {
     const cb = document.getElementById('canvas-snap-grid');
     if (cb && cb.checked) {
@@ -6523,8 +7021,8 @@ function applyGridSnap(val, axis = 'x') {
 function handleCanvasDblClick(e) {
     if (isPlaying) return;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const x = (e.clientX - rect.left) * (800 / rect.width);
+    const y = (e.clientY - rect.top) * (500 / rect.height);
 
     for (let i = objects.length - 1; i >= 0; i--) {
         const obj = objects[i];
@@ -6561,8 +7059,8 @@ function handleCanvasDblClick(e) {
 function handleMouseDown(e) {
     if (isPlaying) return;
     const rect = canvas.getBoundingClientRect();
-    let x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    let y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    let x = (e.clientX - rect.left) * (800 / rect.width);
+    let y = (e.clientY - rect.top) * (500 / rect.height);
 
     if (currentTool === 'select') {
         const prevSelected = selectedObject;
@@ -6580,7 +7078,7 @@ function handleMouseDown(e) {
                 if (Math.abs(x - (prevSelected.x + selR)) <= s && Math.abs(y - prevSelected.y) <= s) { isResizing = true; resizeHandle = 'goal-e'; draggedObject = prevSelected; selectedObject = prevSelected; drawPitch(objects); return; }
                 if (Math.abs(x - prevSelected.x) <= s && Math.abs(y - (prevSelected.y - selR)) <= s) { isResizing = true; resizeHandle = 'goal-n'; draggedObject = prevSelected; selectedObject = prevSelected; drawPitch(objects); return; }
                 if (Math.abs(x - prevSelected.x) <= s && Math.abs(y - (prevSelected.y + selR)) <= s) { isResizing = true; resizeHandle = 'goal-s'; draggedObject = prevSelected; selectedObject = prevSelected; drawPitch(objects); return; }
-            } else if (prevSelected.type === 'rect') {
+            } else if (prevSelected.type === 'rect' || prevSelected.type === 'circle') {
                 const s = 18;
                 if (Math.abs(x - prevSelected.x1) <= s && Math.abs(y - prevSelected.y1) <= s) { isResizing = true; resizeHandle = 'nw'; draggedObject = prevSelected; selectedObject = prevSelected; drawPitch(objects); return; }
                 if (Math.abs(x - prevSelected.x2) <= s && Math.abs(y - prevSelected.y1) <= s) { isResizing = true; resizeHandle = 'ne'; draggedObject = prevSelected; selectedObject = prevSelected; drawPitch(objects); return; }
@@ -6616,7 +7114,7 @@ function handleMouseDown(e) {
                     startX = x; startY = y;
                     break;
                 }
-            } else if (obj.type === 'rect') {
+            } else if (obj.type === 'rect' || obj.type === 'circle') {
                 const mx1 = Math.min(obj.x1, obj.x2);
                 const mx2 = Math.max(obj.x1, obj.x2);
                 const my1 = Math.min(obj.y1, obj.y2);
@@ -6707,6 +7205,8 @@ function handleMouseDown(e) {
 
         if(currentTool === 'ball') { color = '#ffffff'; radius = 8; type = 'ball'; }
         if(currentTool === 'marker') { color = '#f97316'; radius = 8; type = 'marker'; }
+        if(currentTool === 'marker-blue') { color = '#3b82f6'; radius = 8; type = 'marker'; }
+        if(currentTool === 'marker-red') { color = '#ef4444'; radius = 8; type = 'marker'; }
         if(currentTool === 'cone') { color = '#facc15'; radius = 10; type = 'cone'; }
         if(currentTool === 'minigoal') { color = '#ffffff'; radius = 15; type = 'minigoal'; }
         if(currentTool === 'text') { color = '#000000'; radius = 0; type = 'text'; }
@@ -6761,20 +7261,20 @@ function handleMouseDown(e) {
 function handleMouseMove(e) {
     if (isPlaying) return;
     const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+    const x = (e.clientX - rect.left) * (800 / rect.width);
+    const y = (e.clientY - rect.top) * (500 / rect.height);
 
     if(draggedObject) {
         if (isResizing && draggedObject.type === 'minigoal') {
             const dist = Math.sqrt(Math.pow(x - draggedObject.x, 2) + Math.pow(y - draggedObject.y, 2));
             const newScale = Math.max(0.4, Math.min(3.5, dist / 21));
             draggedObject.goalScale = parseFloat(newScale.toFixed(2));
-        } else if (isResizing && draggedObject.type === 'rect') {
+        } else if (isResizing && (draggedObject.type === 'rect' || draggedObject.type === 'circle')) {
             if (resizeHandle === 'nw') { draggedObject.x1 = applyGridSnap(x, 'x'); draggedObject.y1 = applyGridSnap(y, 'y'); }
             if (resizeHandle === 'ne') { draggedObject.x2 = applyGridSnap(x, 'x'); draggedObject.y1 = applyGridSnap(y, 'y'); }
             if (resizeHandle === 'sw') { draggedObject.x1 = applyGridSnap(x, 'x'); draggedObject.y2 = applyGridSnap(y, 'y'); }
             if (resizeHandle === 'se') { draggedObject.x2 = applyGridSnap(x, 'x'); draggedObject.y2 = applyGridSnap(y, 'y'); }
-        } else if (draggedObject.type === 'rect') {
+        } else if (draggedObject.type === 'rect' || draggedObject.type === 'circle') {
             const dx = applyGridSnap(x, 'x') - applyGridSnap(startX, 'x');
             const dy = applyGridSnap(y, 'y') - applyGridSnap(startY, 'y');
             draggedObject.x1 += dx; draggedObject.x2 += dx;
@@ -6797,6 +7297,8 @@ function handleMouseMove(e) {
             drawLadder(startX, startY, applyGridSnap(x, 'x'), applyGridSnap(y, 'y'));
         } else if (currentTool === 'line-rect') {
             drawRectPreview(startX, startY, applyGridSnap(x, 'x'), applyGridSnap(y, 'y'));
+        } else if (currentTool === 'line-circle') {
+            drawCirclePreview(startX, startY, applyGridSnap(x, 'x'), applyGridSnap(y, 'y'));
         } else {
             const lType = currentTool.replace('line-', '');
             drawArrow(startX, startY, applyGridSnap(x, 'x'), applyGridSnap(y, 'y'), lType);
@@ -6811,6 +7313,7 @@ function handleMouseUp(e) {
         draggedObject = null;
         isResizing = false;
         resizeHandle = null;
+        drawPitch(objects);
     } else if (isDrawing && currentTool && (currentTool.startsWith('line-') || currentTool === 'ladder')) {
         const rect = canvas.getBoundingClientRect();
         const x = applyGridSnap((e.clientX - rect.left) * (canvas.width / rect.width), 'x');
@@ -6820,6 +7323,8 @@ function handleMouseUp(e) {
                 objects.push({ id: objectIdCounter++, type: 'ladder', x1: startX, y1: startY, x2: x, y2: y });
             } else if (currentTool === 'line-rect') {
                 objects.push({ id: objectIdCounter++, type: 'rect', x1: startX, y1: startY, x2: x, y2: y });
+            } else if (currentTool === 'line-circle') {
+                objects.push({ id: objectIdCounter++, type: 'circle', x1: startX, y1: startY, x2: x, y2: y });
             } else {
                 const lType = currentTool.replace('line-', '');
                 objects.push({ id: objectIdCounter++, type: 'line', lineType: lType, x1: startX, y1: startY, x2: x, y2: y });

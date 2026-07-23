@@ -1863,3 +1863,587 @@ body.role-read-only #pd-tab-goals textarea {
     border-bottom: none;
 }
 
+/* ===== Full-Bleed Context-Oriented Soccer Drawing Workspace ===== */
+body:has(.anim-app-container) .topbar,
+body.drawing-mode .topbar {
+    display: none !important;
+}
+
+body:has(.anim-app-container) .view-container,
+body.drawing-mode .view-container {
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.anim-app-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    background: #f1f5f9 !important;
+}
+
+/* 1. Header (50px Single Row) */
+.anim-header {
+    height: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #ffffff;
+    border-bottom: 1px solid var(--surface-border);
+    padding: 0 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    z-index: 100;
+}
+
+.anim-header-left, .anim-header-center, .anim-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.anim-menu-title-icon {
+    font-size: 1.1rem;
+}
+
+.anim-editable-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px dashed transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.anim-editable-title:hover, .anim-editable-title:focus {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: var(--primary);
+    outline: none;
+}
+
+/* Settings Popover Dropdown */
+.anim-settings-popover {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 6px;
+    background: #ffffff;
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+    padding: 0.8rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 250;
+}
+
+.anim-settings-popover.hidden {
+    display: none !important;
+}
+
+/* 2 & 3. Main Workspace (50px Tool Dock + 100% Full-Bleed Canvas) */
+.anim-main-workspace {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #f1f5f9 !important;
+}
+
+/* 2. Slim Tool Dock (Width ~50px, Restored All Tools, Vertical Scroll) */
+.anim-tool-dock {
+    width: 50px;
+    flex-shrink: 0;
+    height: 100%;
+    max-height: calc(100vh - 50px);
+    max-height: calc(100dvh - 50px);
+    background: #ffffff;
+    border-right: 1px solid var(--surface-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0;
+    gap: 0.35rem;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.03);
+    z-index: 90;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+}
+
+.dock-btn {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1.1rem;
+    position: relative;
+}
+
+.dock-btn .dock-text {
+    display: none;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    letter-spacing: -0.03em;
+}
+
+.dock-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* Active State: Color Change + Icon Swaps to Text (Flat Design) */
+.dock-btn.active {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    border-color: var(--primary) !important;
+    box-shadow: none !important;
+}
+
+.dock-btn.active i,
+.dock-btn.active span:not(.dock-text) {
+    display: none !important;
+}
+
+.dock-btn.active .dock-text {
+    display: block !important;
+    color: #ffffff !important;
+}
+
+/* Tooltips on hover for icon-only dock */
+.dock-btn[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    background: rgba(15, 23, 42, 0.92);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 300;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.dock-btn[data-tooltip]:hover::after {
+    opacity: 1;
+}
+
+/* 3. Maximized Canvas Area (One Step Smaller, Padded Fit) */
+.anim-canvas-area {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    background: #f1f5f9 !important;
+    padding: 1.2rem 1.6rem !important;
+    box-sizing: border-box;
+}
+
+.canvas-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    background: #f1f5f9 !important;
+}
+
+.canvas-wrapper canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    aspect-ratio: 8/5;
+    object-fit: contain;
+    display: block;
+    background: #f1f5f9;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* Right Collapsible Detail Side Panel (Persistent Toggle Tab) */
+.anim-detail-side-panel {
+    width: 250px;
+    flex-shrink: 0;
+    height: 100%;
+    background: #ffffff;
+    border-left: 1px solid var(--surface-border);
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 95;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.anim-detail-side-panel.collapsed {
+    transform: translateX(250px);
+}
+
+.side-panel-toggle-btn {
+    position: absolute;
+    left: -28px;
+    top: 14px;
+    width: 28px;
+    height: 38px;
+    background: #ffffff;
+    border: 1px solid var(--surface-border);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    z-index: 120;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.anim-detail-side-panel.collapsed .side-panel-toggle-btn i {
+    transform: rotate(180deg);
+}
+
+.side-panel-toggle-btn:hover {
+    color: var(--primary);
+    background: #f8fafc;
+}
+
+.side-panel-header {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    background: #f8fafc;
+}
+
+.side-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.side-info-card {
+    background: #f8fafc;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    padding: 0.65rem 0.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.side-info-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.side-info-val {
+    font-size: 0.82rem;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    line-height: 1.45;
+}
+
+/* 4. Floating Context Popover Menu (Smart Top/Bottom flip positioning) */
+.anim-context-popover {
+    position: absolute;
+    z-index: 150;
+    transform: translate(-50%, -100%);
+    margin-top: -12px;
+    transition: opacity 0.15s ease;
+    pointer-events: auto;
+}
+
+.anim-context-popover.popover-below {
+    transform: translate(-50%, 0);
+    margin-top: 14px;
+}
+
+.anim-context-popover.hidden {
+    display: none !important;
+}
+
+.popover-content {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 10px;
+    padding: 0.35rem 0.55rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    white-space: nowrap;
+}
+
+.popover-group {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.popover-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.popover-input-num {
+    width: 44px;
+    height: 26px;
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.popover-color-dots {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.color-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+    padding: 0;
+}
+
+.color-dot:hover {
+    transform: scale(1.15);
+}
+
+.color-dot.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.popover-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-left: 1px solid var(--surface-border);
+    padding-left: 0.5rem;
+}
+
+.popover-arrow {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background: #ffffff;
+    border-right: 1px solid rgba(0, 0, 0, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.anim-context-popover.popover-below .popover-arrow {
+    bottom: auto;
+    top: -6px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* 5. Floating Compact Player Bar Timeline (Height ~44px, Floating Bottom Center) */
+.anim-player-bar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 44px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 22px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+    z-index: 200;
+    box-sizing: border-box;
+}
+
+.player-bar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.player-bar-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--surface-border);
+    margin: 0 2px;
+}
+
+.anim-player-bar select#anim-frame-select {
+    height: 30px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0 0.6rem;
+    border-radius: 10px;
+    border: 1px solid var(--surface-border);
+    background: #ffffff;
+    color: var(--text-primary);
+    cursor: pointer;
+    min-width: 130px;
+    max-width: 180px;
+    outline: none;
+    text-align: center;
+}
+
+.anim-player-bar .btn-xs {
+    height: 30px;
+    padding: 0 0.65rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+}
+
+.anim-player-bar #anim-play {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
+.anim-player-bar #anim-play:hover {
+    background: #059669 !important;
+}
+
+/* Right Collapsible Detail Side Panel with Layout Transition */
+.anim-detail-side-panel {
+    width: 250px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    border-left: 1px solid var(--surface-border);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+
+.anim-detail-side-panel.collapsed {
+    transform: translateX(250px);
+}
+
+.side-panel-toggle-btn {
+    position: absolute;
+    top: 14px;
+    left: -28px;
+    width: 28px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--surface-border);
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.05);
+    z-index: 110;
+}
+
+.anim-detail-side-panel.collapsed .side-panel-toggle-btn i {
+    transform: rotate(180deg);
+}
+
+.side-panel-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.side-panel-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+}
+
+.side-info-card {
+    background: var(--surface-ground, #f8fafc);
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+}
+
+.side-info-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
+}
+
+.side-info-val {
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+

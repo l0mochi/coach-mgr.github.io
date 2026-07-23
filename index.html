@@ -505,170 +505,219 @@
     </template>
 
     <template id="tpl-animation">
-        <div class="animation-container">
-            <!-- Menu details inside animation workspace (Collapsible Accordion) -->
-            <div id="anim-menu-info" class="card" style="margin-bottom:0.3rem; padding:0.5rem 1rem; display:none; position:relative;">
-                <!-- Header (Click to toggle) -->
-                <div id="anim-menu-info-header" style="display:flex; justify-content:space-between; align-items:center; cursor:pointer; user-select:none;">
-                    <div style="display:flex; align-items:center; gap:0.6rem;">
-                        <h3 id="anim-menu-focus" style="color:var(--primary); font-size:1rem; margin:0; font-weight:600; padding-right:1rem;"></h3>
-                        <button class="btn btn-secondary" id="btn-edit-anim-menu" style="padding:0.25rem 0.5rem; font-size:0.75rem; height:24px; display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box;" title="基本情報を編集"><i class="fa-solid fa-pen"></i> 編集</button>
-                    </div>
-                    <span id="anim-menu-info-toggle-btn" style="color:var(--text-secondary); font-size:0.8rem; display:flex; align-items:center; gap:0.3rem;"><i class="fa-solid fa-chevron-down"></i> 詳細を表示</span>
+        <div class="anim-app-container">
+            
+            <!-- Region 1: Integrated 50px Single-Row Header (Strict 1-Row Bar) -->
+            <header class="anim-header">
+                <div class="anim-header-left">
+                    <button class="btn btn-secondary btn-sm" id="anim-back" title="一覧に戻る"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
                 </div>
-                <!-- Collapsible content (Hidden by default) -->
-                <div id="anim-menu-info-content" style="display:none; margin-top:0.8rem; border-top:1px solid var(--surface-border); padding-top:0.8rem; font-size:0.85rem; color:var(--text-secondary);">
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; width:100%;">
-                        <div id="anim-menu-organize-container" style="display:none; flex-direction:column; gap:0.25rem;">
-                            <strong style="color:var(--text-primary); font-size:0.8rem;"><i class="fa-solid fa-users"></i> オーガナイズ</strong>
-                            <div id="anim-menu-organize" style="white-space:pre-wrap; line-height:1.4; background:rgba(0,0,0,0.02); padding:0.5rem; border-radius:4px; border:1px solid var(--surface-border); margin-top:0.15rem;"></div>
-                        </div>
-                        <div id="anim-menu-keyfactor-container" style="display:none; flex-direction:column; gap:0.25rem;">
-                            <strong style="color:var(--text-primary); font-size:0.8rem;"><i class="fa-solid fa-key"></i> キーファクター</strong>
-                            <div id="anim-menu-keyfactor" style="white-space:pre-wrap; line-height:1.4; background:rgba(0,0,0,0.02); padding:0.5rem; border-radius:4px; border:1px solid var(--surface-border); margin-top:0.15rem;"></div>
-                        </div>
-                        <div id="anim-menu-options-container" style="display:none; flex-direction:column; gap:0.25rem;">
-                            <strong style="color:var(--text-primary); font-size:0.8rem;"><i class="fa-solid fa-plus"></i> オプション</strong>
-                            <div id="anim-menu-options" style="white-space:pre-wrap; line-height:1.4; background:rgba(0,0,0,0.02); padding:0.5rem; border-radius:4px; border:1px solid var(--surface-border); margin-top:0.15rem;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <div class="animation-workspace" style="display:flex; gap:0.8rem; align-items:stretch;">
-            <!-- Left: Pitch Canvas -->
-            <div style="flex:3; min-width:550px; max-width:100%; display:flex; flex-direction:column; gap:0.4rem;">
-                <div class="canvas-wrapper" id="canvas-wrapper" style="width:100%; aspect-ratio:8/5; background:#4ade80; border-radius:var(--border-radius); overflow:hidden; position:relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                    <canvas id="pitch-canvas" width="800" height="500" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
-                </div>
-                <div class="canvas-instructions" style="color:#64748b; font-size:0.75rem; line-height:1.3; background:rgba(255,255,255,0.02); padding:0.4rem 0.6rem; border-radius:6px; border:1px solid var(--surface-border); margin:0;">
-                    <p style="margin:0;">💡 <strong>操作方法:</strong> ツールを選んでクリック配置（選択でドラッグ）。「シーン記録」を押すとアニメーションになります。</p>
-                </div>
-            </div>
-
-            <!-- Right: Structured Sidebar Toolbar -->
-            <div class="canvas-toolbar">
                 
-                <!-- Section 1: Navigation & Save (Top Actions) -->
-                <div class="canvas-toolbar-section">
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.25rem;">
-                        <button class="btn btn-secondary" id="anim-back" style="padding:0.25rem; font-size:0.7rem; justify-content:center;" title="編集を終了して一覧に戻る"><i class="fa-solid fa-arrow-left"></i> 戻る</button>
-                        <button class="btn btn-primary" id="anim-save" style="padding:0.25rem; font-size:0.7rem; justify-content:center;" title="作図を保存"><i class="fa-solid fa-save"></i> 保存</button>
-                    </div>
+                <div class="anim-header-center">
+                    <span id="anim-menu-focus" class="anim-editable-title" style="cursor:default;" title="テーマ・フォーカス">テーマ・フォーカス</span>
                 </div>
 
-                <!-- Section 2: Player Selection / Numbers & Colors & Object Sizes -->
-                <div class="canvas-toolbar-section" style="background:rgba(0,0,0,0.03); padding:0.25rem; border-radius:6px;">
-                    <div style="display:flex; align-items:center; gap:0.25rem; width:100%; flex-wrap:wrap;">
-                        <label for="canvas-player-number" style="font-size:0.7rem; color:var(--text-secondary); margin:0; white-space:nowrap;">背番号:</label>
-                        <input type="text" id="canvas-player-number" value="" maxlength="3" style="width:30px; padding:0.1rem; text-align:center; background:#ffffff; border:1px solid var(--surface-border); color:var(--text-primary); border-radius:3px; font-weight:bold; font-size:0.75rem; height:20px; box-sizing:border-box;">
-                        
-                        <label for="canvas-player-color" style="font-size:0.7rem; color:var(--text-secondary); margin:0; white-space:nowrap; margin-left:0.25rem;">色:</label>
-                        <select id="canvas-player-color" style="flex:1; padding:0.1rem; font-size:0.7rem; border:1px solid var(--surface-border); border-radius:3px; height:20px; background:#ffffff; color:var(--text-primary);">
-                            <option value="red" style="color:#f23932; font-weight:bold;">赤 (自チーム)</option>
-                            <option value="blue" style="color:#3d79d5; font-weight:bold;">青 (相手)</option>
-                            <option value="green" style="color:#63a84d; font-weight:bold;">緑 (GK/控え)</option>
-                            <option value="orange" style="color:#f09f4d; font-weight:bold;">橙 (フリーマン)</option>
-                        </select>
-                        
+                <div class="anim-header-right">
+                    <button class="btn btn-secondary btn-sm" id="tool-undo" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i> Undo</button>
+                    <button class="btn btn-secondary btn-sm" id="tool-redo" title="Redo (Ctrl+Y)"><i class="fa-solid fa-rotate-right"></i> Redo</button>
 
-                        
-                        <select id="canvas-player-select" class="form-control hidden" style="width:100%; padding:0.1rem; font-size:0.7rem; border:1px solid var(--surface-border); border-radius:3px; height:20px; margin-top:0.2rem;">
-                            <!-- Populated dynamically -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Scrollable sections container to prevent any overflow issues -->
-                <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:0.35rem; padding-right:2px;">
-                    
-                    <!-- Section 3: Players & Basic Tools -->
-                    <div class="canvas-toolbar-section">
-                        <div class="canvas-toolbar-section-title"><i class="fa-solid fa-hand-pointer"></i> 選手・基本操作</div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.2rem;">
-                            <button class="btn btn-secondary tool-btn active" data-tool="select" style="padding:0.2rem; font-size:0.7rem; justify-content:center;" title="選択"><i class="fa-solid fa-hand-pointer"></i> 選択</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="text" style="padding:0.2rem; font-size:0.7rem; justify-content:center;" title="文字"><i class="fa-solid fa-font"></i> 文字</button>
-                            
-                            <button class="btn btn-secondary tool-btn" data-tool="player" style="padding:0.2rem; font-size:0.7rem; justify-content:center; grid-column: span 2;" title="選手"><i class="fa-solid fa-user-plus"></i> 選手を配置</button>
-                            
-                            <button class="btn btn-secondary" id="tool-rotate" style="padding:0.2rem; font-size:0.7rem; justify-content:center;" title="向きを回転"><i class="fa-solid fa-rotate-right"></i> 回転</button>
-                            <button class="btn btn-danger" id="tool-delete" style="padding:0.2rem; font-size:0.7rem; justify-content:center;" title="選択削除"><i class="fa-solid fa-trash-can"></i> 選択削除</button>
-                        </div>
-                    </div>
-
-                    <!-- Section 4: Equipment & Lines -->
-                    <div class="canvas-toolbar-section">
-                        <div class="canvas-toolbar-section-title"><i class="fa-solid fa-toolbox"></i> 器具配置・ライン描画</div>
-                        <!-- Equipment Grid -->
-                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.2rem; margin-bottom:0.35rem;">
-                            <button class="btn btn-secondary tool-btn" data-tool="ball" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="ボール"><i class="fa-solid fa-futbol"></i> ボール</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="marker" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="マーカー"><i class="fa-solid fa-circle" style="color:#f97316;"></i> マーク</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="cone" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="コーン"><i class="fa-solid fa-caret-up" style="color:#facc15;"></i> コーン</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="ladder" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="ラダー"><i class="fa-solid fa-bars" style="transform: rotate(90deg); display: inline-block;"></i> ラダー</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="minigoal" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="ミニゴール"><span style="display:inline-block; width:10px; height:6px; border:2px solid #fff; border-bottom:none; vertical-align:middle; margin-right:2px;"></span> ゴール</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="line-rect" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="四角枠"><i class="fa-regular fa-square" style="border: 1.5px dashed #cbd5e1; width: 10px; height: 10px; display: inline-block; vertical-align: middle;"></i> 四角</button>
-                        </div>
-                        <!-- Lines Grid -->
-                        <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.2rem;">
-                            <button class="btn btn-secondary tool-btn" data-tool="line-move" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="移動(人)"><i class="fa-solid fa-arrow-right"></i> 移動</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="line-pass" style="padding:0.2rem; font-size:0.65rem; justify-content:center;" title="パス"><i class="fa-solid fa-arrow-right-long" style="opacity:0.8;"></i> パス</button>
-                            <button class="btn btn-secondary tool-btn" data-tool="line-dribble" style="padding:0.2rem 0.1rem; font-size:0.58rem; letter-spacing:-0.5px; justify-content:center;" title="ドリブル"><i class="fa-solid fa-water"></i> ドリブル</button>
-                        </div>
-                    </div>
-
-                    <!-- Section 5: Pitch Layout Options -->
-                    <div class="canvas-toolbar-section">
-                        <div class="canvas-toolbar-section-title"><i class="fa-solid fa-soccer-ball"></i> ピッチ設定</div>
-                        <div style="display:flex; flex-direction:column; gap:0.25rem;">
-                            <select id="canvas-pitch-template" class="form-control" style="width:100%; padding:0.15rem; font-size:0.7rem; border:1px solid var(--surface-border); border-radius:3px; height:22px; background:#ffffff; color:var(--text-primary);">
-                                <option value="full">フルコート</option>
-                                <option value="half">ハーフコート(上)</option>
-                                <option value="half-bottom">ハーフコート(下)</option>
-                                <option value="blank">ブランク（白地）</option>
-                            </select>
-                            <label style="font-size:0.7rem; display:flex; align-items:center; gap:0.2rem; color:var(--text-secondary); cursor:pointer; margin:0;">
-                                <input type="checkbox" id="canvas-snap-grid" checked>
-                                <span>グリッド吸着</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Section 6: Animation Controller -->
-                    <div class="canvas-toolbar-section">
-                        <div class="canvas-toolbar-section-title"><i class="fa-solid fa-film"></i> アニメーション</div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.25rem;">
-                            <button class="btn btn-primary" id="anim-add-frame" style="padding:0.25rem 0.1rem; font-size:0.65rem; justify-content:center;" title="最後にシーンを追加"><i class="fa-solid fa-plus"></i> 末尾追加 <span id="frame-count" class="badge" style="padding:1px 4px; font-size:0.6rem;">0</span></button>
-                            <button class="btn btn-secondary" id="anim-insert-frame" style="padding:0.25rem 0.1rem; font-size:0.65rem; justify-content:center;" title="現在表示中のシーンの直後に割り込み挿入"><i class="fa-solid fa-code-commit"></i> 間に挿入</button>
-                        </div>
-                        
-                        <!-- Hybrid Scene Navigator Controls -->
-                        <div id="anim-scene-navigator" style="margin-top:0.35rem; display:flex; flex-direction:column; gap:0.25rem;">
-                            <div style="display:flex; align-items:center; gap:0.2rem; width:100%;">
-                                <button class="btn btn-secondary" id="anim-prev-frame" style="padding:0.2rem 0.45rem; font-size:0.65rem; height:24px; box-sizing:border-box; justify-content:center;" title="前のシーンへ"><i class="fa-solid fa-chevron-left"></i></button>
-                                <select id="anim-frame-select" class="form-control" style="flex:1; padding:0.1rem 0.2rem; font-size:0.7rem; height:24px; border:1px solid var(--surface-border); border-radius:4px; background:#ffffff; color:var(--text-primary); text-align:center; font-weight:600; min-width:0;">
-                                    <option value="-1">シーン未作成 (0)</option>
+                    <!-- Settings Dropdown -->
+                    <div class="dropdown-settings-wrapper" style="position:relative;">
+                        <button class="btn btn-secondary btn-sm" id="anim-settings-btn" title="設定 (ピッチ・グリッド)"><i class="fa-solid fa-gear"></i> 設定</button>
+                        <div id="anim-settings-popover" class="anim-settings-popover hidden">
+                            <div class="setting-item">
+                                <label style="font-size:0.75rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">ピッチタイプ</label>
+                                <select id="canvas-pitch-template" class="form-control form-control-sm" style="width:100%; font-size:0.8rem;">
+                                    <option value="full">フルコート</option>
+                                    <option value="half">ハーフコート(上)</option>
+                                    <option value="half-bottom">ハーフコート(下)</option>
+                                    <option value="blank">ブランク（白地）</option>
                                 </select>
-                                <button class="btn btn-secondary" id="anim-next-frame" style="padding:0.2rem 0.45rem; font-size:0.65rem; height:24px; box-sizing:border-box; justify-content:center;" title="次のシーンへ"><i class="fa-solid fa-chevron-right"></i></button>
-                                <button class="btn btn-danger" id="anim-delete-frame" style="padding:0.2rem 0.45rem; font-size:0.65rem; height:24px; box-sizing:border-box; justify-content:center;" title="現在のシーンを削除"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                            <div class="setting-item" style="margin-top:8px;">
+                                <label style="font-size:0.78rem; display:flex; align-items:center; gap:0.4rem; cursor:pointer; margin:0;">
+                                    <input type="checkbox" id="canvas-snap-grid" checked>
+                                    <span>グリッド吸着</span>
+                                </label>
+                            </div>
+                            <hr style="margin:8px 0; border:none; border-top:1px solid var(--surface-border);">
+                            <div class="setting-item">
+                                <button class="btn btn-danger btn-xs" id="tool-clear" style="width:100%; justify-content:center;"><i class="fa-solid fa-trash"></i> すべて消去</button>
                             </div>
                         </div>
+                    </div>
 
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.25rem; margin-top:0.3rem;">
-                            <button class="btn btn-primary" id="anim-play" style="background:#10b981; padding:0.25rem; font-size:0.7rem; justify-content:center;" title="アニメーション再生"><i class="fa-solid fa-play"></i> 再生</button>
-                            <button class="btn btn-secondary" id="anim-stop" style="padding:0.25rem; font-size:0.7rem; justify-content:center;" title="停止"><i class="fa-solid fa-stop"></i> 停止</button>
+                    <button class="btn btn-primary btn-sm" id="anim-save" title="作図を保存"><i class="fa-solid fa-save"></i> 保存</button>
+                </div>
+            </header>
+
+            <!-- Region 2 & 3: Main Workspace (Restored All-Tool Left Dock + 100% Full-Bleed Pitch Canvas) -->
+            <div class="anim-main-workspace">
+                
+                <!-- Region 2: Left Icon Dock (Width ~50px, Restored All Tools, Vertical Scroll) -->
+                <nav class="anim-tool-dock" id="anim-tool-dock">
+                    <button class="dock-btn tool-btn active" data-tool="select" data-tooltip="選択 (👆)"><i class="fa-solid fa-hand-pointer"></i><span class="dock-text">選択</span></button>
+                    <button class="dock-btn tool-btn" data-tool="player" data-tooltip="選手配置 (👤)"><i class="fa-solid fa-user-plus"></i><span class="dock-text">選手</span></button>
+                    <button class="dock-btn tool-btn" data-tool="ball" data-tooltip="ボール (⚽)"><i class="fa-solid fa-futbol"></i><span class="dock-text">ボール</span></button>
+                    
+                    <button class="dock-btn tool-btn" data-tool="line-move" data-tooltip="移動 (↗️)"><i class="fa-solid fa-arrow-right"></i><span class="dock-text">移動</span></button>
+                    <button class="dock-btn tool-btn" data-tool="line-pass" data-tooltip="パス (➡️)"><i class="fa-solid fa-arrow-right-long" style="opacity:0.8;"></i><span class="dock-text">パス</span></button>
+                    <button class="dock-btn tool-btn" data-tool="line-dribble" data-tooltip="ドリブル (〰️)"><i class="fa-solid fa-water"></i><span class="dock-text">ドリブル</span></button>
+
+                    <button class="dock-btn tool-btn" data-tool="marker" data-tooltip="マーカー (🟠)"><i class="fa-solid fa-circle" style="color:#f97316;"></i><span class="dock-text">マーカー</span></button>
+                    <button class="dock-btn tool-btn" data-tool="cone" data-tooltip="コーン (🔺)"><i class="fa-solid fa-caret-up" style="color:#facc15;"></i><span class="dock-text">コーン</span></button>
+                    <button class="dock-btn tool-btn" data-tool="ladder" data-tooltip="ラダー (🪜)"><i class="fa-solid fa-bars" style="transform: rotate(90deg);"></i><span class="dock-text">ラダー</span></button>
+                    <button class="dock-btn tool-btn" data-tool="minigoal" data-tooltip="ミニゴール (🥅)"><span style="display:inline-block; width:10px; height:6px; border:2px solid currentColor; border-bottom:none;"></span><span class="dock-text">ゴール</span></button>
+
+                    <button class="dock-btn tool-btn" data-tool="line-rect" data-tooltip="四角エリア (🔲)"><i class="fa-regular fa-square"></i><span class="dock-text">四角</span></button>
+                    <button class="dock-btn tool-btn" data-tool="line-circle" data-tooltip="円エリア (⭕)"><i class="fa-regular fa-circle"></i><span class="dock-text">円</span></button>
+                    <button class="dock-btn tool-btn" data-tool="text" data-tooltip="文字 (🔤)"><i class="fa-solid fa-font"></i><span class="dock-text">文字</span></button>
+                </nav>
+
+                <!-- 3. Pitch Canvas (100% True Full Bleed) -->
+                <div class="anim-canvas-area">
+                    <div class="canvas-wrapper" id="canvas-wrapper">
+                        <canvas id="pitch-canvas" width="800" height="500"></canvas>
+                        
+                        <!-- 4. Contextual Floating Popover Menu (Directly above/below selected object) -->
+                        <div id="anim-context-popover" class="anim-context-popover hidden">
+                            <div class="popover-content">
+                                <div id="popover-player-controls" class="popover-group">
+                                    <span class="popover-label">No:</span>
+                                    <input type="text" id="canvas-player-number" class="popover-input-num" value="" maxlength="3" placeholder="No">
+                                    
+                                    <span class="popover-label" style="margin-left:0.3rem;">色:</span>
+                                    <div class="popover-color-dots">
+                                        <button type="button" class="color-dot active" data-color="red" style="background:#f23932;" title="赤"></button>
+                                        <button type="button" class="color-dot" data-color="blue" style="background:#3d79d5;" title="青"></button>
+                                        <button type="button" class="color-dot" data-color="green" style="background:#63a84d;" title="緑"></button>
+                                        <button type="button" class="color-dot" data-color="orange" style="background:#f09f4d;" title="橙"></button>
+                                    </div>
+                                    <select id="canvas-player-color" class="hidden">
+                                        <option value="red">赤</option>
+                                        <option value="blue">青</option>
+                                        <option value="green">緑</option>
+                                        <option value="orange">橙</option>
+                                    </select>
+                                    <select id="canvas-player-select" class="form-control hidden"></select>
+                                </div>
+
+                                <div class="popover-actions">
+                                    <button class="btn btn-secondary btn-xs" id="tool-rotate" title="向きを回転"><i class="fa-solid fa-rotate-right"></i> 回転</button>
+                                    <button class="btn btn-danger btn-xs" id="tool-delete" title="選択削除"><i class="fa-solid fa-trash-can"></i> 削除</button>
+                                </div>
+                            </div>
+                            <div class="popover-arrow"></div>
+                        </div>
+
+                        <!-- 5. Floating Compact Player Bar Timeline (Centered Inside Pitch Canvas) -->
+                        <footer class="anim-player-bar" id="anim-timeline-bar">
+                            <!-- Left Group: Play / Stop -->
+                            <div class="player-bar-group player-bar-left">
+                                <button class="btn btn-primary btn-xs" id="anim-play" title="アニメーション再生"><i class="fa-solid fa-play"></i> 再生</button>
+                                <button class="btn btn-secondary btn-xs" id="anim-stop" title="停止"><i class="fa-solid fa-stop"></i> 停止</button>
+                            </div>
+
+                            <span class="player-bar-divider"></span>
+
+                            <!-- Center Group: Prev / Select Scene Dropdown / Edit Title / Next -->
+                            <div class="player-bar-group player-bar-center">
+                                <button class="btn btn-secondary btn-xs" id="anim-prev-frame" title="前のシーンへ"><i class="fa-solid fa-chevron-left"></i> 前へ</button>
+                                <select id="anim-frame-select" title="シーン切替プルダウン"></select>
+                                <button class="btn btn-secondary btn-xs" id="anim-edit-frame-title" title="現在のシーンの見出し（例: 初期配置）を編集"><i class="fa-solid fa-pen"></i></button>
+                                <button class="btn btn-secondary btn-xs" id="anim-next-frame" title="次のシーンへ">次へ <i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+
+                            <span class="player-bar-divider"></span>
+
+                            <!-- Right Group: Add Scene / Delete Scene / Video Export -->
+                            <div class="player-bar-group player-bar-right">
+                                <button class="btn btn-primary btn-xs" id="anim-add-frame" title="現在のシーンの次に新しいシーンを挿入"><i class="fa-solid fa-plus"></i> 追加</button>
+                                <button class="btn btn-danger btn-xs" id="anim-delete-frame" title="現在のシーンを削除"><i class="fa-solid fa-trash-can"></i> 削除</button>
+                                <button class="btn btn-secondary btn-xs" id="anim-export-video" title="ダウンロード (LINE共有用)" style="padding:0 0.55rem; font-size:0.85rem;"><i class="fa-solid fa-download" style="color:var(--primary);"></i></button>
+                            </div>
+                        </footer>
+
+                    </div>
+                </div>
+
+                <!-- Right Collapsible Detail Side Panel (Organize, Key Factors, Options) -->
+                <aside class="anim-detail-side-panel" id="anim-detail-side-panel">
+                    <button class="side-panel-toggle-btn" id="anim-side-panel-toggle-btn" title="詳細パネルを開閉">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <div class="side-panel-header">
+                        <h4 style="margin:0; font-size:0.9rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:0.4rem;">
+                            <i class="fa-solid fa-clipboard-list" style="color:var(--primary);"></i> メニュー詳細
+                        </h4>
+                    </div>
+                    <div class="side-panel-body">
+                        <div class="side-info-card">
+                            <span class="side-info-label"><i class="fa-solid fa-bullseye" style="color:var(--primary);"></i> テーマ・フォーカス</span>
+                            <div id="side-info-focus" class="side-info-val" style="font-weight:700;">未設定</div>
+                        </div>
+
+                        <div class="side-info-card">
+                            <span class="side-info-label"><i class="fa-solid fa-users" style="color:#3b82f6;"></i> オーガナイズ</span>
+                            <div id="side-info-organize" class="side-info-val">なし</div>
+                        </div>
+
+                        <div class="side-info-card">
+                            <span class="side-info-label"><i class="fa-solid fa-key" style="color:#eab308;"></i> キーファクター</span>
+                            <div id="side-info-keyfactor" class="side-info-val">なし</div>
+                        </div>
+
+                        <div class="side-info-card">
+                            <span class="side-info-label"><i class="fa-solid fa-plus-circle" style="color:#10b981;"></i> オプション</span>
+                            <div id="side-info-options" class="side-info-val">なし</div>
                         </div>
                     </div>
-                </div>
+                </aside>
 
-                <!-- Section 7: Global Tools (Always at the bottom) -->
-                <div class="canvas-toolbar-section" style="border-top:1.5px solid var(--surface-border); border-bottom:none; padding-top:0.35rem; padding-bottom:0; margin-bottom:0;">
-                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.2rem;">
-                        <button class="btn btn-secondary" id="tool-undo" style="padding:0.25rem 0.1rem; font-size:0.65rem; justify-content:center;" title="元に戻す (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i> 戻す</button>
-                        <button class="btn btn-secondary" id="tool-redo" style="padding:0.25rem 0.1rem; font-size:0.65rem; justify-content:center;" title="やり直し (Ctrl+Y)"><i class="fa-solid fa-rotate-right"></i> 進む</button>
-                        <button class="btn btn-danger" id="tool-clear" style="padding:0.25rem 0.1rem; font-size:0.65rem; justify-content:center;" title="すべて消去"><i class="fa-solid fa-trash"></i> 消去</button>
+            <!-- Menu Detail Info Modal (Organize, Key Factor, Options) -->
+            <div id="modal-anim-menu-info" class="modal-overlay hidden" style="z-index: 500;">
+                <div class="modal" style="max-width: 540px; width: 92%; border-radius: 14px; padding: 1.5rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--surface-border); padding-bottom:0.6rem;">
+                        <h3 style="margin:0; font-size:1.05rem; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:0.5rem;">
+                            <i class="fa-solid fa-clipboard-list" style="color:var(--primary);"></i> メニュー詳細情報
+                        </h3>
+                        <button class="btn btn-secondary btn-xs" id="btn-close-anim-info" style="border:none; background:transparent; font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:1rem;">
+                        <div style="background:#f8fafc; padding:0.65rem 0.85rem; border-radius:8px; border:1px solid var(--surface-border);">
+                            <strong style="color:var(--primary); font-size:0.78rem; display:block; margin-bottom:2px;"><i class="fa-solid fa-bullseye"></i> テーマ・フォーカス</strong>
+                            <div id="modal-info-focus" style="font-weight:700; font-size:0.95rem; color:var(--text-primary);">未設定</div>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; gap:0.8rem;">
+                            <div>
+                                <strong style="color:var(--text-primary); font-size:0.8rem; display:flex; align-items:center; gap:0.4rem; margin-bottom:4px;">
+                                    <i class="fa-solid fa-users" style="color:#3b82f6;"></i> オーガナイズ
+                                </strong>
+                                <div id="modal-info-organize" style="white-space:pre-wrap; line-height:1.5; font-size:0.85rem; background:#f8fafc; padding:0.6rem 0.8rem; border-radius:6px; border:1px solid var(--surface-border); min-height:36px; color:var(--text-primary);">なし</div>
+                            </div>
+
+                            <div>
+                                <strong style="color:var(--text-primary); font-size:0.8rem; display:flex; align-items:center; gap:0.4rem; margin-bottom:4px;">
+                                    <i class="fa-solid fa-key" style="color:#eab308;"></i> キーファクター
+                                </strong>
+                                <div id="modal-info-keyfactor" style="white-space:pre-wrap; line-height:1.5; font-size:0.85rem; background:#f8fafc; padding:0.6rem 0.8rem; border-radius:6px; border:1px solid var(--surface-border); min-height:36px; color:var(--text-primary);">なし</div>
+                            </div>
+
+                            <div>
+                                <strong style="color:var(--text-primary); font-size:0.8rem; display:flex; align-items:center; gap:0.4rem; margin-bottom:4px;">
+                                    <i class="fa-solid fa-plus-circle" style="color:#10b981;"></i> オプション
+                                </strong>
+                                <div id="modal-info-options" style="white-space:pre-wrap; line-height:1.5; font-size:0.85rem; background:#f8fafc; padding:0.6rem 0.8rem; border-radius:6px; border:1px solid var(--surface-border); min-height:36px; color:var(--text-primary);">なし</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:1.2rem; display:flex; justify-content:flex-end;">
+                        <button class="btn btn-secondary btn-sm" id="btn-close-anim-info-footer">閉じる</button>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </template>
 
