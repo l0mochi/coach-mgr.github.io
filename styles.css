@@ -2539,4 +2539,48 @@ body.drawing-mode .view-container {
     .anim-detail-side-panel.open {
         transform: translateX(0) !important;
     }
+
+    /* 1. 再生バー本体の幅・余白・位置調整 */
+    .anim-player-bar {
+        bottom: 8px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 96% !important;
+        /* 画面幅の96%に抑える */
+        max-width: 380px !important;
+        /* スマホの最大幅制限 */
+        height: 38px !important;
+        /* 高さを少しコンパクトに */
+        padding: 0 6px !important;
+        gap: 0.25rem !important;
+        /* 要素間の隙間を詰める */
+        justify-content: space-between !important;
+    }
+
+    /* 2. 区切り線の非表示（省スペース化） */
+    .player-bar-divider {
+        display: none !important;
+    }
+
+    /* 3. 各ボタンのコンパクト化 */
+    .anim-player-bar .btn-xs {
+        height: 28px !important;
+        padding: 0 0.35rem !important;
+        font-size: 0.68rem !important;
+        gap: 0.15rem !important;
+    }
+
+    /* 4. シーン選択プルダウンのコンパクト化 */
+    .anim-player-bar select#anim-frame-select {
+        height: 28px !important;
+        min-width: 85px !important;
+        max-width: 105px !important;
+        font-size: 0.72rem !important;
+        padding: 0 0.2rem !important;
+    }
+
+    /* 5. グループ間の隙間調整 */
+    .player-bar-group {
+        gap: 0.2rem !important;
+    }
 }
