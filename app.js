@@ -573,6 +573,16 @@ function setupEventListeners() {
     updateRoleUI();
 }
 
+// ボトムナビゲーションのクリックイベント設定
+const bottomNavLinks = document.querySelectorAll('.bottom-nav .nav-item');
+bottomNavLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const route = e.currentTarget.dataset.route;
+        navigate(route);
+    });
+});
+
 function updateRoleUI() {
     const badge = document.getElementById('user-role-badge');
     const avatar = document.getElementById('user-avatar');
@@ -670,6 +680,11 @@ function navigate(route, params = null) {
         link.classList.toggle('active', link.dataset.route === route);
         if (link.dataset.route === route) {
             topbarTitle.textContent = link.textContent.trim();
+            // ボトムナビの active 切り替え
+            const bottomNavLinks = document.querySelectorAll('.bottom-nav .nav-item');
+            bottomNavLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.route === route);
+            });
         }
     });
 
