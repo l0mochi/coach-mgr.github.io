@@ -79,7 +79,7 @@ const ITEMS_PER_PAGE = 10;
 // Security & Helper Functions
 function escapeHtml(str) {
     if (typeof str !== 'string') return str;
-    return str.replace(/[&<>"']/g, function(m) {
+    return str.replace(/[&<>"']/g, function (m) {
         return {
             '&': '&amp;',
             '<': '&lt;',
@@ -95,7 +95,7 @@ function encryptData(text) {
         if (!text) return text;
         const encoded = encodeURIComponent(text);
         return btoa(encoded.split('').map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ (101 + (i % 7)))).join(''));
-    } catch(e) {
+    } catch (e) {
         return text;
     }
 }
@@ -106,7 +106,7 @@ function decryptData(ciphertext) {
         const decoded = atob(ciphertext);
         const unmasked = decoded.split('').map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ (101 + (i % 7)))).join('');
         return decodeURIComponent(unmasked);
-    } catch(e) {
+    } catch (e) {
         return ciphertext; // Fallback to raw if decryption fails (e.g., plain json from older version)
     }
 }
@@ -128,7 +128,7 @@ function loadData() {
         let parsed = null;
         try {
             parsed = JSON.parse(saved);
-        } catch(e) {
+        } catch (e) {
             console.error('Failed to parse saved data:', e);
         }
         if (parsed) {
@@ -220,7 +220,7 @@ function saveData() {
         teamInfo: state.teamInfo,
         customFormations: state.customFormations
     });
-    
+
     // Store encrypted
     localStorage.setItem('coachMgrData', 'enc:' + encryptData(jsonStr));
 
@@ -265,22 +265,22 @@ function syncPushGasCloud(isSilent = false) {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
     })
-    .then(res => {
-        if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
-        return res.json();
-    })
-    .then(resData => {
-        if (resData && resData.status === 'success') {
-            if (!isSilent) showToast('クラウドへの送信が完了しました！');
-            return resData;
-        } else {
-            throw new Error(resData.message || '同期エラー');
-        }
-    })
-    .catch(err => {
-        console.error('GAS Sync Push Error Details:', err);
-        if (!isSilent) alert(`クラウド送信に失敗しました:\n${err.message || err}`);
-    });
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
+            return res.json();
+        })
+        .then(resData => {
+            if (resData && resData.status === 'success') {
+                if (!isSilent) showToast('クラウドへの送信が完了しました！');
+                return resData;
+            } else {
+                throw new Error(resData.message || '同期エラー');
+            }
+        })
+        .catch(err => {
+            console.error('GAS Sync Push Error Details:', err);
+            if (!isSilent) alert(`クラウド送信に失敗しました:\n${err.message || err}`);
+        });
 }
 
 function syncPullGasCloud(isSilent = false) {
@@ -300,65 +300,65 @@ function syncPullGasCloud(isSilent = false) {
         mode: 'cors',
         redirect: 'follow'
     })
-    .then(res => {
-        if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
-        return res.json();
-    })
-    .then(resData => {
-        if (resData && resData.status === 'success' && resData.data) {
-            let remoteData = resData.data;
-            
-            // Handle multiple levels of stringification if present
-            for (let i = 0; i < 3; i++) {
-                if (typeof remoteData === 'string') {
-                    try { remoteData = JSON.parse(remoteData); } catch(e) { break; }
-                }
-            }
-            
-            // Validate data integrity
-            if (remoteData && (typeof remoteData === 'object')) {
-                const currentGasUrl = state.teamInfo.gasApiUrl;
-                const currentGasSheetName = state.teamInfo.gasSheetName;
-                const currentGasAuthToken = state.teamInfo.gasAuthToken;
-                
-                // Direct state assignment from remote data
-                state.matches = remoteData.matches || [];
-                state.practices = remoteData.practices || [];
-                state.players = remoteData.players || [];
-                state.menuLibrary = remoteData.menuLibrary || [];
-                state.matchTypes = remoteData.matchTypes || state.matchTypes;
-                state.menuCategories = remoteData.menuCategories || state.menuCategories;
-                state.skillMetrics = remoteData.skillMetrics || state.skillMetrics;
-                state.positions = remoteData.positions || state.positions;
-                state.positionsCat2 = remoteData.positionsCat2 || state.positionsCat2;
-                if (remoteData.teamInfo) {
-                    state.teamInfo = remoteData.teamInfo;
-                }
-                if (remoteData.customFormations) {
-                    state.customFormations = remoteData.customFormations;
-                }
-                
-                if (currentGasUrl) state.teamInfo.gasApiUrl = currentGasUrl;
-                if (currentGasSheetName) state.teamInfo.gasSheetName = currentGasSheetName;
-                if (currentGasAuthToken) state.teamInfo.gasAuthToken = currentGasAuthToken;
-                
-                saveData();
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTPエラー: ${res.status}`);
+            return res.json();
+        })
+        .then(resData => {
+            if (resData && resData.status === 'success' && resData.data) {
+                let remoteData = resData.data;
 
-                document.documentElement.style.setProperty('--primary', state.teamInfo.color);
-                const sidebarTitle = document.querySelector('.sidebar-header h2');
-                if (sidebarTitle) sidebarTitle.innerHTML = `<i class="fa-solid fa-futbol"></i> ${state.teamInfo.name}`;
-                
-                if (!isSilent) showToast('クラウドから最新データを復元しました！');
-                navigate(state.currentRoute || 'dashboard');
-                return remoteData;
+                // Handle multiple levels of stringification if present
+                for (let i = 0; i < 3; i++) {
+                    if (typeof remoteData === 'string') {
+                        try { remoteData = JSON.parse(remoteData); } catch (e) { break; }
+                    }
+                }
+
+                // Validate data integrity
+                if (remoteData && (typeof remoteData === 'object')) {
+                    const currentGasUrl = state.teamInfo.gasApiUrl;
+                    const currentGasSheetName = state.teamInfo.gasSheetName;
+                    const currentGasAuthToken = state.teamInfo.gasAuthToken;
+
+                    // Direct state assignment from remote data
+                    state.matches = remoteData.matches || [];
+                    state.practices = remoteData.practices || [];
+                    state.players = remoteData.players || [];
+                    state.menuLibrary = remoteData.menuLibrary || [];
+                    state.matchTypes = remoteData.matchTypes || state.matchTypes;
+                    state.menuCategories = remoteData.menuCategories || state.menuCategories;
+                    state.skillMetrics = remoteData.skillMetrics || state.skillMetrics;
+                    state.positions = remoteData.positions || state.positions;
+                    state.positionsCat2 = remoteData.positionsCat2 || state.positionsCat2;
+                    if (remoteData.teamInfo) {
+                        state.teamInfo = remoteData.teamInfo;
+                    }
+                    if (remoteData.customFormations) {
+                        state.customFormations = remoteData.customFormations;
+                    }
+
+                    if (currentGasUrl) state.teamInfo.gasApiUrl = currentGasUrl;
+                    if (currentGasSheetName) state.teamInfo.gasSheetName = currentGasSheetName;
+                    if (currentGasAuthToken) state.teamInfo.gasAuthToken = currentGasAuthToken;
+
+                    saveData();
+
+                    document.documentElement.style.setProperty('--primary', state.teamInfo.color);
+                    const sidebarTitle = document.querySelector('.sidebar-header h2');
+                    if (sidebarTitle) sidebarTitle.innerHTML = `<i class="fa-solid fa-futbol"></i> ${state.teamInfo.name}`;
+
+                    if (!isSilent) showToast('クラウドから最新データを復元しました！');
+                    navigate(state.currentRoute || 'dashboard');
+                    return remoteData;
+                }
             }
-        }
-        throw new Error('有効なクラウドデータが見つかりませんでした');
-    })
-    .catch(err => {
-        console.error('GAS Sync Pull Error Details:', err);
-        if (!isSilent) alert(`クラウドからの復元に失敗しました:\n${err.message || err}`);
-    });
+            throw new Error('有効なクラウドデータが見つかりませんでした');
+        })
+        .catch(err => {
+            console.error('GAS Sync Pull Error Details:', err);
+            if (!isSilent) alert(`クラウドからの復元に失敗しました:\n${err.message || err}`);
+        });
 }
 
 // Show a fallback modal with the JSON text for environments where download is not available (iOS, file://)
@@ -390,7 +390,7 @@ function _showExportFallbackModal(jsonStr) {
                     const msg = document.getElementById('export-copy-success');
                     if (msg) { msg.style.display = 'block'; setTimeout(() => msg.style.display = 'none', 2500); }
                 }
-            } catch(e) {
+            } catch (e) {
                 alert('コピーできませんでした。テキストを手動で選択してコピーしてください。');
             }
         });
@@ -426,19 +426,19 @@ function init() {
             try {
                 const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
                 window.history.replaceState({}, document.title, cleanUrl);
-            } catch(e) {}
+            } catch (e) { }
         }
-        
+
         // Apply Team Info Settings
         document.documentElement.style.setProperty('--primary', state.teamInfo.color);
         const sidebarTitle = document.querySelector('.sidebar-header h2');
-        if(sidebarTitle) sidebarTitle.innerHTML = `<i class="fa-solid fa-futbol"></i> ${state.teamInfo.name}`;
+        if (sidebarTitle) sidebarTitle.innerHTML = `<i class="fa-solid fa-futbol"></i> ${state.teamInfo.name}`;
         setupEventListeners();
         setupModals();
-        
+
         // Always show dashboard immediately so screen is never stuck loading
         navigate('dashboard');
-        
+
         // Auto pull latest data from cloud in background if configured
         if (state.teamInfo && state.teamInfo.gasApiUrl) {
             if (isFromInviteLink) {
@@ -453,7 +453,7 @@ function init() {
         alert("初期化エラーが発生しました: " + e.message);
         try {
             navigate('dashboard');
-        } catch (err) {}
+        } catch (err) { }
     }
 }
 
@@ -464,7 +464,7 @@ function showToast(message) {
     toast.className = 'toast';
     toast.innerHTML = `<i class="fa-solid fa-check-circle"></i> ${message}`;
     container.appendChild(toast);
-    
+
     setTimeout(() => { toast.classList.add('show'); }, 10);
     setTimeout(() => {
         toast.classList.remove('show');
@@ -600,8 +600,8 @@ function updateRoleUI() {
     }
 
     if (btnToggle) {
-        btnToggle.innerHTML = isCoach 
-            ? '<i class="fa-solid fa-eye"></i> 保護者モードへ' 
+        btnToggle.innerHTML = isCoach
+            ? '<i class="fa-solid fa-eye"></i> 保護者モードへ'
             : '<i class="fa-solid fa-user-lock"></i> コーチモードへ';
     }
 
@@ -665,7 +665,7 @@ function navigate(route, params = null) {
     canvas = null;
     ctx = null;
     state.currentRoute = route;
-    
+
     navLinks.forEach(link => {
         link.classList.toggle('active', link.dataset.route === route);
         if (link.dataset.route === route) {
@@ -683,7 +683,7 @@ function navigate(route, params = null) {
     if (template) {
         viewContainer.innerHTML = '';
         viewContainer.appendChild(template.content.cloneNode(true));
-        
+
         if (route === 'dashboard') initDashboard();
         if (route === 'matches') {
             currentMatchPage = 1;
@@ -704,7 +704,7 @@ function navigate(route, params = null) {
 function initData() {
     const btnExportSettings = document.getElementById('btn-export-data');
     const btnExportView = document.getElementById('btn-data-view-export');
-    
+
     const handleExport = () => {
         const dataStr = JSON.stringify({
             matches: state.matches,
@@ -721,7 +721,7 @@ function initData() {
         }, null, 2);
 
         const now = new Date();
-        const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+        const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
         const filename = `coachMgrBackup_${dateStr}.json`;
 
         try {
@@ -811,21 +811,21 @@ function initData() {
 function addGoalRecordRow(scorerId = null, assistId = null, targetContainerId = 'goal-records-list') {
     const container = document.getElementById(targetContainerId);
     if (!container) return;
-    
+
     const rowId = 'goal-row-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    
+
     const sortedPlayers = [...state.players].sort((a, b) => {
         const numA = parseInt(a.number, 10) || 0;
         const numB = parseInt(b.number, 10) || 0;
         return numA - numB;
     });
 
-    const scorerOptions = `<option value="">得点者なし/OG</option>` + 
+    const scorerOptions = `<option value="">得点者なし/OG</option>` +
         sortedPlayers.map(p => `<option value="${p.id}" ${p.id === scorerId ? 'selected' : ''}>${p.number} ${p.name}</option>`).join('');
-        
-    const assistOptions = `<option value="">アシストなし</option>` + 
+
+    const assistOptions = `<option value="">アシストなし</option>` +
         sortedPlayers.map(p => `<option value="${p.id}" ${p.id === assistId ? 'selected' : ''}>${p.number} ${p.name}</option>`).join('');
-        
+
     const div = document.createElement('div');
     div.id = rowId;
     div.className = 'goal-record-row';
@@ -861,7 +861,7 @@ function addFormationVideoRow(urlVal = '') {
 
 function setupModals() {
     const closeBtns = document.querySelectorAll('.btn-close-modal');
-    
+
     closeBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             const overlay = e.target.closest('.modal-overlay');
@@ -943,7 +943,7 @@ function setupModals() {
         if (goodStr || improveStr) {
             commentsStr = '【ポジティブ】\n' + goodStr + '\n\n【ネクストステップ】\n' + improveStr;
         }
-        
+
         let resultStr = "";
         if (scoreUs !== "" && scoreThem !== "") {
             resultStr = `${scoreUs}-${scoreThem}`;
@@ -953,15 +953,15 @@ function setupModals() {
         const goalRecords = [];
         const rows = document.querySelectorAll('#goal-records-list .goal-record-row');
         const scorersList = [];
-        
+
         rows.forEach(row => {
             const scorerVal = row.querySelector('.goal-scorer-select').value;
             const assistVal = row.querySelector('.goal-assist-select').value;
             const scorerId = scorerVal ? parseInt(scorerVal, 10) : null;
             const assistId = assistVal ? parseInt(assistVal, 10) : null;
-            
+
             goalRecords.push({ scorerId, assistId });
-            
+
             let text = '';
             if (scorerId) {
                 const sPlayer = state.players.find(p => p.id === scorerId);
@@ -1008,15 +1008,15 @@ function setupModals() {
             state.matches.unshift(newMatch);
             showToast('試合を記録しました');
         }
-        
+
         saveData();
         document.getElementById('modal-match').classList.add('hidden');
         navigate('matches');
-        
+
         if (matchId) {
             openMatchDetail(parseInt(matchId));
         }
-        
+
         e.target.reset();
         document.getElementById('match-edit-id').value = '';
     });
@@ -1024,7 +1024,7 @@ function setupModals() {
     document.getElementById('form-practice').addEventListener('submit', (e) => {
         e.preventDefault();
         const editId = document.getElementById('practice-edit-id').value;
-        
+
         // Collect checked players
         const checkedBoxes = document.querySelectorAll('#practice-attendance-roster input[type="checkbox"]:checked');
         const presentIds = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
@@ -1049,7 +1049,7 @@ function setupModals() {
             state.practices.unshift(newPractice);
             showToast('練習日を記録しました');
         }
-        
+
         saveData();
         document.getElementById('modal-practice').classList.add('hidden');
         navigate('practices');
@@ -1060,9 +1060,9 @@ function setupModals() {
     // Populate Library Select when changed
     document.getElementById('menu-library-select').addEventListener('change', (e) => {
         const libId = parseInt(e.target.value);
-        if(libId) {
+        if (libId) {
             const libMenu = state.menuLibrary.find(m => m.id === libId);
-            if(libMenu) {
+            if (libMenu) {
                 document.getElementById('menu-focus').value = libMenu.focus || '';
                 document.getElementById('menu-organize').value = libMenu.organize || '';
                 document.getElementById('menu-keyfactor').value = libMenu.keyfactor || '';
@@ -1089,12 +1089,12 @@ function setupModals() {
         e.preventDefault();
         const practiceId = document.getElementById('menu-practice-id').value;
         const sourceId = document.getElementById('menu-library-source-id').value;
-        
+
         let frames = null;
         let pitchTemplate = 'full';
-        if(sourceId) {
+        if (sourceId) {
             const src = state.menuLibrary.find(m => m.id === parseInt(sourceId));
-            if(src) {
+            if (src) {
                 if (src.frames) {
                     frames = JSON.parse(JSON.stringify(src.frames)); // deep copy frames
                 }
@@ -1118,7 +1118,7 @@ function setupModals() {
             frames: frames,
             pitchTemplate: pitchTemplate
         };
-        
+
         const editId = document.getElementById('menu-edit-id') ? document.getElementById('menu-edit-id').value : '';
         if (editId) {
             let targetMenu = null;
@@ -1144,7 +1144,7 @@ function setupModals() {
                 saveData();
                 showToast('メニューを更新しました');
                 document.getElementById('modal-menu').classList.add('hidden');
-                
+
                 const animView = document.getElementById('view-animation');
                 if (animView && animView.classList.contains('active')) {
                     document.getElementById('anim-menu-focus').textContent = targetMenu.focus || 'メニュー';
@@ -1158,9 +1158,9 @@ function setupModals() {
                     if (practiceId === 'library') navigate('library');
                     else navigate('practices');
                 }
-                
+
                 e.target.reset();
-                if(document.getElementById('menu-edit-id')) document.getElementById('menu-edit-id').value = '';
+                if (document.getElementById('menu-edit-id')) document.getElementById('menu-edit-id').value = '';
                 document.getElementById('menu-library-source-id').value = '';
                 return;
             }
@@ -1187,7 +1187,7 @@ function setupModals() {
     });
 
     const formPlayer = document.getElementById('form-player');
-    if(formPlayer) {
+    if (formPlayer) {
         formPlayer.addEventListener('submit', (e) => {
             e.preventDefault();
             const editId = document.getElementById('player-edit-id').value;
@@ -1195,7 +1195,7 @@ function setupModals() {
             document.querySelectorAll('.player-pos-checkbox:checked').forEach(cb => {
                 selectedPositions.push(cb.value);
             });
-            
+
             if (editId) {
                 // Edit mode
                 const player = state.players.find(p => p.id === parseInt(editId));
@@ -1241,21 +1241,21 @@ function setupModals() {
     }
 
     const formMatchFeedback = document.getElementById('form-match-feedback');
-    if(formMatchFeedback) {
+    if (formMatchFeedback) {
         formMatchFeedback.addEventListener('submit', (e) => {
             e.preventDefault();
             const matchId = parseInt(document.getElementById('feedback-match-id').value);
             const match = state.matches.find(m => m.id === matchId);
-            if(match) {
+            if (match) {
                 const inputs = document.querySelectorAll('.bulk-feedback-good');
                 let addedCount = 0;
-                
+
                 inputs.forEach(inputGood => {
                     const playerId = parseInt(inputGood.dataset.playerId);
                     const inputImprove = document.querySelector(`.bulk-feedback-improve[data-player-id="${playerId}"]`);
                     const good = inputGood.value.trim();
                     const improve = inputImprove ? inputImprove.value.trim() : '';
-                    
+
                     if (good || improve) {
                         const comment = '【ポジティブ】\n' + good + '\n\n【ネクストステップ】\n' + improve;
                         const existingFb = match.playerFeedback.find(fb => fb.playerId === playerId);
@@ -1267,15 +1267,15 @@ function setupModals() {
                         addedCount++;
                     }
                 });
-                
+
                 if (addedCount > 0) {
                     saveData();
                     showToast(`${addedCount}件のフィードバックを保存しました`);
                     document.getElementById('modal-match-feedback').classList.add('hidden');
-                    
+
                     // Re-render detail view if open
                     const btnDetail = document.querySelector(`.btn-detail-match[data-id="${matchId}"]`);
-                    if(btnDetail) btnDetail.click();
+                    if (btnDetail) btnDetail.click();
                 } else {
                     showToast('コメントが入力されていません');
                 }
@@ -1290,16 +1290,16 @@ function setupModals() {
             const matchId = parseInt(document.getElementById('formation-match-id').value);
             const formationId = document.getElementById('formation-id').value;
             const match = state.matches.find(m => m.id === matchId);
-            
-            if(match) {
+
+            if (match) {
                 const name = document.getElementById('formation-name').value;
                 const system = document.getElementById('formation-system-select').value;
-                
+
                 // Collect video URLs
                 const videoInputs = document.querySelectorAll('#formation-video-list .formation-video-input');
                 const videoUrls = Array.from(videoInputs).map(inp => inp.value.trim()).filter(val => val.length > 0);
                 const videoUrl = videoUrls.length > 0 ? videoUrls[0] : '';
-                
+
                 const nodes = document.querySelectorAll('#tactical-formation-pitch .pitch-node');
                 const lineup = [];
                 nodes.forEach(node => {
@@ -1317,7 +1317,7 @@ function setupModals() {
                 // Collect Period Scores
                 const scoreUs = parseInt(document.getElementById('formation-score-us').value, 10) || 0;
                 const scoreThem = parseInt(document.getElementById('formation-score-them').value, 10) || 0;
-                
+
                 // Collect Period Goal Records
                 const goalRecords = [];
                 const goalRows = document.querySelectorAll('#period-goal-records-list .goal-record-row');
@@ -1362,7 +1362,7 @@ function setupModals() {
                 let totalUs = 0;
                 let totalThem = 0;
                 const allMatchGoalRecords = [];
-                
+
                 match.formations.forEach(f => {
                     totalUs += (f.scoreUs !== undefined ? f.scoreUs : 0);
                     totalThem += (f.scoreThem !== undefined ? f.scoreThem : 0);
@@ -1372,7 +1372,7 @@ function setupModals() {
                 });
 
                 match.goalRecords = allMatchGoalRecords;
-                
+
                 // Rebuild match scorers string
                 const scorersList = [];
                 allMatchGoalRecords.forEach(r => {
@@ -1398,7 +1398,7 @@ function setupModals() {
                 saveData();
                 showToast('ピリオド(得点・フォーメーション)情報を保存しました');
                 document.getElementById('modal-formation').classList.add('hidden');
-                
+
                 // Re-render detail view
                 openMatchDetail(matchId);
             }
@@ -1408,13 +1408,13 @@ function setupModals() {
 
 
     const formPlayerAssessment = document.getElementById('form-player-assessment');
-    if(formPlayerAssessment) {
+    if (formPlayerAssessment) {
         formPlayerAssessment.addEventListener('submit', (e) => {
             e.preventDefault();
             const playerId = parseInt(document.getElementById('assessment-player-id').value, 10);
             const editId = document.getElementById('assessment-edit-id').value;
             const player = state.players.find(p => p.id === playerId);
-            if(player) {
+            if (player) {
                 const skills = [];
                 state.skillMetrics.forEach((metric, i) => {
                     const val = document.getElementById(`skill-ass-${i}`);
@@ -1444,13 +1444,13 @@ function setupModals() {
                 }
 
                 // Sort history by date descending
-                player.history.sort((a,b) => new Date(b.date) - new Date(a.date));
+                player.history.sort((a, b) => new Date(b.date) - new Date(a.date));
                 saveData();
                 document.getElementById('modal-player-assessment').classList.add('hidden');
-                
+
                 // Refresh player detail view
                 openPlayerDetail(playerId);
-                
+
                 // Re-render grid to update radar
                 initPlayers();
             }
@@ -1460,13 +1460,13 @@ function setupModals() {
 }
 
 function openModal(id) {
-    if(id === 'modal-menu') {
+    if (id === 'modal-menu') {
         const catSel = document.getElementById('menu-category');
-        if(catSel) {
+        if (catSel) {
             const currentVal = catSel.value;
             catSel.innerHTML = state.menuCategories.map(c => `<option value="${c}">${c}</option>`).join('');
-            if(state.menuCategories.includes(currentVal)) catSel.value = currentVal;
-            else if(state.menuCategories.length > 0) catSel.value = state.menuCategories[0];
+            if (state.menuCategories.includes(currentVal)) catSel.value = currentVal;
+            else if (state.menuCategories.length > 0) catSel.value = state.menuCategories[0];
         }
     }
     document.getElementById(id).classList.remove('hidden');
@@ -1492,7 +1492,7 @@ function openMatchModal(matchId = null) {
             document.getElementById('match-opponent').value = m.opponent;
             if (select) select.value = m.type;
             document.getElementById('match-tournament').value = m.tournament || '';
-            
+
             if (m.result && m.result.includes('-')) {
                 const scores = m.result.split('-');
                 document.getElementById('match-score-us').value = scores[0];
@@ -1501,13 +1501,13 @@ function openMatchModal(matchId = null) {
                 document.getElementById('match-score-us').value = '';
                 document.getElementById('match-score-them').value = '';
             }
-            
+
             if (goalRecordsList && m.goalRecords && m.goalRecords.length > 0) {
                 m.goalRecords.forEach(r => {
                     addGoalRecordRow(r.scorerId, r.assistId);
                 });
             }
-            
+
             let good = '';
             let improve = '';
             if (m.comments) {
@@ -1521,15 +1521,15 @@ function openMatchModal(matchId = null) {
             }
             document.getElementById('match-comments-good').value = good;
             document.getElementById('match-comments-improve').value = improve;
-            
+
             if (title) title.textContent = '試合情報を編集';
         }
     }
-    
+
     // Close match detail modal if open to prevent stack overlay issues
     const matchDetailModal = document.getElementById('modal-match-detail');
     if (matchDetailModal) matchDetailModal.classList.add('hidden');
-    
+
     openModal('modal-match');
 }
 
@@ -1538,14 +1538,14 @@ function openPracticeModal(practiceId = null) {
     document.getElementById('practice-edit-id').value = '';
     const title = document.getElementById('practice-modal-title');
     if (title) title.textContent = '練習日を追加';
-    
+
     if (practiceId) {
         const p = state.practices.find(prac => prac.id === practiceId);
         if (p) {
             document.getElementById('practice-edit-id').value = p.id;
             document.getElementById('practice-date').value = p.date;
             if (title) title.textContent = '練習日情報を編集';
-            
+
             let activeIds = p.presentPlayerIds;
             if (!activeIds && p.attendance) {
                 activeIds = state.players.map(pl => pl.id);
@@ -1563,7 +1563,7 @@ function openPracticeModal(practiceId = null) {
 
 function initDashboard() {
     const now = new Date();
-    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
     // Separate completed (past or today only) and upcoming matches
     const completedMatches = state.matches.filter(m => m.result && /(\d+)\s*-\s*(\d+)/.test(m.result) && m.date <= todayStr);
@@ -1581,11 +1581,11 @@ function initDashboard() {
             else draws++;
         }
     });
-    
+
     const dbRecord = document.getElementById('dash-db-record');
     const dbRecordBar = document.getElementById('dash-db-record-bar');
     const winRate = (wins + losses + draws) > 0 ? Math.round((wins / (wins + losses + draws)) * 100) : 0;
-    
+
     if (dbRecord) dbRecord.innerHTML = `${wins}勝 ${losses}敗 ${draws}分 <span style="font-size:0.75rem; font-weight:normal; color:var(--text-secondary); margin-left:0.25rem;">(勝率:${winRate}%)</span>`;
     if (dbRecordBar) dbRecordBar.style.width = `${winRate}%`;
 
@@ -1649,7 +1649,7 @@ function initDashboard() {
     const matchesContent = document.getElementById('dash-matches-content');
     if (matchesContent) {
         if (completedMatches.length > 0) {
-            const sortedMatches = [...completedMatches].sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+            const sortedMatches = [...completedMatches].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
             matchesContent.innerHTML = sortedMatches.map(m => {
                 const match = m.result.match(/(\d+)\s*-\s*(\d+)/);
                 let us = 0, them = 0;
@@ -1661,18 +1661,18 @@ function initDashboard() {
                 let badgeClass = 'draw';
                 let bgStyle = 'rgba(100,116,139,0.15)';
                 let colorStyle = '#475569';
-                if (us > them) { 
-                    resultLabel = '勝ち'; 
+                if (us > them) {
+                    resultLabel = '勝ち';
                     badgeClass = 'win';
                     bgStyle = 'var(--primary)';
                     colorStyle = '#ffffff';
-                } else if (us < them) { 
-                    resultLabel = '負け'; 
+                } else if (us < them) {
+                    resultLabel = '負け';
                     badgeClass = 'loss';
                     bgStyle = 'rgba(100,116,139,0.15)';
                     colorStyle = '#475569';
                 }
-                
+
                 const displayScore = match ? `${us} - ${them}` : m.result;
 
                 return `
@@ -1711,7 +1711,7 @@ function initDashboard() {
 
     // 3. Chronological Schedule List (Bottom Card)
     const allEvents = [];
-    
+
     // Merge practices
     state.practices.forEach(p => {
         allEvents.push({
@@ -1724,7 +1724,7 @@ function initDashboard() {
             raw: p
         });
     });
-    
+
     // Merge matches
     state.matches.forEach(m => {
         const hasResult = m.result && /(\d+)\s*-\s*(\d+)/.test(m.result);
@@ -1838,10 +1838,10 @@ function initDashboard() {
                     `;
                 } else {
                     const resultText = e.hasResult ? `<span style="font-weight:bold; color:var(--primary); font-size:0.85rem;">${e.result}</span>` : `<span style="color:#f59e0b; font-size:0.75rem; font-weight:bold;">結果未入力</span>`;
-                    const actionBtn = e.hasResult 
+                    const actionBtn = e.hasResult
                         ? `<button class="btn btn-secondary btn-sm" onclick="openMatchDetail(${e.id})" style="padding:0.25rem 0.5rem; font-size:0.75rem; display:flex; align-items:center; gap:0.2rem;"><i class="fa-solid fa-circle-info"></i> 詳細</button>`
                         : `<button class="btn btn-primary btn-sm btn-dash-score-match" data-id="${e.id}" style="padding:0.25rem 0.5rem; font-size:0.75rem; display:flex; align-items:center; gap:0.2rem;"><i class="fa-solid fa-square-poll-horizontal"></i> 結果入力</button>`;
-                    
+
                     return `
                         <div class="schedule-item" style="opacity:0.95;">
                             <div class="schedule-item-info">
@@ -1877,7 +1877,7 @@ function initDashboard() {
     // Bind schedule buttons
     const btnDashAddPrac = document.getElementById('dash-btn-add-practice');
     if (btnDashAddPrac) btnDashAddPrac.onclick = () => openPracticeModal();
-    
+
     const btnDashAddMatch = document.getElementById('dash-btn-add-match');
     if (btnDashAddMatch) btnDashAddMatch.onclick = () => openMatchModal();
 
@@ -1916,13 +1916,13 @@ function initDashboard() {
     const topScorers = Object.entries(scorerCounts)
         .map(([id, count]) => ({ p: state.players.find(pl => pl.id === parseInt(id)), count }))
         .filter(x => x.p)
-        .sort((a,b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)))
+        .sort((a, b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)))
         .slice(0, 3);
 
     const topAssists = Object.entries(assistCounts)
         .map(([id, count]) => ({ p: state.players.find(pl => pl.id === parseInt(id)), count }))
         .filter(x => x.p)
-        .sort((a,b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)))
+        .sort((a, b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)))
         .slice(0, 3);
 
     const renderDashLeaderItem = (item, idx) => `
@@ -1933,15 +1933,15 @@ function initDashboard() {
     `;
 
     const elTopScorers = document.getElementById('dash-top-scorers');
-    if(elTopScorers) {
-        elTopScorers.innerHTML = topScorers.length > 0 
+    if (elTopScorers) {
+        elTopScorers.innerHTML = topScorers.length > 0
             ? topScorers.map((item, idx) => renderDashLeaderItem(item, idx)).join('')
             : '<div style="color:var(--text-secondary); font-size:0.72rem; padding:0.25rem 0;">得点記録なし</div>';
     }
 
     const elTopAssists = document.getElementById('dash-top-assists');
-    if(elTopAssists) {
-        elTopAssists.innerHTML = topAssists.length > 0 
+    if (elTopAssists) {
+        elTopAssists.innerHTML = topAssists.length > 0
             ? topAssists.map((item, idx) => renderDashLeaderItem(item, idx)).join('')
             : '<div style="color:var(--text-secondary); font-size:0.72rem; padding:0.25rem 0;">アシスト記録なし</div>';
     }
@@ -1967,12 +1967,12 @@ function openLeaderRankingModal() {
     const allScorers = Object.entries(scorerCounts)
         .map(([id, count]) => ({ p: state.players.find(pl => pl.id === parseInt(id)), count }))
         .filter(x => x.p)
-        .sort((a,b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)));
+        .sort((a, b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)));
 
     const allAssists = Object.entries(assistCounts)
         .map(([id, count]) => ({ p: state.players.find(pl => pl.id === parseInt(id)), count }))
         .filter(x => x.p)
-        .sort((a,b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)));
+        .sort((a, b) => b.count - a.count || ((parseInt(a.p.number) || 0) - (parseInt(b.p.number) || 0)));
 
     const renderRankingItem = (item, idx) => {
         return `
@@ -2003,7 +2003,7 @@ function openLeaderRankingModal() {
 // View Initializers
 function initMatches() {
     // Nendo Filter Setup
-    const matchNendos = [...new Set(state.matches.map(m => getNendo(m.date)))].sort((a,b) => b - a);
+    const matchNendos = [...new Set(state.matches.map(m => getNendo(m.date)))].sort((a, b) => b - a);
     const filterSelect = document.getElementById('filter-nendo-match');
     if (filterSelect) {
         let options = '<option value="all">すべての年度</option>';
@@ -2011,7 +2011,7 @@ function initMatches() {
             options += `<option value="${y}" ${currentMatchNendo === String(y) ? 'selected' : ''}>${y}年度</option>`;
         });
         filterSelect.innerHTML = options;
-        
+
         filterSelect.onchange = (e) => {
             currentMatchNendo = e.target.value;
             currentMatchPage = 1;
@@ -2019,8 +2019,8 @@ function initMatches() {
         };
     }
 
-    const filteredMatches = currentMatchNendo === 'all' 
-        ? state.matches 
+    const filteredMatches = currentMatchNendo === 'all'
+        ? state.matches
         : state.matches.filter(m => String(getNendo(m.date)) === currentMatchNendo);
 
     // Stats Update
@@ -2113,7 +2113,7 @@ function initMatches() {
             return { p, count };
         })
         .filter(x => x.p)
-        .sort((a,b) => b.count - a.count || (parseInt(a.p.number) - parseInt(b.p.number)))
+        .sort((a, b) => b.count - a.count || (parseInt(a.p.number) - parseInt(b.p.number)))
         .slice(0, 3);
 
     const topAssists = Object.entries(assistCounts)
@@ -2122,19 +2122,19 @@ function initMatches() {
             return { p, count };
         })
         .filter(x => x.p)
-        .sort((a,b) => b.count - a.count || (parseInt(a.p.number) - parseInt(b.p.number)))
+        .sort((a, b) => b.count - a.count || (parseInt(a.p.number) - parseInt(b.p.number)))
         .slice(0, 3);
 
     const topScorersList = document.getElementById('top-scorers-list');
     if (topScorersList) {
-        topScorersList.innerHTML = topScorers.length > 0 
+        topScorersList.innerHTML = topScorers.length > 0
             ? topScorers.map(item => `<li>${item.p.name} (${item.count}点)</li>`).join('')
             : '<div style="color:var(--text-secondary); font-size:0.75rem;">-</div>';
     }
 
     const topAssistsList = document.getElementById('top-assists-list');
     if (topAssistsList) {
-        topAssistsList.innerHTML = topAssists.length > 0 
+        topAssistsList.innerHTML = topAssists.length > 0
             ? topAssists.map(item => `<li>${item.p.name} (${item.count}アシ)</li>`).join('')
             : '<div style="color:var(--text-secondary); font-size:0.75rem;">-</div>';
     }
@@ -2186,17 +2186,17 @@ function initMatches() {
                             return (m.scorers || '記録なし').replace(/\s*\([^)]*アシスト[^)]*\)/g, '');
                         })()}">
                             <i class="fa-solid fa-futbol" style="font-size:0.8rem;"></i> ${(() => {
-                                if (m.goalRecords && m.goalRecords.length > 0) {
-                                    return m.goalRecords.map(r => {
-                                        if (r.scorerId) {
-                                            const p = state.players.find(pl => pl.id === r.scorerId);
-                                            return p ? `${p.name}` : '不明な選手';
-                                        }
-                                        return 'オウンゴール/その他';
-                                    }).join(', ');
-                                }
-                                return (m.scorers || '記録なし').replace(/\s*\([^)]*アシスト[^)]*\)/g, '');
-                            })()}
+                            if (m.goalRecords && m.goalRecords.length > 0) {
+                                return m.goalRecords.map(r => {
+                                    if (r.scorerId) {
+                                        const p = state.players.find(pl => pl.id === r.scorerId);
+                                        return p ? `${p.name}` : '不明な選手';
+                                    }
+                                    return 'オウンゴール/その他';
+                                }).join(', ');
+                            }
+                            return (m.scorers || '記録なし').replace(/\s*\([^)]*アシスト[^)]*\)/g, '');
+                        })()}
                         </div>
                         ` : ''}
                         <div class="match-card-actions">
@@ -2270,7 +2270,7 @@ function initMatches() {
 
     document.querySelectorAll('.btn-delete-match').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if(confirm('この試合記録を削除しますか？')) {
+            if (confirm('この試合記録を削除しますか？')) {
                 const id = parseInt(e.currentTarget.dataset.id);
                 state.matches = state.matches.filter(m => m.id !== id);
                 saveData();
@@ -2283,7 +2283,7 @@ function initMatches() {
 
 function openMatchDetail(id) {
     const m = state.matches.find(match => match.id === id);
-    if(m) {
+    if (m) {
         // Tab logic
         const tabInfo = document.getElementById('tab-match-info');
         const tabFormation = document.getElementById('tab-match-formation');
@@ -2326,14 +2326,14 @@ function openMatchDetail(id) {
                 } else {
                     scorerText = 'オウンゴール/その他';
                 }
-                
+
                 let assistText = '';
                 if (r.assistId) {
                     const aPlayer = state.players.find(pl => pl.id === r.assistId);
                     assistText = aPlayer ? ` (アシ: <span class="player-link" data-id="${aPlayer.id}" style="cursor:pointer; font-weight:bold; color:var(--primary); text-decoration:underline;">${aPlayer.number} ${aPlayer.name}</span>)` : '';
                 }
                 return `<div style="display:flex; align-items:baseline; margin-bottom:0.25rem;">
-                    <span style="width:1.5rem; text-align:left; font-weight:500; color:var(--text-secondary); flex-shrink:0;">${idx+1}.</span>
+                    <span style="width:1.5rem; text-align:left; font-weight:500; color:var(--text-secondary); flex-shrink:0;">${idx + 1}.</span>
                     <div style="text-align:left; flex:1;">${scorerText}${assistText}</div>
                 </div>`;
             }).join('');
@@ -2354,7 +2354,7 @@ function openMatchDetail(id) {
                 <p style="white-space:pre-wrap; text-align:left;">${m.comments || '記録なし'}</p>
             </div>
         `;
-        
+
         // 2. Render Feedback List
         const feedbackList = document.getElementById('match-feedback-list');
         if (m.playerFeedback && m.playerFeedback.length > 0) {
@@ -2413,13 +2413,13 @@ function openMatchDetail(id) {
             formList.innerHTML = m.formations.map(f => {
                 // Group lineup by role
                 const roles = { 'FW': [], 'MF': [], 'DF': [], 'GK': [], 'SUB': [] };
-                if(f.lineup) {
+                if (f.lineup) {
                     f.lineup.forEach(l => {
                         const p = state.players.find(pl => pl.id === l.playerId);
                         if (p && roles[l.role]) roles[l.role].push(p.name);
                     });
                 }
-                
+
                 const vUrls = f.videoUrls && f.videoUrls.length > 0 ? f.videoUrls : (f.videoUrl ? [f.videoUrl] : []);
                 const videoBtn = vUrls.length > 0 ? vUrls.map((vUrl, idx) => `
                     <a href="${vUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="btn btn-secondary" style="padding:0.15rem 0.4rem; font-size:0.75rem; color:#ef4444; text-decoration:none; display:inline-flex; align-items:center; gap:0.25rem;">
@@ -2463,29 +2463,29 @@ function openMatchDetail(id) {
                     const mCanv = document.getElementById(`mini-pitch-${f.id}`);
                     if (!mCanv) return;
                     const mCtx = mCanv.getContext('2d');
-                    
+
                     if (f.boardData && f.boardData.length > 0) {
                         drawPitchToCtx(f.boardData, mCanv, mCtx, f.pitchTemplate || 'full');
                     } else {
                         // Generate line-up board objects dynamically matching formation modal pitch coordinates
                         const customForm = state.customFormations.find(cf => cf.name === f.system);
                         const coords = customForm ? customForm.coords : (formationCoords[f.system] || (state.customFormations.length > 0 ? state.customFormations[0].coords : []));
-                        
+
                         const lineupObjects = [];
                         coords.forEach((coord, idx) => {
                             const topPercent = parseFloat(coord.top) / 100;
                             const leftPercent = parseFloat(coord.left) / 100;
-                            
+
                             // Map vertical formation coordinates (GK at bottom 88%, FW at top 15%)
                             // to horizontal landscape canvas (GK at left, FW at right, attacking rightwards)
                             // topPercent -> Horizontal X axis (0.88 -> ~90px left GK, 0.15 -> ~670px right FW)
                             // leftPercent -> Vertical Y axis
                             const x = 20 + 760 * (1 - topPercent);
                             const y = 20 + 460 * leftPercent;
-                            
+
                             const assigned = f.lineup ? f.lineup.find(l => l.roleLabel === coord.label || (f.lineup.length === coords.length && l.roleIndex === idx)) : null;
                             const p = assigned ? state.players.find(pl => pl.id === assigned.playerId) : null;
-                            
+
                             // Player node circle (pointing right 90 deg towards opponent)
                             lineupObjects.push({
                                 id: idx + 1,
@@ -2510,7 +2510,7 @@ function openMatchDetail(id) {
                                 });
                             }
                         });
-                        
+
                         drawPitchToCtx(lineupObjects, mCanv, mCtx, 'full');
                     }
                 });
@@ -2528,25 +2528,25 @@ function openMatchDetail(id) {
             document.getElementById('formation-id').value = '';
             document.getElementById('formation-score-us').value = 0;
             document.getElementById('formation-score-them').value = 0;
-            
+
             const pGoalList = document.getElementById('period-goal-records-list');
             if (pGoalList) pGoalList.innerHTML = '';
-            
+
             const vList = document.getElementById('formation-video-list');
             if (vList) {
                 vList.innerHTML = '';
                 addFormationVideoRow(); // Default single empty input row
             }
-            
+
             const sysSelect = document.getElementById('formation-system-select');
             sysSelect.innerHTML = state.customFormations.map(cf => `<option value="${cf.name}">${cf.name} (${cf.coords.length}人制)</option>`).join('');
-            
+
             const defaultSys = state.customFormations.length > 0 ? state.customFormations[0].name : '3-3-1';
             sysSelect.value = defaultSys;
             sysSelect.onchange = (e) => {
                 renderFormationPitch(e.target.value, []);
             };
-            
+
             renderFormationPitch(defaultSys, []);
 
             const modalTitle = document.getElementById('formation-modal-title');
@@ -2589,7 +2589,7 @@ function openMatchDetail(id) {
             document.getElementById('formation-name').value = fObj.name || '';
             document.getElementById('formation-score-us').value = fObj.scoreUs !== undefined ? fObj.scoreUs : 0;
             document.getElementById('formation-score-them').value = fObj.scoreThem !== undefined ? fObj.scoreThem : 0;
-            
+
             const pGoalList = document.getElementById('period-goal-records-list');
             if (pGoalList) {
                 pGoalList.innerHTML = '';
@@ -2675,12 +2675,12 @@ function openMatchDetail(id) {
 function renderPracticeRoster(selectedPlayerIds = []) {
     const container = document.getElementById('practice-attendance-roster');
     if (!container) return;
-    
+
     if (state.players.length === 0) {
         container.innerHTML = '<p class="text-secondary" style="font-size:0.85rem; margin:0;">登録されている選手がいません。「選手一覧」から選手を登録してください。</p>';
         return;
     }
-    
+
     // Sort players by number
     const sortedPlayers = [...state.players].sort((a, b) => {
         const numA = parseInt(a.number, 10) || 0;
@@ -2701,7 +2701,7 @@ function renderPracticeRoster(selectedPlayerIds = []) {
 
 function initPractices() {
     // Nendo Filter Setup
-    const practiceNendos = [...new Set(state.practices.map(p => getNendo(p.date)))].sort((a,b) => b - a);
+    const practiceNendos = [...new Set(state.practices.map(p => getNendo(p.date)))].sort((a, b) => b - a);
     const filterSelect = document.getElementById('filter-nendo-practice');
     if (filterSelect) {
         let options = '<option value="all">すべての年度</option>';
@@ -2709,7 +2709,7 @@ function initPractices() {
             options += `<option value="${y}" ${currentPracticeNendo === String(y) ? 'selected' : ''}>${y}年度</option>`;
         });
         filterSelect.innerHTML = options;
-        
+
         filterSelect.onchange = (e) => {
             currentPracticeNendo = e.target.value;
             currentPracticeMonth = 'all';
@@ -2720,18 +2720,18 @@ function initPractices() {
 
     const filterMonthSelect = document.getElementById('filter-month-practice');
     if (filterMonthSelect) {
-        const availablePractices = currentPracticeNendo === 'all' 
-            ? state.practices 
+        const availablePractices = currentPracticeNendo === 'all'
+            ? state.practices
             : state.practices.filter(p => String(getNendo(p.date)) === currentPracticeNendo);
-        
-        const practiceMonths = [...new Set(availablePractices.map(p => parseInt(p.date.substring(5, 7), 10)))].sort((a,b) => b - a);
+
+        const practiceMonths = [...new Set(availablePractices.map(p => parseInt(p.date.substring(5, 7), 10)))].sort((a, b) => b - a);
         let options = '<option value="all">すべての月</option>';
         practiceMonths.forEach(m => {
             const mStr = m.toString().padStart(2, '0');
             options += `<option value="${mStr}" ${currentPracticeMonth === mStr ? 'selected' : ''}>${m}月</option>`;
         });
         filterMonthSelect.innerHTML = options;
-        
+
         filterMonthSelect.onchange = (e) => {
             currentPracticeMonth = e.target.value;
             currentPracticePage = 1;
@@ -2753,7 +2753,7 @@ function initPractices() {
 
     // List Update
     const practiceList = document.getElementById('practice-list');
-    
+
     const grouped = {};
     displayedPractices.forEach(p => {
         const ym = p.date.substring(0, 7).replace('-', '年') + '月';
@@ -2822,7 +2822,7 @@ function initPractices() {
         });
         html += `</div></div>`;
     });
-    
+
     if (filteredPractices.length > displayedPractices.length) {
         const remaining = filteredPractices.length - displayedPractices.length;
         html += `
@@ -2885,7 +2885,7 @@ function initPractices() {
                             if (menu.frames.length > 1) {
                                 let frameIdx = 0;
                                 drawPitchToCtx(menu.frames[frameIdx], mCanv, mCtx, menu.pitchTemplate || 'full');
-                                
+
                                 const intervalId = setInterval(() => {
                                     frameIdx = (frameIdx + 1) % menu.frames.length;
                                     drawPitchToCtx(menu.frames[frameIdx], mCanv, mCtx, menu.pitchTemplate || 'full');
@@ -2921,14 +2921,14 @@ function initPractices() {
             document.getElementById('menu-practice-id').value = id;
             document.getElementById('menu-library-source-id').value = '';
             if (document.getElementById('menu-edit-id')) document.getElementById('menu-edit-id').value = '';
-            
+
             // Populate select
             const select = document.getElementById('menu-library-select');
             select.innerHTML = '<option value="">（新規作成）</option>' + state.menuLibrary.map(m => `<option value="${m.id}">${m.focus}</option>`).join('');
             select.parentElement.style.display = 'block'; // Show select box
 
             const title = document.querySelector('#modal-menu h2');
-            if(title) title.textContent = '練習メニューを追加';
+            if (title) title.textContent = '練習メニューを追加';
 
             openModal('modal-menu');
         });
@@ -2944,7 +2944,7 @@ function initPractices() {
 
     document.querySelectorAll('.btn-delete-practice').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if(confirm('この日の練習記録をすべて削除しますか？')) {
+            if (confirm('この日の練習記録をすべて削除しますか？')) {
                 const id = parseInt(e.currentTarget.dataset.id);
                 state.practices = state.practices.filter(p => p.id !== id);
                 saveData();
@@ -2956,11 +2956,11 @@ function initPractices() {
 
     document.querySelectorAll('.btn-delete-menu').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if(confirm('この練習メニューを削除しますか？')) {
+            if (confirm('この練習メニューを削除しますか？')) {
                 const pid = parseInt(e.currentTarget.dataset.pid);
                 const mid = parseInt(e.currentTarget.dataset.mid);
                 const practice = state.practices.find(p => p.id === pid);
-                if(practice) {
+                if (practice) {
                     practice.menus = practice.menus.filter(m => m.id !== mid);
                     saveData();
                     showToast('メニューを削除しました');
@@ -2975,13 +2975,13 @@ function initPractices() {
             const pid = parseInt(e.currentTarget.dataset.pid);
             const mid = parseInt(e.currentTarget.dataset.mid);
             const practice = state.practices.find(p => p.id === pid);
-            if(practice) {
+            if (practice) {
                 const menu = practice.menus.find(m => m.id === mid);
                 if (menu) {
                     document.getElementById('menu-practice-id').value = pid;
                     document.getElementById('menu-library-source-id').value = '';
                     if (document.getElementById('menu-edit-id')) document.getElementById('menu-edit-id').value = mid;
-                    
+
                     document.getElementById('menu-focus').value = menu.focus || '';
                     document.getElementById('menu-category').value = menu.category || 'その他';
                     document.getElementById('menu-organize').value = menu.organize || '';
@@ -2991,10 +2991,10 @@ function initPractices() {
                     if (vInp) vInp.value = menu.videoUrl || '';
 
                     document.getElementById('menu-library-select').parentElement.style.display = 'none'; // hide library select
-                    
+
                     const title = document.querySelector('#modal-menu h2');
-                    if(title) title.textContent = '練習メニューを編集';
-                    
+                    if (title) title.textContent = '練習メニューを編集';
+
                     openModal('modal-menu');
                 }
             }
@@ -3060,14 +3060,14 @@ const formationCoords = {
 function renderFormationPitch(systemName, existingLineup = []) {
     const pitch = document.getElementById('tactical-formation-pitch');
     if (!pitch) return;
-    
+
     // Clear old nodes
     const oldNodes = pitch.querySelectorAll('.pitch-node');
     oldNodes.forEach(node => node.remove());
-    
+
     const customForm = state.customFormations.find(cf => cf.name === systemName);
     const coords = customForm ? customForm.coords : (formationCoords[systemName] || (state.customFormations.length > 0 ? state.customFormations[0].coords : []));
-    
+
     coords.forEach((coord, index) => {
         const nodeEl = document.createElement('div');
         nodeEl.className = 'pitch-node';
@@ -3076,12 +3076,12 @@ function renderFormationPitch(systemName, existingLineup = []) {
         nodeEl.dataset.index = index;
         nodeEl.dataset.role = coord.role;
         nodeEl.dataset.label = coord.label;
-        
+
         // Find if a player is assigned to this index/label
         const assigned = existingLineup.find(l => l.roleLabel === coord.label || (existingLineup.length === coords.length && l.roleIndex === index));
         let playerText = '';
         let numberText = coord.label;
-        
+
         if (assigned) {
             const p = state.players.find(pl => pl.id === assigned.playerId);
             if (p) {
@@ -3090,18 +3090,18 @@ function renderFormationPitch(systemName, existingLineup = []) {
                 nodeEl.dataset.playerId = p.id;
             }
         }
-        
+
         nodeEl.innerHTML = `
             <span class="pitch-node-role">${coord.label}</span>
             <span class="pitch-node-number">${numberText}</span>
             ${playerText}
         `;
-        
+
         nodeEl.onclick = (e) => {
             e.stopPropagation();
             openFormationPlayerPicker(nodeEl);
         };
-        
+
         pitch.appendChild(nodeEl);
     });
 
@@ -3116,18 +3116,18 @@ function openFormationPlayerPicker(nodeEl) {
     const picker = document.getElementById('formation-player-picker');
     const select = document.getElementById('formation-picker-select');
     if (!picker || !select) return;
-    
-    const sorted = [...state.players].sort((a,b) => (parseInt(a.number,10)||0) - (parseInt(b.number,10)||0));
+
+    const sorted = [...state.players].sort((a, b) => (parseInt(a.number, 10) || 0) - (parseInt(b.number, 10) || 0));
     select.innerHTML = '<option value="">-- 未選択 --</option>' + sorted.map(p => `
         <option value="${p.id}">${p.number} ${p.name} (${(Array.isArray(p.position) ? p.position : [p.position]).join('/')})</option>
     `).join('');
-    
+
     select.value = nodeEl.dataset.playerId || '';
-    
+
     picker.style.display = 'block';
     picker.style.top = `calc(${nodeEl.style.top} + 25px)`;
     picker.style.left = `calc(${nodeEl.style.left} - 70px)`;
-    
+
     document.getElementById('btn-formation-picker-ok').onclick = () => {
         const val = select.value;
         if (val) {
@@ -3150,7 +3150,7 @@ function openFormationPlayerPicker(nodeEl) {
         }
         picker.style.display = 'none';
     };
-    
+
     document.getElementById('btn-formation-picker-clear').onclick = () => {
         nodeEl.removeAttribute('data-player-id');
         nodeEl.innerHTML = `
@@ -3170,13 +3170,13 @@ function editFormation(matchId, formId) {
     document.getElementById('formation-match-id').value = match.id;
     document.getElementById('formation-id').value = formObj.id;
     document.getElementById('formation-name').value = formObj.name;
-    
+
     const sysSelect = document.getElementById('formation-system-select');
     sysSelect.innerHTML = state.customFormations.map(cf => `<option value="${cf.name}">${cf.name} (${cf.coords.length}人制)</option>`).join('');
-    
+
     const systemName = formObj.system || (state.customFormations.length > 0 ? state.customFormations[0].name : '3-3-1');
     sysSelect.value = systemName;
-    
+
     sysSelect.onchange = (e) => {
         renderFormationPitch(e.target.value, []);
     };
@@ -3219,7 +3219,7 @@ function initPlayers() {
             }
             if (p.history && p.history.length > 0) {
                 evaluatedCount++;
-                const skills = p.history[0].skills || [0,0,0,0,0,0];
+                const skills = p.history[0].skills || [0, 0, 0, 0, 0, 0];
                 const sum = skills.reduce((a, b) => a + (b || 0), 0);
                 const avg = skills.length > 0 ? sum / skills.length : 0;
                 totalSkillAvg += avg;
@@ -3268,7 +3268,7 @@ function initPlayers() {
 
     const playerGrid = document.getElementById('player-grid');
     if (!playerGrid) return;
-    
+
     if (state.players.length === 0) {
         playerGrid.innerHTML = `
             <div class="card" style="grid-column: 1 / -1; padding:3rem 2rem; text-align:center; border: 1.5px dashed var(--surface-border); display:flex; flex-direction:column; align-items:center; gap:1rem; box-sizing:border-box;">
@@ -3298,15 +3298,15 @@ function initPlayers() {
                         <div>
                             <div style="display:flex; gap:0.25rem; flex-wrap:wrap; margin-bottom:0.3rem;">
                                 ${(Array.isArray(p.position) ? p.position : [p.position]).map(pos => {
-                                    if (!pos) return '';
-                                    const lower = pos.toLowerCase();
-                                    let badgeClass = 'badge-sub';
-                                    if (lower === 'fw') badgeClass = 'badge-fw';
-                                    else if (lower === 'mf') badgeClass = 'badge-mf';
-                                    else if (lower === 'df') badgeClass = 'badge-df';
-                                    else if (lower === 'gk') badgeClass = 'badge-gk';
-                                    return `<span class="player-position ${badgeClass}" style="font-size:0.7rem; padding:0.1rem 0.35rem; border-radius:12px; font-weight:600; display:inline-block;">${pos}</span>`;
-                                }).join('')}
+                if (!pos) return '';
+                const lower = pos.toLowerCase();
+                let badgeClass = 'badge-sub';
+                if (lower === 'fw') badgeClass = 'badge-fw';
+                else if (lower === 'mf') badgeClass = 'badge-mf';
+                else if (lower === 'df') badgeClass = 'badge-df';
+                else if (lower === 'gk') badgeClass = 'badge-gk';
+                return `<span class="player-position ${badgeClass}" style="font-size:0.7rem; padding:0.1rem 0.35rem; border-radius:12px; font-weight:600; display:inline-block;">${pos}</span>`;
+            }).join('')}
                             </div>
                             <div style="font-size:1.2rem; font-weight:bold; margin-top:0.2rem;">${p.name}</div>
                         </div>
@@ -3321,34 +3321,34 @@ function initPlayers() {
 
         // Draw Radar Charts
         sortedPlayers.forEach(p => {
-            const currentSkills = p.history && p.history.length > 0 ? p.history[0].skills : [0,0,0,0,0,0];
+            const currentSkills = p.history && p.history.length > 0 ? p.history[0].skills : [0, 0, 0, 0, 0, 0];
             drawRadarChart(`radar-${p.id}`, currentSkills);
         });
     }
 
     const btnAdd = document.getElementById('btn-add-player');
-    if(btnAdd) {
+    if (btnAdd) {
         // Refresh dynamically populated lists for the modal
         const posContainer = document.getElementById('player-position-container');
-        if(posContainer) {
+        if (posContainer) {
             posContainer.innerHTML = state.positions.map(p => `
                 <label style="display:flex; align-items:center; gap:0.3rem; cursor:pointer;">
                     <input type="checkbox" class="player-pos-checkbox" value="${p}"> ${p}
                 </label>
             `).join('');
         }
-        
+
         const posCat2Container = document.getElementById('player-position-cat2-container');
-        if(posCat2Container) {
+        if (posCat2Container) {
             posCat2Container.innerHTML = (state.positionsCat2 || []).map(p => `
                 <label style="display:flex; align-items:center; gap:0.3rem; cursor:pointer;">
                     <input type="checkbox" class="player-pos-checkbox" value="${p}"> ${p}
                 </label>
             `).join('');
         }
-        
+
         const initSkills = document.getElementById('player-initial-skills-container');
-        if(initSkills) {
+        if (initSkills) {
             initSkills.innerHTML = state.skillMetrics.map((m, i) => `
                 <div class="form-group"><label>${m}</label><input type="number" id="skill-initial-${i}" class="form-control" min="1" max="5" value="3" required></div>
             `).join('');
@@ -3360,10 +3360,10 @@ function initPlayers() {
             document.getElementById('player-initial-assessment-section').classList.remove('hidden');
             document.getElementById('player-initial-good').setAttribute('required', 'true');
             document.getElementById('player-initial-improve').setAttribute('required', 'true');
-            
+
             // Uncheck all position boxes
             document.querySelectorAll('.player-pos-checkbox').forEach(cb => cb.checked = false);
-            
+
             openModal('modal-player');
         });
     }
@@ -3379,22 +3379,22 @@ function initPlayers() {
 // --- CSV Bulk Import for Players ---
 function parsePlayerCSV(csvText) {
     if (!csvText || !csvText.trim()) return [];
-    
+
     const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
     if (lines.length === 0) return [];
-    
+
     const results = [];
-    
+
     // Header detection keywords
     const headerKeywords = ['背番号', '番号', '氏名', '名前', '選手名', '学年', 'ポジション', 'num', 'number', 'name', 'pos', 'position'];
     let startIndex = 0;
-    
+
     // Check if first line is a header
     const firstLineLower = lines[0].toLowerCase();
     if (headerKeywords.some(k => firstLineLower.includes(k))) {
         startIndex = 1; // Skip header line
     }
-    
+
     for (let i = startIndex; i < lines.length; i++) {
         const line = lines[i];
         // Split by comma or tab or multi-space
@@ -3402,14 +3402,14 @@ function parsePlayerCSV(csvText) {
         if (parts.length === 1 && line.includes(' ')) {
             parts = line.split(/\s+/).map(p => p.trim());
         }
-        
+
         if (parts.length === 0 || !parts[0]) continue;
-        
+
         let number = '';
         let name = '';
         let grade = '';
         let position = 'MF';
-        
+
         if (parts.length >= 4) {
             number = parts[0];
             name = parts[1];
@@ -3440,7 +3440,7 @@ function parsePlayerCSV(csvText) {
         } else if (parts.length === 1) {
             name = parts[0];
         }
-        
+
         if (name) {
             results.push({
                 number: number ? (parseInt(number, 10) || number) : '',
@@ -3450,7 +3450,7 @@ function parsePlayerCSV(csvText) {
             });
         }
     }
-    
+
     return results;
 }
 
@@ -3461,18 +3461,18 @@ function openPlayerCSVImportModal() {
     const previewContainer = document.getElementById('csv-preview-container');
     const errorMsg = document.getElementById('csv-error-msg');
     const form = document.getElementById('form-import-players-csv');
-    
+
     if (!modal) return;
-    
+
     if (inputFileInput) inputFileInput.value = '';
     if (textareaData) textareaData.value = '';
     if (previewContainer) { previewContainer.style.display = 'none'; previewContainer.innerHTML = ''; }
     if (errorMsg) errorMsg.style.display = 'none';
-    
+
     const updatePreview = () => {
         const text = textareaData ? textareaData.value : '';
         const parsed = parsePlayerCSV(text);
-        
+
         if (parsed.length > 0) {
             previewContainer.style.display = 'block';
             previewContainer.innerHTML = `
@@ -3506,7 +3506,7 @@ function openPlayerCSVImportModal() {
             previewContainer.innerHTML = '';
         }
     };
-    
+
     if (inputFileInput) {
         inputFileInput.onchange = (e) => {
             const file = e.target.files[0];
@@ -3522,17 +3522,17 @@ function openPlayerCSVImportModal() {
             }
         };
     }
-    
+
     if (textareaData) {
         textareaData.oninput = updatePreview;
     }
-    
+
     if (form) {
         form.onsubmit = (e) => {
             e.preventDefault();
             const text = textareaData ? textareaData.value : '';
             const parsed = parsePlayerCSV(text);
-            
+
             if (parsed.length === 0) {
                 if (errorMsg) {
                     errorMsg.textContent = '登録可能な選手データが検出されませんでした。フォーマットを確認してください。';
@@ -3540,7 +3540,7 @@ function openPlayerCSVImportModal() {
                 }
                 return;
             }
-            
+
             let addedCount = 0;
             parsed.forEach((p, idx) => {
                 const newPlayer = {
@@ -3554,14 +3554,14 @@ function openPlayerCSVImportModal() {
                 state.players.push(newPlayer);
                 addedCount++;
             });
-            
+
             saveData();
             modal.classList.add('hidden');
             showToast(`${addedCount}名の選手を一括登録しました！`);
             initPlayers();
         };
     }
-    
+
     modal.classList.remove('hidden');
 }
 
@@ -3576,20 +3576,20 @@ function initLibrary() {
             currentLibraryCategory = 'all';
             filterSelect.value = 'all';
         }
-        
+
         filterSelect.onchange = (e) => {
             currentLibraryCategory = e.target.value;
             initLibrary();
         };
     }
 
-    const filteredMenus = currentLibraryCategory === 'all' 
-        ? state.menuLibrary 
+    const filteredMenus = currentLibraryCategory === 'all'
+        ? state.menuLibrary
         : state.menuLibrary.filter(m => m.category === currentLibraryCategory);
 
     const elLibrary = document.getElementById('dash-library');
     if (elLibrary) elLibrary.textContent = filteredMenus.length + '個';
-    
+
     // Show count in topbar title
     const topbarTitleEl = document.getElementById('topbar-title');
     if (topbarTitleEl && topbarTitleEl.textContent.includes('メニュー管理')) {
@@ -3597,7 +3597,7 @@ function initLibrary() {
     }
 
     const libraryList = document.getElementById('library-list');
-    
+
     // Group menus by category
     const grouped = {};
     filteredMenus.forEach(m => {
@@ -3710,7 +3710,7 @@ function initLibrary() {
                     if (m.frames.length > 1) {
                         let frameIdx = 0;
                         drawPitchToCtx(m.frames[frameIdx], mCanv, mCtx, m.pitchTemplate || 'full');
-                        
+
                         const intervalId = setInterval(() => {
                             frameIdx = (frameIdx + 1) % m.frames.length;
                             drawPitchToCtx(m.frames[frameIdx], mCanv, mCtx, m.pitchTemplate || 'full');
@@ -3736,7 +3736,7 @@ function initLibrary() {
             document.getElementById('menu-library-select').parentElement.style.display = 'none'; // Hide select box
             document.getElementById('form-menu').reset();
             const title = document.querySelector('#modal-menu h2');
-            if(title) title.textContent = '練習メニューを追加';
+            if (title) title.textContent = '練習メニューを追加';
             openModal('modal-menu');
         };
     }
@@ -3749,7 +3749,7 @@ function initLibrary() {
                 document.getElementById('menu-practice-id').value = 'library';
                 document.getElementById('menu-library-source-id').value = '';
                 if (document.getElementById('menu-edit-id')) document.getElementById('menu-edit-id').value = id;
-                
+
                 document.getElementById('menu-focus').value = menu.focus || '';
                 document.getElementById('menu-category').value = menu.category || 'その他';
                 document.getElementById('menu-organize').value = menu.organize || '';
@@ -3759,10 +3759,10 @@ function initLibrary() {
                 if (vInp) vInp.value = menu.videoUrl || '';
 
                 document.getElementById('menu-library-select').parentElement.style.display = 'none'; // hide library select
-                
+
                 const title = document.querySelector('#modal-menu h2');
-                if(title) title.textContent = '練習メニューを編集';
-                
+                if (title) title.textContent = '練習メニューを編集';
+
                 openModal('modal-menu');
             }
         });
@@ -3770,7 +3770,7 @@ function initLibrary() {
 
     document.querySelectorAll('.btn-delete-library').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            if(confirm('このライブラリを削除しますか？')) {
+            if (confirm('このライブラリを削除しますか？')) {
                 const id = parseInt(e.currentTarget.dataset.id);
                 state.menuLibrary = state.menuLibrary.filter(m => m.id !== id);
                 saveData();
@@ -3821,10 +3821,10 @@ function openAssignPracticeModal(menuId) {
             btn.onclick = (e) => {
                 const pid = parseInt(e.currentTarget.dataset.pid);
                 const mid = parseInt(inputMenuId.value);
-                
+
                 const practice = state.practices.find(p => p.id === pid);
                 const libMenu = state.menuLibrary.find(m => m.id === mid);
-                
+
                 if (practice && libMenu) {
                     let frames = null;
                     let pitchTemplate = 'full';
@@ -3834,7 +3834,7 @@ function openAssignPracticeModal(menuId) {
                     if (libMenu.pitchTemplate) {
                         pitchTemplate = libMenu.pitchTemplate;
                     }
-                    
+
                     const newMenuObj = {
                         id: Date.now(),
                         focus: libMenu.focus,
@@ -3846,7 +3846,7 @@ function openAssignPracticeModal(menuId) {
                         frames: frames,
                         pitchTemplate: pitchTemplate
                     };
-                    
+
                     practice.menus.push(newMenuObj);
                     saveData();
                     showToast(`「${libMenu.focus}」を ${practice.date} の練習にアサインしました`);
@@ -3877,11 +3877,11 @@ function initSettings() {
     const teamNameInput = document.getElementById('team-info-name');
     const teamColorInput = document.getElementById('team-info-color');
     const teamPasscodeInput = document.getElementById('team-info-passcode');
-    if(teamNameInput && teamColorInput) {
+    if (teamNameInput && teamColorInput) {
         teamNameInput.value = state.teamInfo.name;
         teamColorInput.value = state.teamInfo.color;
         if (teamPasscodeInput) teamPasscodeInput.value = state.teamInfo.passcode || '7064';
-        
+
         const formTeamInfo = document.getElementById('form-team-info');
         const newFormTeamInfo = formTeamInfo.cloneNode(true);
         formTeamInfo.parentNode.replaceChild(newFormTeamInfo, formTeamInfo);
@@ -3898,7 +3898,7 @@ function initSettings() {
             // Update UI variables
             document.documentElement.style.setProperty('--primary', state.teamInfo.color);
             const sidebarTitle = document.querySelector('.sidebar-header h2');
-            if(sidebarTitle) sidebarTitle.innerHTML = `<i class="fa-solid fa-futbol"></i> ${state.teamInfo.name}`;
+            if (sidebarTitle) sidebarTitle.innerHTML = `<i class="fa-solid fa-futbol"></i> ${state.teamInfo.name}`;
         });
     }
 
@@ -3987,16 +3987,16 @@ function initSettings() {
                 } else {
                     prompt('以下の招待用URLをコピーして保護者に共有してください:', inviteUrl);
                 }
-            } catch(e) {
+            } catch (e) {
                 prompt('以下の招待用URLをコピーして保護者に共有してください:', inviteUrl);
             }
         };
     }
 
     // Generic list renderer
-    function renderList(listId, stateArray, itemLabelFunc = (x)=>x) {
+    function renderList(listId, stateArray, itemLabelFunc = (x) => x) {
         const list = document.getElementById(listId);
-        if(!list) return;
+        if (!list) return;
         list.innerHTML = stateArray.map((item, index) => {
             const isCustomForm = listId === 'custom-formation-list';
             const editBtnClass = isCustomForm ? 'btn-edit-custom-formation' : 'btn-edit-master-item';
@@ -4078,17 +4078,17 @@ function initSettings() {
         btn.addEventListener('click', (e) => {
             const listId = e.currentTarget.dataset.list;
             const idx = parseInt(e.currentTarget.dataset.index);
-            
+
             let label = "";
             let inUse = false;
-            
+
             if (listId === 'match-type-list') {
                 label = state.matchTypes[idx];
                 inUse = state.matches.some(m => m.type === label);
             } else if (listId === 'menu-category-list') {
                 label = state.menuCategories[idx];
                 inUse = state.practices.some(p => p.menus.some(m => m.category === label)) ||
-                        state.menuLibrary.some(m => m.category === label);
+                    state.menuLibrary.some(m => m.category === label);
             } else if (listId === 'skill-metric-list') {
                 label = state.skillMetrics[idx];
                 inUse = state.players.some(p => p.history && p.history.some(h => h.skills && h.skills.length > idx));
@@ -4119,12 +4119,12 @@ function initSettings() {
                 }
             }
 
-            if(listId === 'match-type-list') state.matchTypes.splice(idx, 1);
-            if(listId === 'menu-category-list') state.menuCategories.splice(idx, 1);
-            if(listId === 'skill-metric-list') state.skillMetrics.splice(idx, 1);
-            if(listId === 'position-list') state.positions.splice(idx, 1);
-            if(listId === 'position-cat2-list') state.positionsCat2.splice(idx, 1);
-            if(listId === 'custom-formation-list') state.customFormations.splice(idx, 1);
+            if (listId === 'match-type-list') state.matchTypes.splice(idx, 1);
+            if (listId === 'menu-category-list') state.menuCategories.splice(idx, 1);
+            if (listId === 'skill-metric-list') state.skillMetrics.splice(idx, 1);
+            if (listId === 'position-list') state.positions.splice(idx, 1);
+            if (listId === 'position-cat2-list') state.positionsCat2.splice(idx, 1);
+            if (listId === 'custom-formation-list') state.customFormations.splice(idx, 1);
             saveData();
             initSettings();
         });
@@ -4133,25 +4133,25 @@ function initSettings() {
     // Custom Formation visual builder & editor
     const openCustomFormationModal = (editIndex = null) => {
         document.getElementById('form-custom-formation').reset();
-        
+
         const titleEl = document.querySelector('#modal-custom-formation h2');
         if (titleEl) {
-            titleEl.innerHTML = editIndex !== null 
+            titleEl.innerHTML = editIndex !== null
                 ? `<i class="fa-solid fa-street-view"></i> カスタムフォーメーション編集`
                 : `<i class="fa-solid fa-street-view"></i> カスタムフォーメーション作成`;
         }
 
         const pitchCanvas = document.getElementById('custom-formation-pitch-canvas');
         pitchCanvas.querySelectorAll('.pitch-node').forEach(n => n.remove());
-        
+
         const editorList = document.getElementById('custom-formation-nodes-editor-list');
         editorList.innerHTML = `<p class="text-secondary" style="font-size:0.85rem; font-style:italic;">ピッチをクリックしてポジションを追加してください。</p>`;
-        
+
         const selectCount = document.getElementById('custom-formation-player-count');
         const maxCountLabel = document.getElementById('custom-formation-max-count');
-        
+
         let placedNodes = [];
-        
+
         const drawAndBindNode = (node) => {
             const nodeEl = document.createElement('div');
             nodeEl.className = 'pitch-node';
@@ -4164,17 +4164,17 @@ function initSettings() {
                 <span class="pitch-node-number" id="custom-pitch-node-role-span-${node.index}" style="font-size:0.6rem;">${node.role}</span>
             `;
             pitchCanvas.appendChild(nodeEl);
-            
+
             if (placedNodes.length === 1) {
                 editorList.innerHTML = '';
             }
-            
+
             const cat1Roles = (state.positions && state.positions.length > 0) ? state.positions : ['GK', 'DF', 'MF', 'FW'];
             const cat2Roles = (state.positionsCat2 && state.positionsCat2.length > 0) ? state.positionsCat2 : ['CB', 'SB', 'CH', 'SH', 'ST', 'WG'];
-            
+
             const cat1Options = cat1Roles.map(r => `<option value="${r}" ${node.role === r ? 'selected' : ''}>${r}</option>`).join('');
             const cat2Options = `<option value="">(選択なし)</option>` + cat2Roles.map(r => `<option value="${r}" ${node.label === r ? 'selected' : ''}>${r}</option>`).join('');
-            
+
             const row = document.createElement('div');
             row.className = 'custom-formation-node-row';
             row.id = `custom-node-editor-row-${node.index}`;
@@ -4188,67 +4188,67 @@ function initSettings() {
                     ${cat2Options}
                 </select>
             `;
-            
+
             const roleSelect = row.querySelector('.custom-node-role-select');
             const cat2Select = row.querySelector('.custom-node-cat2-select');
-            
+
             const updateNodeLabels = () => {
                 const c1 = roleSelect.value;
                 const c2 = cat2Select.value;
                 node.role = c1;
                 node.label = c2 ? c2 : c1;
-                
+
                 const spanLabel = document.getElementById(`custom-pitch-node-label-span-${node.index}`);
                 const spanRole = document.getElementById(`custom-pitch-node-role-span-${node.index}`);
                 if (spanLabel) spanLabel.textContent = node.label;
                 if (spanRole) spanRole.textContent = node.role;
             };
-            
+
             roleSelect.onchange = updateNodeLabels;
             cat2Select.onchange = updateNodeLabels;
-            
+
             editorList.appendChild(row);
-            
+
             let isDragging = false;
-            
+
             const handleStart = (e) => {
                 isDragging = true;
                 nodeEl.style.cursor = 'grabbing';
                 e.stopPropagation();
                 e.preventDefault();
             };
-            
+
             const handleMove = (e) => {
                 if (!isDragging) return;
                 const rect = pitchCanvas.getBoundingClientRect();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                
+
                 const x = clientX - rect.left;
                 const y = clientY - rect.top;
-                
+
                 let leftPercent = Math.round((x / rect.width) * 100);
                 let topPercent = Math.round((y / rect.height) * 100);
                 leftPercent = Math.max(0, Math.min(100, leftPercent));
                 topPercent = Math.max(0, Math.min(100, topPercent));
-                
+
                 nodeEl.style.left = `${leftPercent}%`;
                 nodeEl.style.top = `${topPercent}%`;
                 node.left = `${leftPercent}%`;
                 node.top = `${topPercent}%`;
             };
-            
+
             const handleEnd = () => {
                 if (isDragging) {
                     isDragging = false;
                     nodeEl.style.cursor = 'grab';
                 }
             };
-            
+
             nodeEl.addEventListener('mousedown', handleStart);
             window.addEventListener('mousemove', handleMove);
             window.addEventListener('mouseup', handleEnd);
-            
+
             nodeEl.addEventListener('touchstart', handleStart, { passive: false });
             window.addEventListener('touchmove', handleMove, { passive: false });
             window.addEventListener('touchend', handleEnd);
@@ -4259,7 +4259,7 @@ function initSettings() {
             document.getElementById('custom-formation-name').value = formObj.name;
             selectCount.value = formObj.coords.length;
             maxCountLabel.textContent = formObj.coords.length;
-            
+
             formObj.coords.forEach((coord, i) => {
                 const node = {
                     index: i,
@@ -4285,30 +4285,30 @@ function initSettings() {
             maxCountLabel.textContent = selectCount.value;
             clearBoard();
         };
-        
+
         document.getElementById('btn-custom-formation-clear-all').onclick = clearBoard;
-        
+
         pitchCanvas.onclick = (e) => {
             if (e.target.closest('.pitch-node')) {
                 return;
             }
-            
+
             const maxCount = parseInt(selectCount.value, 10);
             if (placedNodes.length >= maxCount) {
                 alert(`ポジションは最大 ${maxCount} 箇所まで設定可能です。`);
                 return;
             }
-            
+
             const rect = pitchCanvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             const leftPercent = Math.round((x / rect.width) * 100);
             const topPercent = Math.round((y / rect.height) * 100);
-            
+
             const nodeIndex = placedNodes.length;
             const defaultLabel = nodeIndex === 0 ? 'GK' : `P${nodeIndex}`;
             const defaultRole = nodeIndex === 0 ? 'GK' : 'DF';
-            
+
             const newNode = {
                 index: nodeIndex,
                 top: `${topPercent}%`,
@@ -4316,22 +4316,22 @@ function initSettings() {
                 label: defaultLabel,
                 role: defaultRole
             };
-            
+
             placedNodes.push(newNode);
             drawAndBindNode(newNode);
         };
-        
+
         const formCustomForm = document.getElementById('form-custom-formation');
         formCustomForm.onsubmit = (e) => {
             e.preventDefault();
             const name = document.getElementById('custom-formation-name').value.trim();
             const maxCount = parseInt(selectCount.value, 10);
-            
+
             if (placedNodes.length !== maxCount) {
                 alert(`指定された人数（${maxCount}人）分のポジションを設定してください。（現在: ${placedNodes.length}箇所）`);
                 return;
             }
-            
+
             const finalCoords = placedNodes.map(node => {
                 const rowEl = document.getElementById(`custom-node-editor-row-${node.index}`);
                 const role = rowEl.querySelector('.custom-node-role-select').value;
@@ -4344,7 +4344,7 @@ function initSettings() {
                     left: node.left
                 };
             });
-            
+
             if (editIndex !== null) {
                 state.customFormations[editIndex] = { name, coords: finalCoords };
                 showToast(`フォーメーション「${name}」を更新しました`);
@@ -4352,12 +4352,12 @@ function initSettings() {
                 state.customFormations.push({ name, coords: finalCoords });
                 showToast(`フォーメーション「${name}」を登録しました`);
             }
-            
+
             saveData();
             document.getElementById('modal-custom-formation').classList.add('hidden');
             initSettings();
         };
-        
+
         openModal('modal-custom-formation');
     };
 
@@ -4376,13 +4376,13 @@ function initSettings() {
     // Generic add handler
     function setupAddForm(formId, inputId, stateArray) {
         const form = document.getElementById(formId);
-        if(!form) return;
+        if (!form) return;
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
         newForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const newVal = document.getElementById(inputId).value.trim();
-            if(newVal && !stateArray.includes(newVal)) {
+            if (newVal && !stateArray.includes(newVal)) {
                 stateArray.push(newVal);
                 saveData();
                 initSettings();
@@ -4404,10 +4404,10 @@ let currentPlayerDetailId = null;
 
 function openPlayerDetail(id) {
     const p = state.players.find(pl => pl.id === id);
-    if(!p) return;
-    
+    if (!p) return;
+
     currentPlayerDetailId = p.id;
-    
+
     const pdPosition = document.getElementById('pd-position');
     if (pdPosition) {
         pdPosition.innerHTML = (Array.isArray(p.position) ? p.position : [p.position]).map(pos => {
@@ -4426,7 +4426,7 @@ function openPlayerDetail(id) {
         pdPosition.style.padding = '0';
     }
     document.getElementById('pd-name').textContent = p.name;
-    
+
     // Calculate player total goals and assists
     let playerGoals = 0;
     let playerAssists = 0;
@@ -4438,7 +4438,7 @@ function openPlayerDetail(id) {
             });
         }
     });
-    
+
     const elPdGoals = document.getElementById('pd-goals');
     const elPdAssists = document.getElementById('pd-assists');
     if (elPdGoals) elPdGoals.textContent = playerGoals;
@@ -4447,10 +4447,10 @@ function openPlayerDetail(id) {
     const btnPdGoals = document.getElementById('btn-pd-goals');
     if (btnPdGoals) {
         btnPdGoals.onclick = () => {
-            const matchesWithGoals = state.matches.filter(m => 
+            const matchesWithGoals = state.matches.filter(m =>
                 m.goalRecords && m.goalRecords.some(r => r.scorerId === p.id)
             );
-            
+
             const pmlTitle = document.getElementById('pml-title');
             const pmlContent = document.getElementById('pml-content');
             if (pmlTitle && pmlContent) {
@@ -4464,7 +4464,7 @@ function openPlayerDetail(id) {
                         <div style="font-size:1.15rem; font-weight:bold; color:var(--primary);">${m.result}</div>
                     </div>
                 `).join('') : '<p class="text-secondary" style="font-size:0.85rem; padding:1rem; text-align:center;">得点した試合はありません。</p>';
-                
+
                 openModal('modal-player-matches-list');
             }
         };
@@ -4473,10 +4473,10 @@ function openPlayerDetail(id) {
     const btnPdAssists = document.getElementById('btn-pd-assists');
     if (btnPdAssists) {
         btnPdAssists.onclick = () => {
-            const matchesWithAssists = state.matches.filter(m => 
+            const matchesWithAssists = state.matches.filter(m =>
                 m.goalRecords && m.goalRecords.some(r => r.assistId === p.id)
             );
-            
+
             const pmlTitle = document.getElementById('pml-title');
             const pmlContent = document.getElementById('pml-content');
             if (pmlTitle && pmlContent) {
@@ -4490,35 +4490,35 @@ function openPlayerDetail(id) {
                         <div style="font-size:1.15rem; font-weight:bold; color:var(--primary);">${m.result}</div>
                     </div>
                 `).join('') : '<p class="text-secondary" style="font-size:0.85rem; padding:1rem; text-align:center;">アシストした試合はありません。</p>';
-                
+
                 openModal('modal-player-matches-list');
             }
         };
     }
 
-    
+
     // Collect all timeline events (Assessments + Match Feedbacks)
     let timeline = [];
-    if(p.history) {
+    if (p.history) {
         p.history.forEach(h => {
             timeline.push({ type: 'assessment', date: h.date, comment: h.comment, data: h });
         });
     }
-    
+
     // Find match feedbacks for this player
     state.matches.forEach(m => {
-        if(m.playerFeedback) {
+        if (m.playerFeedback) {
             m.playerFeedback.forEach(fb => {
-                if(fb.playerId === p.id) {
+                if (fb.playerId === p.id) {
                     timeline.push({ type: 'match', date: m.date, matchDetails: `${m.type}${m.tournament ? ` (${m.tournament})` : ''} vs ${m.opponent}`, comment: fb.comment, matchId: m.id });
                 }
             });
         }
     });
-    
+
     // Sort timeline descending by date
-    timeline.sort((a,b) => new Date(b.date) - new Date(a.date));
-    
+    timeline.sort((a, b) => new Date(b.date) - new Date(a.date));
+
     const historyList = document.getElementById('pd-history-list');
     historyList.innerHTML = timeline.length > 0 ? timeline.map(item => {
         if (item.type === 'assessment') {
@@ -4615,14 +4615,14 @@ function openPlayerDetail(id) {
     });
 
     openModal('modal-player-detail');
-    
+
     // Draw current radar (first item in history, as history is sorted desc)
-    const currentSkills = p.history && p.history.length > 0 ? (p.history[0].data ? p.history[0].data.skills : p.history[0].skills) : [0,0,0,0,0,0];
+    const currentSkills = p.history && p.history.length > 0 ? (p.history[0].data ? p.history[0].data.skills : p.history[0].skills) : [0, 0, 0, 0, 0, 0];
     const prevSkills = p.history && p.history.length > 1 ? (p.history[1].data ? p.history[1].data.skills : p.history[1].skills) : null;
-    
+
     // Toggle legend based on prevSkills
     const legend = document.getElementById('pd-radar-legend');
-    if(legend) {
+    if (legend) {
         legend.style.display = prevSkills ? 'flex' : 'none';
     }
 
@@ -4639,21 +4639,21 @@ function openPlayerDetail(id) {
         document.getElementById('assessment-date').value = new Date().toISOString().split('T')[0];
         document.getElementById('assessment-good').value = '';
         document.getElementById('assessment-improve').value = '';
-        
+
         const assSkills = document.getElementById('assessment-skills-container');
-        if(assSkills) {
+        if (assSkills) {
             assSkills.innerHTML = state.skillMetrics.map((m, i) => `
                 <div class="form-group"><label>${m}</label><input type="number" id="skill-ass-${i}" class="form-control" min="1" max="5" value="3" required></div>
             `).join('');
-            
-            if(currentSkills) {
+
+            if (currentSkills) {
                 state.skillMetrics.forEach((m, i) => {
                     const el = document.getElementById(`skill-ass-${i}`);
-                    if(el) el.value = currentSkills[i] || 3;
+                    if (el) el.value = currentSkills[i] || 3;
                 });
             }
         }
-        
+
         openModal('modal-player-assessment');
     };
 
@@ -4665,13 +4665,13 @@ function openPlayerDetail(id) {
         document.getElementById('player-initial-assessment-section').classList.add('hidden');
         document.getElementById('player-initial-good').removeAttribute('required');
         document.getElementById('player-initial-improve').removeAttribute('required');
-        
+
         document.getElementById('player-name').value = p.name;
         document.getElementById('player-number').value = p.number;
-        
+
         // Populate and check checkbox lists for Category 1 & Category 2
         const posContainer = document.getElementById('player-position-container');
-        if(posContainer) {
+        if (posContainer) {
             posContainer.innerHTML = state.positions.map(pos => {
                 const checked = (Array.isArray(p.position) ? p.position : [p.position]).includes(pos) ? 'checked' : '';
                 return `
@@ -4681,9 +4681,9 @@ function openPlayerDetail(id) {
                 `;
             }).join('');
         }
-        
+
         const posCat2Container = document.getElementById('player-position-cat2-container');
-        if(posCat2Container) {
+        if (posCat2Container) {
             posCat2Container.innerHTML = (state.positionsCat2 || []).map(pos => {
                 const checked = (Array.isArray(p.position) ? p.position : [p.position]).includes(pos) ? 'checked' : '';
                 return `
@@ -4693,7 +4693,7 @@ function openPlayerDetail(id) {
                 `;
             }).join('');
         }
-        
+
         document.getElementById('modal-player-detail').classList.add('hidden');
         openModal('modal-player');
     };
@@ -4701,7 +4701,7 @@ function openPlayerDetail(id) {
     // Delete btn
     const btnDel = document.getElementById('btn-delete-player-detail');
     btnDel.onclick = () => {
-        if(confirm('この選手を削除しますか？')) {
+        if (confirm('この選手を削除しますか？')) {
             state.players = state.players.filter(pl => pl.id !== p.id);
             saveData();
             showToast('削除しました');
@@ -4725,7 +4725,7 @@ function openPlayerDetail(id) {
     // Setup tab switching
     const tabs = document.querySelectorAll('#modal-player-detail .player-detail-tab');
     const panes = document.querySelectorAll('#modal-player-detail .player-detail-tab-pane');
-    
+
     // Reset to first tab
     tabs.forEach(tab => {
         if (tab.dataset.tab === 'pd-tab-history') tab.classList.add('active');
@@ -4740,7 +4740,7 @@ function openPlayerDetail(id) {
         tab.onclick = () => {
             tabs.forEach(t => t.classList.remove('active'));
             panes.forEach(pane => pane.classList.remove('active'));
-            
+
             tab.classList.add('active');
             const targetPane = document.getElementById(tab.dataset.tab);
             if (targetPane) targetPane.classList.add('active');
@@ -4790,7 +4790,7 @@ function openPlayerDetail(id) {
 function render1on1List(p) {
     const listEl = document.getElementById('pd-1on1-list');
     if (!listEl) return;
-    
+
     if (p.notes1on1 && p.notes1on1.length > 0) {
         const sorted = [...p.notes1on1].sort((a, b) => new Date(b.date) - new Date(a.date));
         listEl.innerHTML = sorted.map(note => `
@@ -4802,7 +4802,7 @@ function render1on1List(p) {
                 <p style="font-size:0.85rem; color:var(--text-primary); white-space:pre-wrap; margin:0; line-height:1.4;">${note.content}</p>
             </div>
         `).join('');
-        
+
         listEl.querySelectorAll('.btn-delete-1on1').forEach(btn => {
             btn.onclick = (e) => {
                 e.stopPropagation();
@@ -4826,7 +4826,7 @@ function render1on1List(p) {
 
 function drawRadarChart(canvasId, skills, prevSkills = null) {
     const canvas = document.getElementById(canvasId);
-    if(!canvas) return;
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const w = canvas.width;
     const h = canvas.height;
@@ -4834,13 +4834,13 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
     const cy = h / 2;
     const scaleFactor = w / 200; // Resolution multiplier
     const radius = w / 2 - (56 * scaleFactor / 2);
-    
+
     ctx.clearRect(0, 0, w, h);
-    
+
     const labels = state.skillMetrics || ['シュート', 'パス', 'ドリブル', '守備', 'フィジカル', 'メンタル'];
     const maxVal = 5;
     const numSides = labels.length;
-    
+
     // Draw background rings
     for (let i = 1; i <= maxVal; i++) {
         ctx.beginPath();
@@ -4855,7 +4855,7 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
         ctx.strokeStyle = 'rgba(203, 213, 225, 0.4)';
         ctx.lineWidth = 1 * scaleFactor;
         ctx.stroke();
-        
+
         // Draw axis lines
         if (i === maxVal) {
             for (let j = 0; j < numSides; j++) {
@@ -4866,7 +4866,7 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
                 ctx.strokeStyle = 'rgba(203, 213, 225, 0.5)';
                 ctx.lineWidth = 1 * scaleFactor;
                 ctx.stroke();
-                
+
                 // Labels - High Contrast & Scaled Crisp Font with padding safety
                 const labelDist = radius + (14 * scaleFactor);
                 const lx = cx + labelDist * Math.cos(angle);
@@ -4900,7 +4900,7 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
         ctx.setLineDash([4 * scaleFactor, 4 * scaleFactor]);
         ctx.stroke();
         ctx.setLineDash([]);
-        
+
         for (let j = 0; j < numSides; j++) {
             const val = prevSkills[j] || 0;
             const angle = (Math.PI * 2 * j) / numSides - Math.PI / 2;
@@ -4908,12 +4908,12 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
             const x = cx + r * Math.cos(angle);
             const y = cy + r * Math.sin(angle);
             ctx.beginPath();
-            ctx.arc(x, y, 3 * scaleFactor, 0, Math.PI*2);
+            ctx.arc(x, y, 3 * scaleFactor, 0, Math.PI * 2);
             ctx.fillStyle = '#64748b';
             ctx.fill();
         }
     }
-    
+
     // Draw Current Data Polygon
     ctx.beginPath();
     for (let j = 0; j < numSides; j++) {
@@ -4931,7 +4931,7 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
     ctx.strokeStyle = '#f23932'; // Primary color
     ctx.lineWidth = 2.5 * scaleFactor;
     ctx.stroke();
-    
+
     // Draw Data Points
     for (let j = 0; j < numSides; j++) {
         const val = skills[j] || 0;
@@ -4940,7 +4940,7 @@ function drawRadarChart(canvasId, skills, prevSkills = null) {
         const x = cx + r * Math.cos(angle);
         const y = cy + r * Math.sin(angle);
         ctx.beginPath();
-        ctx.arc(x, y, 4 * scaleFactor, 0, Math.PI*2);
+        ctx.arc(x, y, 4 * scaleFactor, 0, Math.PI * 2);
         ctx.fillStyle = '#f23932';
         ctx.fill();
     }
@@ -5015,7 +5015,7 @@ function updateUndoRedoButtons() {
 function updateCanvasToolbar() {
     const btnDelete = document.getElementById('tool-delete');
     const btnRotate = document.getElementById('tool-rotate');
-    
+
     if (btnDelete) {
         btnDelete.disabled = !selectedObject;
         btnDelete.style.opacity = selectedObject ? '1' : '0.5';
@@ -5030,11 +5030,11 @@ function updateCanvasToolbar() {
 
 function handleCanvasKeyDown(e) {
     if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'SELECT')) {
-        return; 
+        return;
     }
     const canvasWrapper = document.getElementById('canvas-wrapper');
     if (!canvasWrapper) return;
-    
+
     if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedObject) {
             e.preventDefault();
@@ -5069,14 +5069,14 @@ let currentLibraryId = null;
 
 function initAnimation(params) {
     canvas = document.getElementById('pitch-canvas');
-    if(!canvas) return;
-    
+    if (!canvas) return;
+
     currentPracticeId = params && params.practiceId ? params.practiceId : null;
     currentMenuId = params && params.menuId ? params.menuId : null;
     currentMatchId = params && params.matchId ? params.matchId : null;
     currentFormationId = params && params.formId ? params.formId : null;
     currentLibraryId = params && params.libraryId ? params.libraryId : null;
-    
+
     let initialFrames = null;
     let isFormationMode = !!(currentMatchId && currentFormationId);
     let isLibraryMode = !!currentLibraryId;
@@ -5119,15 +5119,15 @@ function initAnimation(params) {
             // Collapse by default
             infoContent.style.display = 'none';
             infoToggleBtn.innerHTML = '<i class="fa-solid fa-chevron-down"></i> 詳細を表示';
-            
+
             infoHeader.onclick = (e) => {
                 // Prevent toggle if clicking edit button
                 if (e.target.closest('#btn-edit-anim-menu')) return;
-                
+
                 const isHidden = infoContent.style.display === 'none';
                 infoContent.style.display = isHidden ? 'block' : 'none';
-                infoToggleBtn.innerHTML = isHidden 
-                    ? '<i class="fa-solid fa-chevron-up"></i> 詳細を閉じる' 
+                infoToggleBtn.innerHTML = isHidden
+                    ? '<i class="fa-solid fa-chevron-up"></i> 詳細を閉じる'
                     : '<i class="fa-solid fa-chevron-down"></i> 詳細を表示';
             };
         }
@@ -5135,7 +5135,7 @@ function initAnimation(params) {
         if (targetMenu && (targetMenu.organize || targetMenu.keyfactor || targetMenu.options)) {
             infoContainer.style.display = 'block';
             document.getElementById('anim-menu-focus').textContent = targetMenu.focus || 'メニュー';
-            
+
             const orgDiv = document.getElementById('anim-menu-organize-container');
             if (targetMenu.organize) {
                 orgDiv.style.display = 'flex';
@@ -5143,7 +5143,7 @@ function initAnimation(params) {
             } else {
                 orgDiv.style.display = 'none';
             }
-            
+
             const kfDiv = document.getElementById('anim-menu-keyfactor-container');
             if (targetMenu.keyfactor) {
                 kfDiv.style.display = 'flex';
@@ -5151,7 +5151,7 @@ function initAnimation(params) {
             } else {
                 kfDiv.style.display = 'none';
             }
-            
+
             const optDiv = document.getElementById('anim-menu-options-container');
             if (targetMenu.options) {
                 optDiv.style.display = 'flex';
@@ -5162,7 +5162,7 @@ function initAnimation(params) {
         } else {
             infoContainer.style.display = 'none';
         }
-        
+
         const btnEditAnim = document.getElementById('btn-edit-anim-menu');
         if (btnEditAnim && targetMenu) {
             // Replace with clone to remove old listeners
@@ -5178,7 +5178,7 @@ function initAnimation(params) {
                     document.getElementById('form-menu').appendChild(hidden);
                 }
                 document.getElementById('menu-edit-id').value = targetMenu.id;
-                
+
                 document.getElementById('menu-focus').value = targetMenu.focus || '';
                 document.getElementById('menu-category').value = targetMenu.category || 'その他';
                 document.getElementById('menu-organize').value = targetMenu.organize || '';
@@ -5186,19 +5186,24 @@ function initAnimation(params) {
                 document.getElementById('menu-options').value = targetMenu.options || '';
 
                 document.getElementById('menu-library-select').parentElement.style.display = 'none';
-                
+
                 const title = document.querySelector('#modal-menu h2');
-                if(title) title.textContent = '練習メニューを編集';
-                
+                if (title) title.textContent = '練習メニューを編集';
+
                 openModal('modal-menu');
             });
+        }
+        // initAnimation 内の処理に追加
+        const sidePanel = document.getElementById('anim-detail-side-panel');
+        if (sidePanel && window.innerWidth <= 768) {
+            sidePanel.classList.add('collapsed');
         }
     }
 
     // Fixed internal resolution
     canvas.width = 800;
     canvas.height = 500;
-    
+
     ctx = canvas.getContext('2d');
     frames = initialFrames || [];
     if (frames.length === 0) {
@@ -5210,7 +5215,7 @@ function initAnimation(params) {
     isPlaying = false;
     historyStack = [];
     saveHistory();
-    
+
     // Set custom number to next available by scanning, though user can change it
     let maxNum = 0;
     objects.forEach(o => {
@@ -5222,7 +5227,7 @@ function initAnimation(params) {
     const elPlayerNumber = document.getElementById('canvas-player-number');
     const elPlayerSelect = document.getElementById('canvas-player-select');
     if (elPlayerNumber) elPlayerNumber.value = maxNum + 1;
-    
+
     if (isFormationMode) {
         if (elPlayerNumber) elPlayerNumber.classList.add('hidden');
         if (elPlayerSelect) {
@@ -5245,7 +5250,7 @@ function initAnimation(params) {
         if (elPlayerNumber) elPlayerNumber.classList.remove('hidden');
         if (elPlayerSelect) elPlayerSelect.classList.add('hidden');
     }
-    
+
     updateFrameCount();
     drawPitch(objects);
 
@@ -5253,7 +5258,7 @@ function initAnimation(params) {
     tools.forEach(tool => {
         const el = document.querySelector(`.tool-btn[data-tool="${tool}"]`);
         if (!el) return;
-        
+
         // Hide non-player tools in formation mode
         const isPlayerTool = ['select', 'player'].includes(tool);
         if (isFormationMode && !isPlayerTool) {
@@ -5264,7 +5269,7 @@ function initAnimation(params) {
 
         const newEl = el.cloneNode(true);
         el.parentNode.replaceChild(newEl, el);
-        
+
         newEl.addEventListener('click', (e) => {
             currentTool = tool;
             updateToolDockActive();
@@ -5272,7 +5277,7 @@ function initAnimation(params) {
     });
     currentTool = 'select';
     updateToolDockActive();
-    
+
     const btnClear = document.getElementById('tool-clear');
     const newBtnClear = btnClear.cloneNode(true);
     btnClear.parentNode.replaceChild(newBtnClear, btnClear);
@@ -5409,7 +5414,7 @@ function initAnimation(params) {
     const newBtnStop = btnStop.cloneNode(true);
     btnStop.parentNode.replaceChild(newBtnStop, btnStop);
     newBtnStop.addEventListener('click', stopAnimation);
-    
+
     // Video Export Button Handler (LINE sharing)
     const btnExportVideo = document.getElementById('anim-export-video');
     if (btnExportVideo) {
@@ -5417,7 +5422,7 @@ function initAnimation(params) {
         btnExportVideo.parentNode.replaceChild(newBtnExport, btnExportVideo);
         newBtnExport.addEventListener('click', exportAnimationVideo);
     }
-    
+
     const countEl = document.getElementById('frame-count');
 
     // Save Button Logic
@@ -5428,7 +5433,7 @@ function initAnimation(params) {
         btnSave.className = 'btn btn-primary';
         document.querySelector('.canvas-toolbar').appendChild(btnSave);
     }
-    
+
     const newBtnSave = btnSave.cloneNode(true);
     btnSave.parentNode.replaceChild(newBtnSave, btnSave);
 
@@ -5442,14 +5447,14 @@ function initAnimation(params) {
         document.querySelector('.canvas-toolbar').appendChild(btnBack);
     }
     btnBack.onclick = () => {
-        if(isFormationMode) {
+        if (isFormationMode) {
             navigate('matches');
             setTimeout(() => {
                 const btnDetail = document.querySelector(`.btn-detail-match[data-id="${currentMatchId}"]`);
-                if(btnDetail) btnDetail.click();
+                if (btnDetail) btnDetail.click();
                 setTimeout(() => {
                     const tabFormation = document.getElementById('tab-match-formation');
-                    if(tabFormation) tabFormation.click();
+                    if (tabFormation) tabFormation.click();
                 }, 50);
             }, 50);
         } else if (isLibraryMode) {
@@ -5458,13 +5463,13 @@ function initAnimation(params) {
             navigate('practices');
         }
     };
-    
+
     if (isFormationMode) {
         newBtnAdd.style.display = 'none';
         newBtnPlay.style.display = 'none';
         newBtnStop.style.display = 'none';
-        if(countEl) countEl.style.display = 'none';
-        
+        if (countEl) countEl.style.display = 'none';
+
         newBtnSave.style.display = 'inline-flex';
         newBtnSave.innerHTML = '<i class="fa-solid fa-save"></i> 保存';
         newBtnSave.addEventListener('click', () => {
@@ -5480,10 +5485,10 @@ function initAnimation(params) {
                     navigate('matches');
                     setTimeout(() => {
                         const btnDetail = document.querySelector(`.btn-detail-match[data-id="${currentMatchId}"]`);
-                        if(btnDetail) btnDetail.click();
+                        if (btnDetail) btnDetail.click();
                         setTimeout(() => {
                             const tabFormation = document.getElementById('tab-match-formation');
-                            if(tabFormation) tabFormation.click();
+                            if (tabFormation) tabFormation.click();
                         }, 50);
                     }, 50);
                 }
@@ -5493,8 +5498,8 @@ function initAnimation(params) {
         newBtnAdd.style.display = 'inline-block';
         newBtnPlay.style.display = 'inline-block';
         newBtnStop.style.display = 'inline-block';
-        if(countEl) countEl.style.display = 'inline-block';
-        
+        if (countEl) countEl.style.display = 'inline-block';
+
         newBtnSave.style.display = 'inline-flex';
         newBtnSave.innerHTML = '<i class="fa-solid fa-save"></i> 保存';
         newBtnSave.addEventListener('click', () => {
@@ -5520,8 +5525,8 @@ function initAnimation(params) {
         newBtnAdd.style.display = 'inline-block';
         newBtnPlay.style.display = 'inline-block';
         newBtnStop.style.display = 'inline-block';
-        if(countEl) countEl.style.display = 'inline-block';
-        
+        if (countEl) countEl.style.display = 'inline-block';
+
         newBtnSave.style.display = 'inline-flex';
         newBtnSave.innerHTML = '<i class="fa-solid fa-save"></i> 保存';
         newBtnSave.addEventListener('click', () => {
@@ -5638,8 +5643,8 @@ function initAnimation(params) {
     drawPitch(objects);
 
     selectedObject = null; // Globals for canvas
-    
-    if(elPlayerNumber) {
+
+    if (elPlayerNumber) {
         const newEl = elPlayerNumber.cloneNode(true);
         elPlayerNumber.parentNode.replaceChild(newEl, elPlayerNumber);
         newEl.addEventListener('input', (e) => {
@@ -5681,7 +5686,7 @@ function initAnimation(params) {
         };
     });
 
-    if(elPlayerSelect) {
+    if (elPlayerSelect) {
         const newEl = elPlayerSelect.cloneNode(true);
         elPlayerSelect.parentNode.replaceChild(newEl, elPlayerSelect);
         newEl.addEventListener('change', (e) => {
@@ -5707,7 +5712,7 @@ function initAnimation(params) {
             if (val === 'small') scale = 0.7;
             else if (val === 'large') scale = 1.6;
             else if (val === 'full') scale = 2.4;
-            
+
             if (selectedObject && selectedObject.type === 'minigoal') {
                 selectedObject.sizeCategory = val;
                 selectedObject.goalScale = scale;
@@ -5756,7 +5761,7 @@ let currentFrameIndex = -1;
 
 function updateFrameCount() {
     const el = document.getElementById('frame-count');
-    if(el) el.textContent = frames.length;
+    if (el) el.textContent = frames.length;
 
     const selectEl = document.getElementById('anim-frame-select');
     const btnPrev = document.getElementById('anim-prev-frame');
@@ -5845,7 +5850,7 @@ function editFrameTitle() {
     }
     let f = frames[currentFrameIndex];
     let currentTitle = (f && typeof f === 'object' && !Array.isArray(f) && f.title) ? f.title : '';
-    
+
     const inputTitle = prompt(`シーン ${currentFrameIndex + 1} の見出しを入力してください\n（例: 初期配置、プレス回避、シュート体勢 など）:`, currentTitle);
     if (inputTitle !== null) {
         const trimmed = inputTitle.trim();
@@ -5881,14 +5886,14 @@ function playAnimation() {
     isPlaying = true;
     let currentFrameIdx = 0;
     let startTime = null;
-    const duration = 1500; 
+    const duration = 1500;
 
     function animate(timestamp) {
         if (!isPlaying) return;
         if (!startTime) startTime = timestamp;
-        
+
         let progress = (timestamp - startTime) / duration;
-        
+
         if (progress >= 1) {
             currentFrameIdx++;
             startTime = timestamp;
@@ -5903,16 +5908,16 @@ function playAnimation() {
 
         const currentFrame = Array.isArray(rawCurrent) ? rawCurrent : ((rawCurrent && rawCurrent.objects) || []);
         const nextFrame = Array.isArray(rawNext) ? rawNext : ((rawNext && rawNext.objects) || []);
-        
+
         const isStaticType = (type) => ['line', 'ladder', 'rect', 'cone', 'marker', 'minigoal'].includes(type);
 
         const interpolatedObjects = currentFrame.map(obj1 => {
-            if (isStaticType(obj1.type)) return obj1; 
+            if (isStaticType(obj1.type)) return obj1;
             const obj2 = nextFrame.find(o => o.id === obj1.id);
-            if (!obj2) return obj1; 
+            if (!obj2) return obj1;
 
             const p = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
-            
+
             return {
                 ...obj1,
                 x: obj1.x + (obj2.x - obj1.x) * p,
@@ -5926,7 +5931,7 @@ function playAnimation() {
         drawPitch(drawList);
         animReqId = requestAnimationFrame(animate);
     }
-    
+
     animReqId = requestAnimationFrame(animate);
 }
 
@@ -6163,7 +6168,7 @@ function updateContextPopover() {
     if (playerControls) {
         if (selectedObject.type === 'player' || selectedObject.type === 'marker') {
             playerControls.style.display = 'flex';
-            
+
             const numInput = document.getElementById('canvas-player-number');
             const numLabels = playerControls.querySelectorAll('.popover-label');
             if (numInput) numInput.style.display = (selectedObject.type === 'player') ? 'inline-block' : 'none';
@@ -6213,29 +6218,29 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
 
     const w = targetCanvas.width;
     const h = targetCanvas.height;
-    
+
     targetCtx.clearRect(0, 0, w, h);
-    
+
     targetCtx.save();
-    
+
     // Scale context from base 800x500 coordinate space to high-res canvas resolution!
     const scaleX = w / 800;
     const scaleY = h / 500;
     targetCtx.scale(scaleX, scaleY);
-    
+
     // Background - modern grey-white
     targetCtx.fillStyle = '#f1f5f9';
     targetCtx.fillRect(0, 0, 800, 500);
-    
+
     // Proportions and Dimensions (Base 800x500 space, side margins fit goals completely)
     const pitchX = 24;
     const pitchY = 16;
     const pitchW = 800 - 48;
     const pitchH = 500 - 32;
-    
+
     targetCtx.strokeStyle = '#334155';
     targetCtx.lineWidth = 1.5;
-    
+
     // Outer boundary
     targetCtx.strokeRect(pitchX, pitchY, pitchW, pitchH);
 
@@ -6264,7 +6269,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.moveTo(pitchX, y);
             targetCtx.lineTo(pitchX + pitchW, y);
         });
-        
+
         // Transversal lines (mid-half zones and penalty box depth)
         const leftMidHalf = pitchX + penW + (pitchW / 2 - penW) / 2;
         const rightMidHalf = pitchX + pitchW / 2 + (pitchW / 2 - penW) / 2;
@@ -6272,7 +6277,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.moveTo(x, pitchY);
             targetCtx.lineTo(x, pitchY + pitchH);
         });
-        
+
         // Bielsa lines
         let m, targetX;
         m = (penY - goalTopY) / penW;
@@ -6318,18 +6323,18 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
         // Main Pitch Lines - Dark grey
         targetCtx.strokeStyle = '#334155';
         targetCtx.lineWidth = 1.5;
-        
+
         // Center line
         targetCtx.beginPath();
         targetCtx.moveTo(pitchX + pitchW / 2, pitchY);
         targetCtx.lineTo(pitchX + pitchW / 2, pitchY + pitchH);
         targetCtx.stroke();
-        
+
         // Center circle
         targetCtx.beginPath();
         targetCtx.arc(pitchX + pitchW / 2, pitchY + pitchH / 2, centerCircleR, 0, Math.PI * 2);
         targetCtx.stroke();
-        
+
         // Center spot
         targetCtx.beginPath();
         targetCtx.arc(pitchX + pitchW / 2, pitchY + pitchH / 2, 3, 0, Math.PI * 2);
@@ -6363,20 +6368,20 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
         // Rotate half court to landscape (attacking upwards) and map coordinates exactly from full court
         const halfW = 760;
         const halfH = 460;
-        
+
         // Exact mapped dimensions to align with full court outer boundaries (20, 20, 760, 460)
         const penX_left = 171.8;
         const penX_right = 627.2;
         const penY_half = 167.2;
-        
+
         const goalAreaX_left = 297.5;
         const goalAreaX_right = 502.5;
         const goalAreaY_half = 70.6;
-        
+
         const goalLeftX_half = 369.6;
         const goalRightX_half = 430.4;
         const goalW_half = goalRightX_half - goalLeftX_half;
-        
+
         const penSpotY_half = 116.6;
         const circleR_halfX = 102.5;
         const circleR_halfY = 75.1;
@@ -6452,20 +6457,20 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
         // Goal at the bottom patterns (vertically reflected half court)
         const halfW = 760;
         const halfH = 460;
-        
+
         // Exact mapped dimensions reflected to bottom
         const penX_left = 171.8;
         const penX_right = 627.2;
         const penY_half = 332.8; // Reflected from 167.2 (500 - 167.2)
-        
+
         const goalAreaX_left = 297.5;
         const goalAreaX_right = 502.5;
         const goalAreaY_half = 429.4; // Reflected from 70.6
-        
+
         const goalLeftX_half = 369.6;
         const goalRightX_half = 430.4;
         const goalW_half = goalRightX_half - goalLeftX_half;
-        
+
         const penSpotY_half = 383.4; // Reflected from 116.6
         const circleR_halfX = 102.5;
         const circleR_halfY = 75.1;
@@ -6543,19 +6548,19 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
     }
 
     renderObjects.forEach(obj => {
-        if(obj.type === 'line') {
+        if (obj.type === 'line') {
             drawArrowToCtx(obj.x1, obj.y1, obj.x2, obj.y2, obj.lineType || 'pass', targetCtx);
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.fillStyle = 'var(--primary)';
-                targetCtx.beginPath(); targetCtx.arc(obj.x1, obj.y1, 5, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(obj.x2, obj.y2, 5, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(obj.x1, obj.y1, 5, 0, Math.PI * 2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(obj.x2, obj.y2, 5, 0, Math.PI * 2); targetCtx.fill();
             }
         } else if (obj.type === 'ladder') {
             drawLadderToCtx(obj.x1, obj.y1, obj.x2, obj.y2, targetCtx);
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.fillStyle = 'var(--primary)';
-                targetCtx.beginPath(); targetCtx.arc(obj.x1, obj.y1, 5, 0, Math.PI*2); targetCtx.fill();
-                targetCtx.beginPath(); targetCtx.arc(obj.x2, obj.y2, 5, 0, Math.PI*2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(obj.x1, obj.y1, 5, 0, Math.PI * 2); targetCtx.fill();
+                targetCtx.beginPath(); targetCtx.arc(obj.x2, obj.y2, 5, 0, Math.PI * 2); targetCtx.fill();
             }
         } else if (obj.type === 'rect') {
             targetCtx.strokeStyle = 'rgba(51, 65, 85, 0.7)';
@@ -6563,14 +6568,14 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.setLineDash([4, 4]);
             targetCtx.strokeRect(Math.min(obj.x1, obj.x2), Math.min(obj.y1, obj.y2), Math.abs(obj.x2 - obj.x1), Math.abs(obj.y2 - obj.y1));
             targetCtx.setLineDash([]);
-            
+
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.fillStyle = 'var(--primary)';
                 const s = 8;
-                targetCtx.fillRect(obj.x1 - s/2, obj.y1 - s/2, s, s);
-                targetCtx.fillRect(obj.x2 - s/2, obj.y1 - s/2, s, s);
-                targetCtx.fillRect(obj.x1 - s/2, obj.y2 - s/2, s, s);
-                targetCtx.fillRect(obj.x2 - s/2, obj.y2 - s/2, s, s);
+                targetCtx.fillRect(obj.x1 - s / 2, obj.y1 - s / 2, s, s);
+                targetCtx.fillRect(obj.x2 - s / 2, obj.y1 - s / 2, s, s);
+                targetCtx.fillRect(obj.x1 - s / 2, obj.y2 - s / 2, s, s);
+                targetCtx.fillRect(obj.x2 - s / 2, obj.y2 - s / 2, s, s);
             }
         } else if (obj.type === 'circle') {
             const rx = Math.abs(obj.x2 - obj.x1) / 2;
@@ -6591,10 +6596,10 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.fillStyle = 'var(--primary)';
                 const s = 8;
-                targetCtx.fillRect(obj.x1 - s/2, obj.y1 - s/2, s, s);
-                targetCtx.fillRect(obj.x2 - s/2, obj.y1 - s/2, s, s);
-                targetCtx.fillRect(obj.x1 - s/2, obj.y2 - s/2, s, s);
-                targetCtx.fillRect(obj.x2 - s/2, obj.y2 - s/2, s, s);
+                targetCtx.fillRect(obj.x1 - s / 2, obj.y1 - s / 2, s, s);
+                targetCtx.fillRect(obj.x2 - s / 2, obj.y1 - s / 2, s, s);
+                targetCtx.fillRect(obj.x1 - s / 2, obj.y2 - s / 2, s, s);
+                targetCtx.fillRect(obj.x2 - s / 2, obj.y2 - s / 2, s, s);
             }
         } else if (obj.type === 'marker') {
             targetCtx.save();
@@ -6609,7 +6614,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.lineWidth = 1;
             targetCtx.stroke();
             targetCtx.restore();
-            
+
             // Draw highlight if selected
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.beginPath();
@@ -6675,7 +6680,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.strokeStyle = '#334155';
             targetCtx.lineWidth = Math.max(2, 2.5 * scale);
             targetCtx.strokeRect(-hw, -gh * 0.66, gw, gh);
-            
+
             targetCtx.beginPath();
             targetCtx.lineWidth = 1;
             targetCtx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
@@ -6712,7 +6717,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
                     { hx: obj.x, hy: obj.y - selR },
                     { hx: obj.x, hy: obj.y + selR }
                 ].forEach(pt => {
-                    targetCtx.fillRect(pt.hx - handleSize/2, pt.hy - handleSize/2, handleSize, handleSize);
+                    targetCtx.fillRect(pt.hx - handleSize / 2, pt.hy - handleSize / 2, handleSize, handleSize);
                 });
             }
         } else if (obj.type === 'text') {
@@ -6730,7 +6735,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.beginPath();
                 const tw = targetCtx.measureText(obj.text || '').width;
-                targetCtx.rect(obj.x - tw/2 - 4, obj.y - 12, tw + 8, 24);
+                targetCtx.rect(obj.x - tw / 2 - 4, obj.y - 12, tw + 8, 24);
                 targetCtx.strokeStyle = 'var(--primary)';
                 targetCtx.lineWidth = 1.5;
                 targetCtx.setLineDash([2, 2]);
@@ -6816,7 +6821,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.arc(obj.x + 1, obj.y + 1, obj.radius, 0, Math.PI * 2);
             targetCtx.fillStyle = 'rgba(0,0,0,0.3)';
             targetCtx.fill();
-            
+
             // Draw base white circle
             targetCtx.beginPath();
             targetCtx.arc(obj.x, obj.y, obj.radius, 0, Math.PI * 2);
@@ -6825,7 +6830,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.strokeStyle = '#334155';
             targetCtx.lineWidth = 1.5;
             targetCtx.stroke();
-            
+
             // Draw pentagon in center
             const r = obj.radius;
             const pentRadius = r * 0.38;
@@ -6840,7 +6845,7 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
             targetCtx.closePath();
             targetCtx.fillStyle = '#1e293b';
             targetCtx.fill();
-            
+
             // Draw lines radiating outward from pentagon corners to outer circle bounds
             targetCtx.beginPath();
             targetCtx.strokeStyle = '#334155';
@@ -6851,30 +6856,30 @@ function drawPitchToCtx(renderObjectsInput, targetCanvas, targetCtx, template = 
                 const py = obj.y + pentRadius * Math.sin(angle);
                 const ox = obj.x + r * Math.cos(angle);
                 const oy = obj.y + r * Math.sin(angle);
-                
+
                 targetCtx.moveTo(px, py);
                 targetCtx.lineTo(ox, oy);
             }
-            
+
             // Draw boundary panel details (small lines linking outer parts)
             for (let i = 0; i < 5; i++) {
                 const angle1 = (Math.PI * 2 * i) / 5 - Math.PI / 2;
                 const angle2 = (Math.PI * 2 * (i + 1)) / 5 - Math.PI / 2;
                 const midAngle = (angle1 + angle2) / 2;
-                
+
                 const ox1 = obj.x + r * Math.cos(angle1);
                 const oy1 = obj.y + r * Math.sin(angle1);
                 const oxMid = obj.x + r * Math.cos(midAngle);
                 const oyMid = obj.y + r * Math.sin(midAngle);
                 const ox2 = obj.x + r * Math.cos(angle2);
                 const oy2 = obj.y + r * Math.sin(angle2);
-                
+
                 targetCtx.moveTo(ox1, oy1);
                 targetCtx.lineTo(oxMid, oyMid);
                 targetCtx.lineTo(ox2, oy2);
             }
             targetCtx.stroke();
-            
+
             // Draw highlight if selected
             if (typeof selectedObject !== 'undefined' && selectedObject === obj) {
                 targetCtx.beginPath();
@@ -6896,23 +6901,23 @@ function drawArrowToCtx(x1, y1, x2, y2, lineType, targetCtx) {
     const dy = y2 - y1;
     const angle = Math.atan2(dy, dx);
     const color = '#334155';
-    
+
     targetCtx.beginPath();
-    
+
     if (lineType === 'dribble') {
         targetCtx.strokeStyle = color;
         targetCtx.lineWidth = 2;
         targetCtx.setLineDash([]);
-        const dist = Math.sqrt(dx*dx + dy*dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
         const steps = Math.floor(dist / 10);
         targetCtx.moveTo(x1, y1);
         if (steps > 0) {
-            for(let i=1; i<=steps; i++) {
+            for (let i = 1; i <= steps; i++) {
                 const px = x1 + (dx / steps) * i;
                 const py = y1 + (dy / steps) * i;
-                const perpX = -dy / dist * (i%2===0 ? 5 : -5);
-                const perpY = dx / dist * (i%2===0 ? 5 : -5);
-                if(i === steps) targetCtx.lineTo(x2, y2);
+                const perpX = -dy / dist * (i % 2 === 0 ? 5 : -5);
+                const perpY = dx / dist * (i % 2 === 0 ? 5 : -5);
+                if (i === steps) targetCtx.lineTo(x2, y2);
                 else targetCtx.lineTo(px + perpX, py + perpY);
             }
         } else {
@@ -6926,10 +6931,10 @@ function drawArrowToCtx(x1, y1, x2, y2, lineType, targetCtx) {
         if (lineType === 'pass') targetCtx.setLineDash([5, 5]);
         else targetCtx.setLineDash([]);
     }
-    
+
     targetCtx.stroke();
     targetCtx.setLineDash([]);
-    
+
     targetCtx.beginPath();
     targetCtx.moveTo(x2, y2);
     targetCtx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
@@ -6946,26 +6951,26 @@ function drawArrow(x1, y1, x2, y2, lineType) {
 function drawLadderToCtx(x1, y1, x2, y2, targetCtx) {
     const dx = x2 - x1;
     const dy = y2 - y1;
-    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 10) return;
-    
+
     const ux = dx / dist;
     const uy = dy / dist;
     const nx = -uy;
     const ny = ux;
     const width = 12; // half-width of ladder (total 24px)
-    
+
     targetCtx.beginPath();
     // Rails
     targetCtx.moveTo(x1 + nx * width, y1 + ny * width);
     targetCtx.lineTo(x2 + nx * width, y2 + ny * width);
     targetCtx.moveTo(x1 - nx * width, y1 - ny * width);
     targetCtx.lineTo(x2 - nx * width, y2 - ny * width);
-    
+
     targetCtx.strokeStyle = '#334155';
     targetCtx.lineWidth = 2.5;
     targetCtx.stroke();
-    
+
     // Rungs (every 20 pixels)
     const step = 20;
     targetCtx.beginPath();
@@ -7038,7 +7043,7 @@ function handleCanvasDblClick(e) {
                     input.value = obj.text || '';
                     modal.classList.remove('hidden');
                     input.focus();
-                    
+
                     const form = document.getElementById('form-text-input');
                     form.onsubmit = (ev) => {
                         ev.preventDefault();
@@ -7067,7 +7072,7 @@ function handleMouseDown(e) {
         selectedObject = null;
         isResizing = false;
         resizeHandle = null;
-        
+
         // 1. Check resize handle hits for previously selected object first
         if (prevSelected) {
             if (prevSelected.type === 'minigoal') {
@@ -7086,9 +7091,9 @@ function handleMouseDown(e) {
                 if (Math.abs(x - prevSelected.x2) <= s && Math.abs(y - prevSelected.y2) <= s) { isResizing = true; resizeHandle = 'se'; draggedObject = prevSelected; selectedObject = prevSelected; drawPitch(objects); return; }
             }
         }
-        
+
         // 2. Otherwise select or drag objects
-        for(let i = objects.length-1; i >= 0; i--) {
+        for (let i = objects.length - 1; i >= 0; i--) {
             const obj = objects[i];
 
             if (obj.type === 'line' || obj.type === 'ladder') {
@@ -7132,21 +7137,21 @@ function handleMouseDown(e) {
                 if (obj.type === 'text') {
                     ctx.font = 'bold 14px Inter, sans-serif';
                     const tw = ctx.measureText(obj.text || '').width;
-                    isHit = Math.abs(dx) <= tw/2 + 5 && Math.abs(dy) <= 15;
+                    isHit = Math.abs(dx) <= tw / 2 + 5 && Math.abs(dy) <= 15;
                 } else if (obj.type === 'minigoal') {
                     const scale = obj.goalScale || 1.0;
                     const gw = 30 * scale;
                     const gh = 15 * scale;
-                    isHit = Math.abs(dx) <= (gw/2 + 10) && Math.abs(dy) <= (gh/2 + 10);
+                    isHit = Math.abs(dx) <= (gw / 2 + 10) && Math.abs(dy) <= (gh / 2 + 10);
                 } else {
-                    isHit = Math.sqrt(dx*dx + dy*dy) <= (obj.radius + 5);
+                    isHit = Math.sqrt(dx * dx + dy * dy) <= (obj.radius + 5);
                 }
-                
-                if(isHit) {
+
+                if (isHit) {
                     draggedObject = obj;
                     selectedObject = obj;
                     startX = x; startY = y;
-                    
+
                     if (obj.type === 'player') {
                         const elNum = document.getElementById('canvas-player-number');
                         const elSel = document.getElementById('canvas-player-select');
@@ -7166,11 +7171,11 @@ function handleMouseDown(e) {
         selectedObject = null;
         x = applyGridSnap(x, 'x');
         y = applyGridSnap(y, 'y');
-        
+
         let color, radius, type, number = '', playerId = '', playerName = '';
         const elPlayerNumber = document.getElementById('canvas-player-number');
         const elPlayerSelect = document.getElementById('canvas-player-select');
-        
+
         const isFormationMode = !!(currentMatchId && currentFormationId);
         if (elPlayerSelect && !elPlayerSelect.classList.contains('hidden')) {
             const opt = elPlayerSelect.options[elPlayerSelect.selectedIndex];
@@ -7183,7 +7188,7 @@ function handleMouseDown(e) {
             number = elPlayerNumber ? elPlayerNumber.value : '';
         }
 
-        if(currentTool === 'player') {
+        if (currentTool === 'player') {
             const colorSelect = document.getElementById('canvas-player-color');
             const colorVal = colorSelect ? colorSelect.value : 'red';
             if (colorVal === 'red') color = '#f23932';
@@ -7203,14 +7208,14 @@ function handleMouseDown(e) {
             else if (sizeCategory === 'full') goalScale = 2.4;
         }
 
-        if(currentTool === 'ball') { color = '#ffffff'; radius = 8; type = 'ball'; }
-        if(currentTool === 'marker') { color = '#f97316'; radius = 8; type = 'marker'; }
-        if(currentTool === 'marker-blue') { color = '#3b82f6'; radius = 8; type = 'marker'; }
-        if(currentTool === 'marker-red') { color = '#ef4444'; radius = 8; type = 'marker'; }
-        if(currentTool === 'cone') { color = '#facc15'; radius = 10; type = 'cone'; }
-        if(currentTool === 'minigoal') { color = '#ffffff'; radius = 15; type = 'minigoal'; }
-        if(currentTool === 'text') { color = '#000000'; radius = 0; type = 'text'; }
-        
+        if (currentTool === 'ball') { color = '#ffffff'; radius = 8; type = 'ball'; }
+        if (currentTool === 'marker') { color = '#f97316'; radius = 8; type = 'marker'; }
+        if (currentTool === 'marker-blue') { color = '#3b82f6'; radius = 8; type = 'marker'; }
+        if (currentTool === 'marker-red') { color = '#ef4444'; radius = 8; type = 'marker'; }
+        if (currentTool === 'cone') { color = '#facc15'; radius = 10; type = 'cone'; }
+        if (currentTool === 'minigoal') { color = '#ffffff'; radius = 15; type = 'minigoal'; }
+        if (currentTool === 'text') { color = '#000000'; radius = 0; type = 'text'; }
+
         if (type) {
             const newObj = { id: objectIdCounter++, type, x, y, radius, color, number };
             if (type === 'minigoal') {
@@ -7220,15 +7225,15 @@ function handleMouseDown(e) {
             if (type === 'text') {
                 const modal = document.getElementById('modal-text-input');
                 const input = document.getElementById('canvas-text-value');
-                if(modal && input) {
+                if (modal && input) {
                     input.value = '';
                     modal.classList.remove('hidden');
                     input.focus();
-                    
+
                     const form = document.getElementById('form-text-input');
                     form.onsubmit = (ev) => {
                         ev.preventDefault();
-                        if(input.value) {
+                        if (input.value) {
                             newObj.text = input.value;
                             objects.push(newObj);
                             selectedObject = newObj;
@@ -7248,7 +7253,7 @@ function handleMouseDown(e) {
             selectedObject = newObj;
             saveHistory();
             drawPitch(objects);
-            
+
             // Auto increment number box
             if (type === 'player' && elPlayerNumber && !isFormationMode) {
                 let n = parseInt(elPlayerNumber.value);
@@ -7264,7 +7269,7 @@ function handleMouseMove(e) {
     const x = (e.clientX - rect.left) * (800 / rect.width);
     const y = (e.clientY - rect.top) * (500 / rect.height);
 
-    if(draggedObject) {
+    if (draggedObject) {
         if (isResizing && draggedObject.type === 'minigoal') {
             const dist = Math.sqrt(Math.pow(x - draggedObject.x, 2) + Math.pow(y - draggedObject.y, 2));
             const newScale = Math.max(0.4, Math.min(3.5, dist / 21));
@@ -7308,7 +7313,7 @@ function handleMouseMove(e) {
 
 function handleMouseUp(e) {
     if (isPlaying) return;
-    if(draggedObject) {
+    if (draggedObject) {
         saveHistory();
         draggedObject = null;
         isResizing = false;
@@ -7318,7 +7323,7 @@ function handleMouseUp(e) {
         const rect = canvas.getBoundingClientRect();
         const x = applyGridSnap((e.clientX - rect.left) * (canvas.width / rect.width), 'x');
         const y = applyGridSnap((e.clientY - rect.top) * (canvas.height / rect.height), 'y');
-        if(Math.abs(x - startX) > 5 || Math.abs(y - startY) > 5) {
+        if (Math.abs(x - startX) > 5 || Math.abs(y - startY) > 5) {
             if (currentTool === 'ladder') {
                 objects.push({ id: objectIdCounter++, type: 'ladder', x1: startX, y1: startY, x2: x, y2: y });
             } else if (currentTool === 'line-rect') {
