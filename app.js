@@ -569,19 +569,17 @@ function setupEventListeners() {
             }
         });
     }
-
+    // ボトムナビゲーションのクリックイベント設定
+    const bottomNavLinks = document.querySelectorAll('.bottom-nav .nav-item');
+    bottomNavLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const route = e.currentTarget.dataset.route;
+            navigate(route);
+        });
+    });
     updateRoleUI();
 }
-
-// ボトムナビゲーションのクリックイベント設定
-const bottomNavLinks = document.querySelectorAll('.bottom-nav .nav-item');
-bottomNavLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const route = e.currentTarget.dataset.route;
-        navigate(route);
-    });
-});
 
 function updateRoleUI() {
     const badge = document.getElementById('user-role-badge');
