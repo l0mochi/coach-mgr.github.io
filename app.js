@@ -2182,7 +2182,7 @@ function initMatches() {
                         <div class="match-card-header">
                             <div>
                                 <div class="match-card-date"><i class="fa-regular fa-calendar"></i> ${m.date} | ${m.type}${m.tournament ? ` (${m.tournament})` : ''}</div>
-                                <div class="match-card-opponent">vs ${m.opponent}</div>
+                                <div class="match-card-opponent">vs ${escapeHtml(m.opponent)}</div>
                             </div>
                             <div class="match-card-result">${resultText}</div>
                         </div>
@@ -2377,9 +2377,9 @@ function openMatchDetail(id) {
                 const pname = p ? `${p.number} ${p.name}` : '不明な選手';
                 return `
                     <div class="feedback-box">
-                        <strong style="color:var(--primary); font-size:0.9rem;">${pname}</strong>
-                        <p style="margin-top:0.3rem; font-size:0.95rem; white-space:pre-wrap;">${fb.comment}</p>
-                    </div>
+    <strong style="color:var(--primary); font-size:0.9rem;">${escapeHtml(pname)}</strong>
+    <p style="margin-top:0.3rem; font-size:0.95rem; white-space:pre-wrap;">${escapeHtml(fb.comment)}</p>
+</div>
                 `;
             }).join('');
         } else {
@@ -2804,7 +2804,7 @@ function initPractices() {
                             <li class="practice-menu-item" style="padding: 0; border: none; list-style: none; margin-bottom: 0.5rem;">
                                 <details class="practice-menu-details" style="background: rgba(0, 0, 0, 0.03); border: 1px solid var(--surface-border); border-radius: 12px; cursor: pointer; width: 100%;">
                                     <summary class="practice-menu-item-header" style="display:flex; justify-content:space-between; align-items:center; padding:0.8rem; list-style:none; outline:none; box-sizing:border-box;">
-                                        <span class="practice-menu-item-title" style="display:inline-flex; align-items:center; gap:0.5rem; font-size:0.95rem; font-weight:bold; color:var(--primary);"><i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:var(--text-secondary); transition:transform 0.2s;"></i> ${menu.focus}</span>
+                                        <span class="practice-menu-item-title" style="display:inline-flex; align-items:center; gap:0.5rem; font-size:0.95rem; font-weight:bold; color:var(--primary);"><i class="fa-solid fa-chevron-down" style="font-size:0.75rem; color:var(--text-secondary); transition:transform 0.2s;"></i> ${escapeHtml(menu.focus)}</span>
                                         <div style="display:flex; gap:0.3rem;" onclick="event.stopPropagation();">
                                             <button class="btn btn-secondary btn-edit-menu" data-pid="${p.id}" data-mid="${menu.id}" style="padding:0.3rem; font-size:0.8rem;" title="編集"><i class="fa-solid fa-pen"></i></button>
                                             <button class="btn btn-secondary btn-anim-practice" data-pid="${p.id}" data-mid="${menu.id}" style="padding:0.3rem; font-size:0.8rem;" title="作図"><i class="fa-solid fa-person-running"></i></button>
@@ -3322,7 +3322,7 @@ function initPlayers() {
                 return `<span class="player-position ${badgeClass}" style="font-size:0.7rem; padding:0.1rem 0.35rem; border-radius:12px; font-weight:600; display:inline-block;">${pos}</span>`;
             }).join('')}
                             </div>
-                            <div style="font-size:1.2rem; font-weight:bold; margin-top:0.2rem;">${p.name}</div>
+                            <div style="font-size:1.2rem; font-weight:bold; margin-top:0.2rem;">${escapeHtml(p.name)}</div>
                         </div>
                         <div class="player-number">${p.number}</div>
                     </div>
@@ -3506,7 +3506,7 @@ function openPlayerCSVImportModal() {
                         ${parsed.map(p => `
                             <tr>
                                 <td>${p.number || '-'}</td>
-                                <td><strong>${p.name}</strong></td>
+                                <td><strong>${escapeHtml(p.name)}</strong></td>
                                 <td>${p.grade || '-'}</td>
                                 <td><span class="badge badge-sub">${p.position}</span></td>
                             </tr>
@@ -3666,7 +3666,7 @@ function initLibrary() {
                                 <button class="btn btn-danger btn-delete-library" data-id="${m.id}" style="padding:0.2rem 0.4rem; font-size:0.8rem;"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
-                        <div style="font-size:1.15rem; font-weight:bold; color:var(--text-primary); line-height:1.3; margin-bottom:0.8rem;">${m.focus}</div>
+                        <div style="font-size:1.15rem; font-weight:bold; color:var(--text-primary); line-height:1.3; margin-bottom:0.8rem;">${escapeHtml(m.focus)}</div>
                         
                         <div class="library-canvas-wrapper" style="width:100%; height:140px; background:#1e293b; border-radius:8px; overflow:hidden; position:relative; margin-bottom:0.8rem; cursor:pointer;" onclick="navigate('animation', { libraryId: ${m.id} })">
                             <canvas id="library-mini-pitch-${m.id}" width="800" height="500" style="width:100%; height:100%; object-fit:contain; pointer-events:none;"></canvas>
