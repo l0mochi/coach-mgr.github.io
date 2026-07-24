@@ -36,23 +36,18 @@
             <header class="topbar">
                 <button id="menu-toggle" class="menu-toggle"><i class="fa-solid fa-bars"></i></button>
                 <div class="topbar-title" id="topbar-title">ダッシュボード</div>
-                <div style="display:flex; align-items:center; gap:0.5rem;">
-                    <button class="btn btn-secondary" id="btn-topbar-sync"
-                        style="font-size:0.75rem; padding:0.25rem 0.6rem; display:none;" title="クラウド手動同期">
-                        <i class="fa-solid fa-rotate"></i> 同期
-                    </button>
-                    <div id="user-role-badge"
-                        style="font-size:0.75rem; padding:0.25rem 0.6rem; border-radius:20px; font-weight:bold; background:rgba(34, 197, 94, 0.15); color:#15803d; display:inline-flex; align-items:center; gap:0.3rem;">
-                        <i class="fa-solid fa-eye"></i> 保護者 (閲覧専用)
+                <div style="display:flex; align-items:center; gap:0.4rem;">
+                    <div id="user-role-badge" class="topbar-badge"
+                        style="background:rgba(34, 197, 94, 0.15); color:#15803d;">
+                        <i class="fa-solid fa-eye"></i><span>保護者モード</span>
                     </div>
-                    <button class="btn btn-secondary" id="btn-toggle-role"
-                        style="font-size:0.75rem; padding:0.25rem 0.6rem;">
-                        <i class="fa-solid fa-user-shield"></i> モード切替
+                    <button class="btn btn-secondary topbar-btn" id="btn-toggle-role" title="モードを切り替えます">
+                        <i class="fa-solid fa-right-left"></i><span>モード切替</span>
                     </button>
-                    <div class="user-profile">
-                        <img id="user-avatar" src="https://ui-avatars.com/api/?name=Parent&background=22c55e&color=fff"
-                            alt="Profile" class="avatar">
-                    </div>
+                    <button class="btn btn-secondary topbar-btn" id="btn-topbar-sync" style="display:none;"
+                        title="クラウド手動同期">
+                        <i class="fa-solid fa-cloud-arrow-down"></i><span>クラウド同期</span>
+                    </button>
                 </div>
             </header>
 
@@ -274,7 +269,7 @@
                     <option value="all">すべての年度</option>
                 </select>
             </div>
-            <button class="btn btn-primary" id="btn-add-match"><i class="fa-solid fa-plus"></i> 試合を追加</button>
+            <button class="btn btn-primary" id="btn-add-match"><i class="fa-solid fa-plus"></i>追加</button>
         </div>
         <div id="match-list" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:1.5rem;">
             <!-- Grouped by month cards injected here -->
@@ -293,7 +288,7 @@
                     <option value="all">すべての月</option>
                 </select>
             </div>
-            <button class="btn btn-primary" id="btn-add-practice"><i class="fa-solid fa-plus"></i> 練習日を追加</button>
+            <button class="btn btn-primary" id="btn-add-practice"><i class="fa-solid fa-plus"></i>追加</button>
         </div>
         <div id="practice-list" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:1.5rem;">
             <!-- Grouped by date cards injected here -->
@@ -308,7 +303,7 @@
         <div class="header-actions" style="justify-content:flex-end; gap:0.5rem;">
             <button class="btn btn-secondary" id="btn-import-players-csv"><i class="fa-solid fa-file-csv"></i>
                 CSVから一括登録</button>
-            <button class="btn btn-primary" id="btn-add-player"><i class="fa-solid fa-user-plus"></i> 選手を追加</button>
+            <button class="btn btn-primary" id="btn-add-player"><i class="fa-solid fa-user-plus"></i>追加</button>
         </div>
         <div class="dashboard-grid" id="player-grid">
             <!-- Player cards with radar charts injected here -->
@@ -324,7 +319,7 @@
                 </select>
             </div>
             <button class="btn btn-primary" id="btn-add-library-menu"><i class="fa-solid fa-plus"></i>
-                新規ライブラリ作成</button>
+                追加</button>
         </div>
         <div id="library-list" style="display:flex; flex-direction:column; gap:1.5rem; margin-top:1.5rem;">
             <!-- Library items grouped by category injected here -->

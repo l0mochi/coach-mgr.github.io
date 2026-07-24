@@ -251,7 +251,6 @@ button {
     width: 40px;
     height: 40px;
     border-radius: 12px;
-    /* D-2: uniform rounded corners (12px for smaller UI blocks) */
     background: rgba(242, 57, 50, 0.1);
     color: var(--primary);
     display: flex;
@@ -347,7 +346,6 @@ button {
     background: rgba(0, 0, 0, 0.03);
     padding: 0.3rem 0.75rem;
     border-radius: 12px;
-    /* D-2: unified radius */
     border: 1px solid var(--surface-border);
 }
 
@@ -427,7 +425,6 @@ button {
     background: rgba(0, 0, 0, 0.05);
     padding: 0.2rem 0.5rem;
     border-radius: 9999px;
-    /* Unified pill style */
     font-size: 0.8rem;
     font-weight: bold;
 }
@@ -443,7 +440,6 @@ button {
 .btn {
     padding: 0.5rem 1.25rem;
     border-radius: 9999px;
-    /* M3 Pill shape */
     border: none;
     font-weight: 500;
     cursor: pointer;
@@ -525,7 +521,6 @@ button {
     margin-bottom: 1.5rem;
 }
 
-/* Small button variant */
 .btn-sm {
     padding: 0.35rem 0.9rem;
     font-size: 0.82rem;
@@ -603,7 +598,6 @@ button {
     opacity: 0.7;
 }
 
-/* Section list items reuse item-list but style within sl-section-body */
 .sl-section-body .sl-list {
     list-style: none;
     margin: 0;
@@ -632,7 +626,6 @@ button {
     font-style: italic;
 }
 
-
 /* Toast */
 .toast-container {
     position: fixed;
@@ -646,7 +639,6 @@ button {
 
 .toast {
     background: #1e293b;
-    /* Dark slate for professional notifications */
     color: white;
     padding: 1rem 1.5rem;
     border-radius: var(--border-radius);
@@ -711,10 +703,8 @@ button {
     letter-spacing: 0.05em;
 }
 
-
 .canvas-wrapper {
     background: #4ade80;
-    /* Pitch green */
     border-radius: var(--border-radius);
     overflow: hidden;
     position: relative;
@@ -758,7 +748,6 @@ canvas {
     background: var(--card-bg);
     border: 1px solid var(--surface-border);
     border-radius: 20px;
-    /* iOS style large radius */
     padding: 2rem;
     width: 90%;
     max-width: 500px;
@@ -801,7 +790,6 @@ canvas {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(242, 57, 50, 0.15);
-    /* Modern accessibility ring */
 }
 
 .detail-box {
@@ -842,7 +830,6 @@ canvas {
 
     .view-container {
         padding: 1rem;
-        /* Compact spacing on mobile */
     }
 
     .sidebar {
@@ -862,7 +849,6 @@ canvas {
         display: block;
     }
 
-    /* Prevent iOS Safari auto-zoom on input focus */
     .form-control,
     select,
     input[type="text"],
@@ -874,7 +860,7 @@ canvas {
     }
 }
 
-/* Modern Position Pill Badges */
+/* Position Pill Badges */
 .badge-fw {
     background: rgba(242, 57, 50, 0.1) !important;
     color: #f23932 !important;
@@ -923,7 +909,6 @@ canvas {
     border-radius: 3px;
 }
 
-/* Helper layout classes to eliminate inline style repetition (D-1) & unify corner radius (D-2) */
 .checkbox-group-container {
     display: flex;
     gap: 1rem;
@@ -986,7 +971,6 @@ canvas {
     gap: 2rem;
 }
 
-/* Fallback for smaller screens */
 @media (max-width: 640px) {
     .modal-layout-grid-2 {
         grid-template-columns: 1fr;
@@ -1008,7 +992,6 @@ canvas {
     padding: 0.3rem 0.5rem;
     font-size: 0.85rem;
     border-radius: 8px;
-    /* D-2: smaller inputs radius */
 }
 
 .goal-record-row .btn {
@@ -1020,7 +1003,6 @@ canvas {
     background: rgba(0, 0, 0, 0.03);
     padding: 1rem;
     border-radius: 12px;
-    /* D-2 */
     border: 1px solid var(--surface-border);
 }
 
@@ -1033,7 +1015,6 @@ canvas {
     background: rgba(0, 0, 0, 0.03);
     padding: 0.8rem 1rem;
     border-radius: 12px;
-    /* D-2 */
     border: 1px solid var(--surface-border);
 }
 
@@ -1127,7 +1108,6 @@ canvas {
 
 .practice-menu-item {
     border-radius: 12px;
-    /* D-2 */
     margin-bottom: 0.5rem;
     background: rgba(0, 0, 0, 0.03);
     display: block;
@@ -1164,7 +1144,7 @@ canvas {
     color: var(--text-secondary);
 }
 
-/* Timeline component (D-1) */
+/* Timeline component */
 .timeline-item {
     border-left: 2px solid var(--primary);
     padding-left: 1rem;
@@ -1214,7 +1194,6 @@ canvas {
     color: var(--text-secondary);
 }
 
-/* Timeline modifiers */
 .timeline-item.match-timeline-item {
     border-left-color: #3b82f6;
 }
@@ -1233,7 +1212,6 @@ canvas {
     }
 }
 
-/* details summary toggle icon rotation */
 details[open] summary .fa-chevron-down {
     transform: rotate(180deg);
 }
@@ -1287,17 +1265,14 @@ summary {
 
 .form-badge.win {
     background: var(--primary);
-    /* Team Color */
 }
 
 .form-badge.draw {
     background: #94a3b8;
-    /* Slate Gray */
 }
 
 .form-badge.loss {
     background: #ef4444;
-    /* Red */
 }
 
 /* Tactical Formation Board Styles */
@@ -1305,16 +1280,13 @@ summary {
     position: relative;
     width: 100%;
     aspect-ratio: 8/10;
-    /* Portrait layout for phone and vertical boards */
     background: #f1f5f9;
-    /* Modern grey-white */
     border: 3px solid #334155;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Soccer Field Markings */
 .tactical-pitch::before {
     content: '';
     position: absolute;
@@ -1339,7 +1311,6 @@ summary {
     pointer-events: none;
 }
 
-/* Penalty Areas */
 .tactical-pitch .penalty-area-top {
     position: absolute;
     top: 0;
@@ -1362,7 +1333,6 @@ summary {
     pointer-events: none;
 }
 
-/* Position Node Pin */
 .pitch-node {
     position: absolute;
     width: 44px;
@@ -1416,7 +1386,6 @@ summary {
     pointer-events: none;
 }
 
-/* Player Details Custom Tab System */
 .player-detail-tabs {
     display: flex;
     gap: 0.5rem;
@@ -1453,7 +1422,6 @@ summary {
     display: block;
 }
 
-/* Custom Formation Master Editor Layout */
 .custom-formation-editor-layout {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -1486,7 +1454,6 @@ summary {
     border: 1px solid var(--surface-border);
 }
 
-/* Additional Soccer Pitch Markings (Vertical Full Court) */
 .tactical-pitch .goal-area-top {
     position: absolute;
     top: 0;
@@ -1615,18 +1582,12 @@ summary {
     pointer-events: none;
 }
 
-/* Restructured Dashboard Styles */
+/* Restructured Dashboard Grid System (Unified & Non-conflicting) */
 .dash-horizontal-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    width: 100%;
-}
-
-@media (max-width: 768px) {
-    .dash-horizontal-grid {
-        grid-template-columns: 1fr;
-    }
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
 }
 
 .schedule-item {
@@ -1747,18 +1708,11 @@ summary {
     color: #475569;
 }
 
-.dash-horizontal-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-}
-
 .dashboard-grid-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: 1.2rem;
     align-items: stretch;
-    height: auto;
 }
 
 .dashboard-left-column {
@@ -1782,7 +1736,6 @@ summary {
     min-width: 0;
 }
 
-/* Make lists within schedule columns scrollable */
 #dash-upcoming-schedule-content,
 #dash-past-schedule-content {
     max-height: 190px;
@@ -1790,7 +1743,6 @@ summary {
     padding-right: 4px;
 }
 
-/* Scrollbar styles for schedule contents to look premium */
 #dash-upcoming-schedule-content::-webkit-scrollbar,
 #dash-past-schedule-content::-webkit-scrollbar {
     width: 4px;
@@ -1805,21 +1757,6 @@ summary {
 #dash-past-schedule-content::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 2px;
-}
-
-/* Responsive adjustment for dashboard grid */
-.dashboard-grid-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.2rem;
-    align-items: stretch;
-}
-
-.dashboard-left-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    height: 100%;
 }
 
 @media (max-width: 1024px) {
@@ -1883,7 +1820,6 @@ body.role-read-only #pd-tab-goals textarea {
     resize: none;
 }
 
-/* CSV Preview Table */
 .csv-preview-table {
     width: 100%;
     border-collapse: collapse;
@@ -1909,7 +1845,7 @@ body.role-read-only #pd-tab-goals textarea {
     border-bottom: none;
 }
 
-/* ===== Full-Bleed Context-Oriented Soccer Drawing Workspace ===== */
+/* Drawing Workspace Styles */
 body:has(.anim-app-container) .topbar,
 body.drawing-mode .topbar {
     display: none !important;
@@ -1933,7 +1869,6 @@ body.drawing-mode .view-container {
     background: #f1f5f9 !important;
 }
 
-/* 1. Header (50px Single Row) */
 .anim-header {
     height: 50px;
     flex-shrink: 0;
@@ -1977,7 +1912,6 @@ body.drawing-mode .view-container {
     outline: none;
 }
 
-/* Settings Popover Dropdown */
 .anim-settings-popover {
     position: absolute;
     right: 0;
@@ -1999,7 +1933,6 @@ body.drawing-mode .view-container {
     display: none !important;
 }
 
-/* 2 & 3. Main Workspace (50px Tool Dock + 100% Full-Bleed Canvas) */
 .anim-main-workspace {
     flex: 1;
     min-height: 0;
@@ -2010,7 +1943,6 @@ body.drawing-mode .view-container {
     background: #f1f5f9 !important;
 }
 
-/* 2. Slim Tool Dock (Width ~50px, Restored All Tools, Vertical Scroll) */
 .anim-tool-dock {
     width: 50px;
     flex-shrink: 0;
@@ -2061,7 +1993,6 @@ body.drawing-mode .view-container {
     background: rgba(0, 0, 0, 0.06);
 }
 
-/* Active State: Color Change + Icon Swaps to Text (Flat Design) */
 .dock-btn.active {
     background: var(--primary) !important;
     color: #ffffff !important;
@@ -2079,7 +2010,6 @@ body.drawing-mode .view-container {
     color: #ffffff !important;
 }
 
-/* Tooltips on hover for icon-only dock */
 .dock-btn[data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -2105,7 +2035,6 @@ body.drawing-mode .view-container {
     opacity: 1;
 }
 
-/* 3. Maximized Canvas Area (One Step Smaller, Padded Fit) */
 .anim-canvas-area {
     flex: 1;
     min-width: 0;
@@ -2146,19 +2075,18 @@ body.drawing-mode .view-container {
     image-rendering: crisp-edges;
 }
 
-/* Right Collapsible Detail Side Panel (Persistent Toggle Tab) */
 .anim-detail-side-panel {
     width: 250px;
     flex-shrink: 0;
     height: 100%;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
     border-left: 1px solid var(--surface-border);
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
     position: relative;
-    z-index: 95;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
 }
 
 .anim-detail-side-panel.collapsed {
@@ -2167,76 +2095,64 @@ body.drawing-mode .view-container {
 
 .side-panel-toggle-btn {
     position: absolute;
-    left: -28px;
     top: 14px;
+    left: -28px;
     width: 28px;
-    height: 38px;
-    background: #ffffff;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.96);
     border: 1px solid var(--surface-border);
     border-right: none;
     border-radius: 8px 0 0 8px;
-    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text-primary);
-    font-size: 0.8rem;
-    z-index: 120;
-    transition: color 0.15s ease, background 0.15s ease;
+    color: var(--text-secondary);
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.05);
+    z-index: 110;
 }
 
 .anim-detail-side-panel.collapsed .side-panel-toggle-btn i {
     transform: rotate(180deg);
 }
 
-.side-panel-toggle-btn:hover {
-    color: var(--primary);
-    background: #f8fafc;
-}
-
 .side-panel-header {
-    padding: 0.8rem 1rem;
+    padding: 1rem;
     border-bottom: 1px solid var(--surface-border);
-    background: #f8fafc;
 }
 
 .side-panel-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.8rem 1rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0.8rem;
+    gap: 1rem;
+    overflow-y: auto;
 }
 
 .side-info-card {
-    background: #f8fafc;
+    background: var(--surface-ground, #f8fafc);
     border: 1px solid var(--surface-border);
-    border-radius: 8px;
-    padding: 0.65rem 0.8rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
 }
 
 .side-info-label {
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--text-secondary);
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.4rem;
+    margin-bottom: 0.3rem;
 }
 
 .side-info-val {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     color: var(--text-primary);
+    line-height: 1.4;
     white-space: pre-wrap;
-    line-height: 1.45;
 }
 
-/* 4. Floating Context Popover Menu (Smart Top/Bottom flip positioning) */
 .anim-context-popover {
     position: absolute;
     z-index: 150;
@@ -2346,7 +2262,6 @@ body.drawing-mode .view-container {
     border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-/* 5. Floating Compact Player Bar Timeline (Height ~44px, Floating Bottom Center) */
 .anim-player-bar {
     position: absolute;
     bottom: 20px;
@@ -2418,96 +2333,15 @@ body.drawing-mode .view-container {
     background: #059669 !important;
 }
 
-/* Right Collapsible Detail Side Panel with Layout Transition */
-.anim-detail-side-panel {
-    width: 250px;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(12px);
-    border-left: 1px solid var(--surface-border);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 100;
-}
-
-.anim-detail-side-panel.collapsed {
-    transform: translateX(250px);
-}
-
-.side-panel-toggle-btn {
-    position: absolute;
-    top: 14px;
-    left: -28px;
-    width: 28px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid var(--surface-border);
-    border-right: none;
-    border-radius: 8px 0 0 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--text-secondary);
-    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.05);
-    z-index: 110;
-}
-
-.anim-detail-side-panel.collapsed .side-panel-toggle-btn i {
-    transform: rotate(180deg);
-}
-
-.side-panel-header {
-    padding: 1rem;
-    border-bottom: 1px solid var(--surface-border);
-}
-
-.side-panel-body {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    overflow-y: auto;
-}
-
-.side-info-card {
-    background: var(--surface-ground, #f8fafc);
-    border: 1px solid var(--surface-border);
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
-}
-
-.side-info-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-bottom: 0.3rem;
-}
-
-.side-info-val {
-    font-size: 0.85rem;
-    color: var(--text-primary);
-    line-height: 1.4;
-    white-space: pre-wrap;
-}
-
-/* ===== スマホ（768px以下）作図画面（Canvas）の完全レイアウト修正 ===== */
+/* Mobile Canvas Tweaks */
 @media (max-width: 768px) {
-
-    /* --- 開閉ボタンの配置を固定化 --- */
     #anim-side-panel-toggle-btn {
         position: absolute !important;
         left: -32px !important;
-        /* パネルの外側（左縁）に出す */
         top: 12px !important;
         width: 32px !important;
         height: 40px !important;
         z-index: 600 !important;
-        /* タップ可能にするため最前面へ */
         background: #ffffff !important;
         border: 1px solid #e5e7eb !important;
         border-right: none !important;
@@ -2519,7 +2353,6 @@ body.drawing-mode .view-container {
         cursor: pointer !important;
     }
 
-    /* パネルの表示（.open）とアイコン切り替え */
     .anim-detail-side-panel {
         position: absolute !important;
         top: 0 !important;
@@ -2531,36 +2364,29 @@ body.drawing-mode .view-container {
         background: #ffffff !important;
         box-shadow: -4px 0 20px rgba(0, 0, 0, 0.25) !important;
         transform: translateX(100%) !important;
-        /* デフォルトで右外へ隠す */
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
-    /* .open クラスが付いた時に左へスライドイン */
     .anim-detail-side-panel.open {
         transform: translateX(0) !important;
     }
 
-    /* 1. 再生バー本体を画面幅いっぱいにフィット */
     .anim-player-bar {
         bottom: 8px !important;
         left: 50% !important;
         transform: translateX(-50%) !important;
         width: 98% !important;
-        /* 左右ギリギリまで使用 */
         max-width: 100% !important;
         height: 38px !important;
         padding: 0 4px !important;
         gap: 0.15rem !important;
-        /* 隙間を極限まで詰める */
         justify-content: space-around !important;
     }
 
-    /* 2. 不要な区切り線を非表示 */
     .player-bar-divider {
         display: none !important;
     }
 
-    /* 3. ボタンのコンパクト化とテキスト調整 */
     .anim-player-bar .btn-xs {
         height: 28px !important;
         padding: 0 0.3rem !important;
@@ -2569,7 +2395,6 @@ body.drawing-mode .view-container {
         min-width: auto !important;
     }
 
-    /* スマホ時はボタンの「文字」を隠してアイコンだけにし、大幅省スペース化 */
     .anim-player-bar #anim-play,
     .anim-player-bar #anim-stop,
     .anim-player-bar #anim-prev-frame,
@@ -2577,7 +2402,6 @@ body.drawing-mode .view-container {
         font-size: 0.75rem !important;
     }
 
-    /* 4. シーン選択プルダウンの幅を小さく調整 */
     .anim-player-bar select#anim-frame-select {
         height: 28px !important;
         min-width: 70px !important;
@@ -2586,26 +2410,22 @@ body.drawing-mode .view-container {
         padding: 0 0.1rem !important;
     }
 
-    /* 5. グループの隙間を最小化 */
     .player-bar-group {
         gap: 0.1rem !important;
     }
 
-    /* 1. ヘッダー全体の余白と高さ調整 */
     .anim-header {
         padding: 0 0.5rem !important;
         height: 46px !important;
         gap: 0.25rem !important;
     }
 
-    /* 左右・中央グループの要素間隔を縮小 */
     .anim-header-left,
     .anim-header-center,
     .anim-header-right {
         gap: 0.25rem !important;
     }
 
-    /* 2. タイトル（メニュー名）の文字サイズ調整と省略表示 */
     .anim-editable-title {
         font-size: 0.85rem !important;
         max-width: 100px !important;
@@ -2615,7 +2435,6 @@ body.drawing-mode .view-container {
         padding: 2px 4px !important;
     }
 
-    /* 3. ヘッダー内ボタンのコンパクト化 */
     .anim-header .btn-sm {
         padding: 0.25rem 0.45rem !important;
         font-size: 0.72rem !important;
@@ -2623,7 +2442,6 @@ body.drawing-mode .view-container {
         gap: 0.2rem !important;
     }
 
-    /* スマホでは一部のボタンのテキストを消してアイコン表示のみにする（超省スペース化） */
     #anim-back,
     #tool-undo,
     #tool-redo,
@@ -2631,92 +2449,21 @@ body.drawing-mode .view-container {
         padding: 0 0.5rem !important;
     }
 
-    /* 「戻る」「Undo」「Redo」「設定」の文字を画面幅に応じて隠し、アイコンのみにする場合 */
     #tool-undo span,
     #tool-redo span,
     #anim-settings-btn span {
         display: none !important;
     }
 
-    /* 「保存」ボタンは目立たせつつコンパクト化 */
     #anim-save {
         padding: 0 0.6rem !important;
         font-size: 0.75rem !important;
     }
-
-    .topbar {
-        padding: 0 0.6rem !important;
-        height: 52px !important;
-        gap: 0.3rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-    }
-
-    /* 右側のボタン群ラッパーを中央揃えに固定 */
-    .topbar>div:last-child {
-        display: flex !important;
-        align-items: center !important;
-        gap: 0.3rem !important;
-        height: 100% !important;
-    }
-
-    .topbar-title {
-        font-size: 0.95rem !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        max-width: 110px !important;
-    }
-
-    /* ボタンの高さを固定し、縦伸びを防止 */
-    .topbar .btn {
-        padding: 0.3rem 0.5rem !important;
-        font-size: 0.72rem !important;
-        height: 32px !important;
-        line-height: 1 !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        white-space: nowrap !important;
-    }
-
-    /* ロールバッジ（保護者/コーチ）の高さ揃え */
-    #user-role-badge {
-        padding: 0.3rem 0.5rem !important;
-        font-size: 0.68rem !important;
-        height: 32px !important;
-        box-sizing: border-box !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        white-space: nowrap !important;
-    }
-
-    /* アバター画像のサイズ固定 */
-    .avatar {
-        width: 32px !important;
-        height: 32px !important;
-        flex-shrink: 0 !important;
-    }
 }
 
-/* ===== 作図画面表示時のメインサイドバー強制非表示 ===== */
-body:has(.anim-app-container) .sidebar,
-body.drawing-mode .sidebar {
-    display: none !important;
-}
-
-body:has(.anim-app-container) .main-content,
-body.drawing-mode .main-content {
-    margin-left: 0 !important;
-    width: 100% !important;
-}
-
-/* ===== 横画面（スマホ・タブレット横持ち）最適化 ===== */
+/* Landscape Mobile Canvas Optimization */
 @media screen and (max-height: 500px) and (orientation: landscape),
 screen and (max-width: 1024px) and (orientation: landscape) {
-
-    /* 右側詳細パネルを作図エリア外（画面外）へ移動し、トグル開閉化 */
     .anim-detail-side-panel {
         position: absolute !important;
         top: 0 !important;
@@ -2734,7 +2481,6 @@ screen and (max-width: 1024px) and (orientation: landscape) {
         transform: translateX(0) !important;
     }
 
-    /* 右パネル開閉ボタンの配置固定 */
     #anim-side-panel-toggle-btn {
         position: absolute !important;
         left: -32px !important;
@@ -2751,7 +2497,6 @@ screen and (max-width: 1024px) and (orientation: landscape) {
         justify-content: center !important;
     }
 
-    /* 上段ヘッダーの高さ・余白圧縮 */
     .anim-header {
         height: 42px !important;
         padding: 0 0.5rem !important;
@@ -2763,7 +2508,6 @@ screen and (max-width: 1024px) and (orientation: landscape) {
         font-size: 0.7rem !important;
     }
 
-    /* 下部再生バーのコンパクト化 */
     .anim-player-bar {
         bottom: 6px !important;
         height: 34px !important;
@@ -2789,258 +2533,71 @@ screen and (max-width: 1024px) and (orientation: landscape) {
     }
 }
 
-/* =========================================================
-   ハイブリッドナビゲーション (ボトムナビ / レフトレール)
-   ========================================================= */
-
-/* デフォルト（PC）では隠す */
-.bottom-nav {
-    display: none;
+/* Header Text & Button Wrap Prevention */
+.topbar-title {
+    max-width: none !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
-/* --- スマホ表示（768px以下） --- */
-@media (max-width: 768px) {
-
-    /* 1. ハンバーガーボタンを非表示（ボトムナビに一本化するため） */
-    .menu-toggle {
-        display: none !important;
-    }
-
-    /* 2. 縦向き（Portrait）：画面下に固定ボトムナビ */
-    @media (orientation: portrait) {
-        .bottom-nav {
-            display: flex !important;
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 56px !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            border-top: 1px solid var(--surface-border) !important;
-            justify-content: space-around !important;
-            align-items: center !important;
-            z-index: 900 !important;
-            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-        }
-
-        /* 下部ナビの分だけコンテンツ底面に余白を空ける */
-        .main-content {
-            padding-bottom: 60px !important;
-        }
-    }
-
-    /* 3. 横向き（Landscape）：画面左にスリムなレフトレール */
-    @media (orientation: landscape) {
-        .bottom-nav {
-            display: flex !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 52px !important;
-            height: 100vh !important;
-            height: 100dvh !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            border-right: 1px solid var(--surface-border) !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            gap: 0.8rem !important;
-            z-index: 900 !important;
-        }
-
-        /* レフトレールの分だけコンテンツ左面に余白を空ける */
-        .main-content {
-            margin-left: 52px !important;
-            padding-bottom: 0 !important;
-        }
-    }
-
-    /* ナビゲーションアイテムのスタイル */
-    .bottom-nav .nav-item {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 0.65rem !important;
-        color: var(--text-secondary) !important;
-        text-decoration: none !important;
-        gap: 2px !important;
-        padding: 4px 8px !important;
-        border-radius: 8px !important;
-        transition: all 0.2s ease !important;
-    }
-
-    .bottom-nav .nav-item i {
-        font-size: 1.1rem !important;
-    }
-
-    .bottom-nav .nav-item.active {
-        color: var(--primary) !important;
-        font-weight: 700 !important;
-        background: rgba(242, 57, 50, 0.08) !important;
-    }
-
-    .gas-actions-row {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 0.6rem !important;
-    }
-
-    .gas-actions-row #btn-copy-invite-link {
-        width: 100% !important;
-        justify-content: center !important;
-        padding: 0.5rem !important;
-    }
-
-    .gas-actions-group {
-        width: 100% !important;
-        margin-left: 0 !important;
-        flex-direction: column !important;
-        gap: 0.5rem !important;
-    }
-
-    .gas-actions-group .btn {
-        width: 100% !important;
-        justify-content: center !important;
-        padding: 0.5rem !important;
-        font-size: 0.8rem !important;
-    }
-
-    .toast-container {
-        top: 60px !important;
-        /* ヘッダー直下に配置 */
-        bottom: auto !important;
-        /* 下部固定を解除 */
-        left: 50% !important;
-        right: auto !important;
-        transform: translateX(-50%) !important;
-        width: 90% !important;
-        /* 画面幅に合わせて横幅を確保 */
-        max-width: 400px !important;
-        align-items: center !important;
-    }
-
-    .toast {
-        width: 100% !important;
-        text-align: center !important;
-        justify-content: center !important;
-        transform: translateY(-150%) !important;
-        /* 初期状態は上に隠す */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    /* 表示時（アニメーション） */
-    .toast.show {
-        transform: translateY(0) !important;
-    }
+.topbar .btn,
+.topbar #user-role-badge,
+.topbar-actions .btn {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    flex-shrink: 0 !important;
+    line-height: 1.2 !important;
 }
 
-/* 4. 作図画面（Animation）が開いている時は縦横問わず完全非表示 */
-body:has(.anim-app-container) .bottom-nav,
-body.drawing-mode .bottom-nav {
-    display: none !important;
+.schedule-badge,
+.form-badge,
+.match-card .badge {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
-body:has(.anim-app-container) .main-content,
-body.drawing-mode .main-content {
-    margin-left: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* デフォルト（769px以上のPC画面）ではボトムナビ/スリムバーを完全非表示 */
+/* Hybrid Responsive & Bottom Navigation */
 .bottom-nav {
     display: none !important;
 }
 
-/* 4. 作図画面（Animation）が開いている時は非表示 */
-body:has(.anim-app-container) .bottom-nav,
-body.drawing-mode .bottom-nav {
-    display: none !important;
-}
-
-body:has(.anim-app-container) .main-content,
-body.drawing-mode .main-content {
-    margin-left: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-/* =========================================================
-   スマホ・タブレット共通（768px以下）完全レイアウト補正
-   ========================================================= */
 @media screen and (max-width: 768px) {
-
-    /* 1. ハンバーガーボタンおよびPC用サイドバーの完全非表示 */
     .menu-toggle {
         display: none !important;
     }
 
-    .sidebar:not(.open) {
+    .sidebar {
         display: none !important;
     }
 
-    /* メインコンテンツのPC用左余白(250px)をリセット */
     .main-content {
         margin-left: 0 !important;
+        width: 100% !important;
+        padding-bottom: 60px !important;
     }
 
-    /* 2. 縦向き（Portrait）：画面下に固定ボトムナビ */
-    @media (orientation: portrait) {
-        .bottom-nav {
-            display: flex !important;
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 56px !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            border-top: 1px solid var(--surface-border) !important;
-            justify-content: space-around !important;
-            align-items: center !important;
-            z-index: 900 !important;
-            padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-        }
-
-        .view-container {
-            padding-bottom: 80px !important;
-        }
+    .bottom-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 56px !important;
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(12px) !important;
+        border-top: 1px solid var(--surface-border) !important;
+        flex-direction: row !important;
+        justify-content: space-around !important;
+        align-items: center !important;
+        z-index: 900 !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
     }
 
-    /* 3. 横向き（Landscape）：画面左にスリムなレフトレール */
-    @media (orientation: landscape) {
-        .bottom-nav {
-            display: flex !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 52px !important;
-            height: 100vh !important;
-            height: 100dvh !important;
-            background: rgba(255, 255, 255, 0.95) !important;
-            backdrop-filter: blur(12px) !important;
-            border-right: 1px solid var(--surface-border) !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            align-items: center !important;
-            gap: 0.8rem !important;
-            z-index: 900 !important;
-        }
-
-        .main-content {
-            margin-left: 52px !important;
-        }
-
-        .view-container {
-            padding-bottom: 1rem !important;
-        }
-    }
-
-    /* ナビゲーションアイテムの基本スタイル */
     .bottom-nav .nav-item {
         display: flex;
-        /* JSでの非表示制御用に!importantは付けない */
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
@@ -3050,7 +2607,6 @@ body.drawing-mode .main-content {
         gap: 2px !important;
         padding: 4px 8px !important;
         border-radius: 8px !important;
-        transition: all 0.2s ease !important;
     }
 
     .bottom-nav .nav-item i {
@@ -3063,14 +2619,14 @@ body.drawing-mode .main-content {
         background: rgba(242, 57, 50, 0.08) !important;
     }
 
-    /* ヘッダー全体とタイトルの位置調整 */
     .topbar {
         padding: 0 0.75rem !important;
-        height: 50px !important;
+        height: 48px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
         gap: 0.5rem !important;
+        width: 100% !important;
     }
 
     .topbar-title {
@@ -3079,10 +2635,8 @@ body.drawing-mode .main-content {
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         margin-right: auto !important;
-        /* タイトルを自然な左配置に固定 */
     }
 
-    /* 右側ボタン群のテキストを隠してアイコン化（省スペース化） */
     .topbar>div:last-child {
         display: flex !important;
         align-items: center !important;
@@ -3091,98 +2645,457 @@ body.drawing-mode .main-content {
         flex-shrink: 0 !important;
     }
 
-    .topbar .btn span:not(.fa-solid):not(.fa-regular):not(.fas),
-    .topbar #role-toggle-btn span {
-        display: none !important;
-        /* ボタンの文字を非表示に */
-    }
-
     .topbar .btn {
-        padding: 0.35rem 0.6rem !important;
-        font-size: 0.85rem !important;
+        padding: 0.35rem 0.55rem !important;
+        font-size: 0.8rem !important;
         height: 32px !important;
         line-height: 1 !important;
-        white-space: nowrap !important;
         border-radius: 8px !important;
     }
 
     #user-role-badge {
-        padding: 0.25rem 0.5rem !important;
-        font-size: 0.68rem !important;
+        padding: 0.25rem 0.45rem !important;
+        font-size: 0.65rem !important;
         height: 32px !important;
         display: inline-flex !important;
         align-items: center !important;
-        white-space: nowrap !important;
     }
 
-    /* 選手管理サマリーカードを3列固定 */
-    #player-summary-cards {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 0.4rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    #player-summary-cards .stat-card {
-        padding: 0.5rem 0.3rem !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        min-height: auto !important;
-    }
-
-    #player-summary-cards .stat-icon {
-        width: 28px !important;
-        height: 28px !important;
-        font-size: 0.85rem !important;
-        margin-bottom: 0.25rem !important;
-    }
-
-    #player-summary-cards .stat-info {
-        margin-left: 0 !important;
-        text-align: center !important;
-        width: 100% !important;
-    }
-
-    #player-summary-cards .stat-info h3 {
-        font-size: 0.6rem !important;
-        white-space: nowrap !important;
-    }
-
-    #player-summary-cards .stat-info p {
-        font-size: 0.85rem !important;
-    }
-
-    #player-summary-cards .stat-info div {
-        font-size: 0.58rem !important;
-        justify-content: center !important;
+    .avatar {
+        width: 32px !important;
+        height: 32px !important;
+        flex-shrink: 0 !important;
     }
 }
 
-/* JSで display: none が指定された場合の優先適用 */
+@media screen and (max-width: 1200px) {
+
+    .topbar .btn span:not(.fa-solid):not(.fa-regular):not(.fas),
+    .topbar #role-toggle-btn span {
+        display: none !important;
+    }
+
+    .topbar .btn {
+        padding: 0.4rem 0.6rem !important;
+    }
+}
+
+/* Recent Match Cards Layout Fixing (Fluid Responsive Grid) */
+#dash-recent-matches,
+.recent-matches-grid,
+.dash-horizontal-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+}
+
+#dash-recent-matches .match-card,
+.recent-matches .match-card,
+.dashboard-grid-container .card .match-card {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    min-height: 135px !important;
+    padding: 0.8rem !important;
+}
+
+.match-card-opponent,
+.match-card h4,
+.match-card div[style*="font-weight: bold"] {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.match-card-date,
+.match-card span,
+.match-card div {
+    white-space: nowrap !important;
+}
+
+/* Tablet Resolution: 2-column fallback for narrow width */
+@media screen and (max-width: 900px) {
+
+    #dash-recent-matches,
+    .recent-matches-grid,
+    .dash-horizontal-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    }
+}
+
+/* Mobile Resolution: Full 1-Column Stack for Match Cards */
+@media screen and (max-width: 640px) {
+
+    #dash-recent-matches,
+    .recent-matches-grid,
+    .dash-horizontal-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    .match-card {
+        width: 100% !important;
+        padding: 1rem !important;
+    }
+}
+
+/* Global Exceptions */
 .bottom-nav .nav-item[style*="display: none"] {
     display: none !important;
 }
 
-/* GAS同期ボタン群のレイアウト調整 */
-.gas-actions-row {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem !important;
+body:has(.anim-app-container) .bottom-nav,
+body.drawing-mode .bottom-nav {
+    display: none !important;
 }
 
-#btn-copy-invite-link {
-    font-weight: bold;
-    color: var(--primary);
-    border-color: var(--primary);
-    white-space: nowrap;
+body:has(.anim-app-container) .main-content,
+body.drawing-mode .main-content {
+    margin-left: 0 !important;
+    padding-bottom: 0 !important;
+    width: 100% !important;
 }
 
-.gas-actions-group {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: nowrap;
-    margin-left: auto;
+/* ===== 試合記録カードのレイアウト＆文字あふれ完全防止 ===== */
+
+/* 1. カード本体をFlexレイアウトで縦並び化 */
+.match-card {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 0.6rem !important;
+    padding: 1rem 1.2rem !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    /* カード外へのはみ出しを物理的に遮断 */
+}
+
+/* 2. ヘッダー行（日付・種別 ＆ スコア） */
+.match-card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    /* Flexboxでの文字あふれ省略に必須 */
+}
+
+/* 日付・大会名（長すぎる場合は「…」で綺麗に省略） */
+.match-card-date,
+.match-card-header>div:first-child,
+.match-card-header span {
+    flex: 1 !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 0.8rem !important;
+    color: var(--text-secondary) !important;
+}
+
+/* スコア（`0 - 5` など）の変形防止 */
+.match-card-result,
+.match-card-header>div:last-child {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+}
+
+/* 3. 対戦相手名（長すぎる場合は省略） */
+.match-card-opponent,
+.match-card h4 {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    margin: 0.2rem 0 !important;
+}
+
+/* 4. 得点者テキスト（自然に折り返してカード内に収める） */
+.match-card-scorers,
+.match-card>div:not(.match-card-header):not(.match-card-actions) {
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.45 !important;
+    font-size: 0.85rem !important;
+    color: var(--text-primary) !important;
+}
+
+/* 5. 下段：アクションボタン群（右寄せで配置） */
+.match-card-actions {
+    position: static !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    margin-top: 0.4rem !important;
+    width: 100% !important;
+}
+
+.match-card-actions .btn,
+.match-card-actions button {
+    flex-shrink: 0 !important;
+}
+
+/* ===== 作図画面表示時の左サイドバー完全非表示（優先度最極大） ===== */
+
+/* 1. 作図画面起動時はどんな条件でもメインサイドバーとオーバーレイを消去 */
+body:has(.anim-app-container) .sidebar,
+body.drawing-mode .sidebar,
+body:has(.anim-app-container) .sidebar-overlay,
+body.drawing-mode .sidebar-overlay {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-100%) !important;
+}
+
+/* 2. メインコンテンツエリアの左余白（250px）をリセットして画面幅いっぱいに使用 */
+body:has(.anim-app-container) .main-content,
+body.drawing-mode .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+}
+
+/* キャンバス要素のタップ位置ズレ防止・タッチスワイプ抑止 */
+.canvas-wrapper canvas {
+    touch-action: none !important;
+    box-sizing: border-box !important;
+}
+
+/* ===== スマホ表示時（768px以下）のトースト通知上部配置 ===== */
+@media screen and (max-width: 768px) {
+    .toast-container {
+        top: 60px !important;
+        bottom: auto !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: 90% !important;
+        max-width: 400px !important;
+        align-items: center !important;
+        z-index: 2500 !important;
+    }
+
+    .toast {
+        width: 100% !important;
+        text-align: center !important;
+        justify-content: center !important;
+        transform: translateY(-150%) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .toast.show {
+        transform: translateY(0) !important;
+    }
+}
+
+/* ===== ヘッダー（トップバー）右側要素のフォント・デザイン完全統一 ===== */
+.topbar-btn,
+.topbar-badge {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    height: 32px !important;
+    padding: 0 0.65rem !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+}
+
+/* スマホ表示時（768px以下）でも文字を消さずにサイズを一括均一化 */
+@media screen and (max-width: 768px) {
+
+    .topbar .btn span,
+    .topbar-btn span,
+    .topbar-badge span {
+        display: inline !important;
+        /* テキスト消去を解除 */
+    }
+
+    .topbar-btn,
+    .topbar-badge {
+        font-size: 0.7rem !important;
+        height: 30px !important;
+        padding: 0 0.5rem !important;
+        gap: 0.25rem !important;
+    }
+}
+
+/* ===== トップバーボタンのテキスト非表示を解除＆完全統一 ===== */
+.topbar .topbar-btn-text,
+.topbar-btn span,
+.topbar-badge span {
+    display: inline-block !important;
+}
+
+.topbar-btn,
+.topbar-badge {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    height: 32px !important;
+    padding: 0 0.65rem !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+}
+
+@media screen and (max-width: 768px) {
+
+    .topbar .topbar-btn-text,
+    .topbar-btn span,
+    .topbar-badge span {
+        display: inline-block !important;
+    }
+
+    .topbar-btn,
+    .topbar-badge {
+        font-size: 0.7rem !important;
+        height: 30px !important;
+        padding: 0 0.5rem !important;
+        gap: 0.25rem !important;
+    }
+}
+
+/* ===== ヘッダーボタンのテキスト表示の強制復元＆完全共通化 ===== */
+.topbar .btn span,
+.topbar button span,
+.topbar .topbar-btn-text {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ボタンとバッジのサイズ・フォントの完全統一 */
+.topbar-btn,
+.topbar-badge {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    height: 32px !important;
+    padding: 0 0.65rem !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.35rem !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+}
+
+/* 768px以下のモバイル表示時でもテキストを表示維持 */
+@media screen and (max-width: 768px) {
+
+    .topbar .btn span,
+    .topbar button span,
+    .topbar .topbar-btn-text {
+        display: inline-block !important;
+    }
+
+    .topbar-btn,
+    .topbar-badge {
+        font-size: 0.7rem !important;
+        height: 30px !important;
+        padding: 0 0.45rem !important;
+        gap: 0.25rem !important;
+    }
+}
+
+/* ===== トップバー内全テキストの強制表示＆スタイル統一 ===== */
+.topbar .btn span:not(.fa-solid):not(.fa-regular):not(.fas),
+.topbar .topbar-btn-text,
+.topbar-btn span,
+.topbar-badge span {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* ===== ヘッダー右側3要素（同期・モードバッジ・切替）の垂直完全中央揃え（最終調整） ===== */
+.topbar-btn,
+.topbar-badge,
+.topbar button.topbar-btn,
+.topbar div.topbar-badge {
+    height: 32px !important;
+    padding: 0 0.65rem !important;
+    border-radius: 8px !important;
+
+    /* Flexboxによる厳密な上下左右中央揃え */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    /* フォント・行高の統一 */
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+
+    /* タグ固有のブラウザ差異を完全除去 */
+    margin: 0 !important;
+    border: none !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+
+/* 内部要素（アイコン・テキスト）のベースラインと位置を固定 */
+.topbar-btn *,
+.topbar-badge * {
+    font-size: 0.78rem !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+}
+
+/* アイコンと文字の間のスペース指定 */
+.topbar-btn i,
+.topbar-badge i {
+    margin-right: 0.35rem !important;
+}
+
+/* スマホ表示時（768px以下） */
+@media screen and (max-width: 768px) {
+
+    .topbar-btn,
+    .topbar-badge,
+    .topbar button.topbar-btn,
+    .topbar div.topbar-badge {
+        height: 30px !important;
+        padding: 0 0.5rem !important;
+        font-size: 0.72rem !important;
+    }
+
+    .topbar-btn *,
+    .topbar-badge * {
+        font-size: 0.72rem !important;
+    }
+
+    .topbar-btn i,
+    .topbar-badge i {
+        margin-right: 0.25rem !important;
+    }
 }

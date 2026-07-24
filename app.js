@@ -583,82 +583,65 @@ function setupEventListeners() {
 
 function updateRoleUI() {
     const badge = document.getElementById('user-role-badge');
-    const avatar = document.getElementById('user-avatar');
     const btnToggle = document.getElementById('btn-toggle-role');
     const isCoach = state.currentUserRole === 'coach';
 
+    // 1. モードのラベル（バッジ：現在の状態を色と文字で表示）
     if (badge) {
         if (isCoach) {
             badge.style.background = 'rgba(242, 57, 50, 0.15)';
             badge.style.color = '#ef4444';
-            badge.innerHTML = '<i class="fa-solid fa-user-shield"></i> コーチ (編集権限)';
+            badge.innerHTML = '<i class="fa-solid fa-user-shield"></i> <span>コーチモード</span>';
         } else {
             badge.style.background = 'rgba(34, 197, 94, 0.15)';
             badge.style.color = '#15803d';
-            badge.innerHTML = '<i class="fa-solid fa-eye"></i> 保護者 (閲覧専用)';
+            badge.innerHTML = '<i class="fa-solid fa-eye"></i> <span>保護者モード</span>';
         }
     }
 
-    if (avatar) {
-        if (isCoach) {
-            avatar.src = 'https://ui-avatars.com/api/?name=Coach&background=ef4444&color=fff';
-        } else {
-            avatar.src = 'https://ui-avatars.com/api/?name=Parent&background=22c55e&color=fff';
-        }
-    }
-
+    // 2. 切替ボタン（モード切替アクション：左右矢印アイコン）
     if (btnToggle) {
-        btnToggle.innerHTML = isCoach
-            ? '<i class="fa-solid fa-eye"></i> 保護者モードへ'
-            : '<i class="fa-solid fa-user-lock"></i> コーチモードへ';
+        btnToggle.innerHTML = '<i class="fa-solid fa-right-left"></i> <span>モード切替</span>';
+        btnToggle.title = isCoach ? '保護者モードに切り替え' : 'コーチモードに切り替え';
     }
 
+    // 3. 同期ボタン（クラウド連携アイコン：コーチ＝送信 Up / 保護者＝受信 Down）
     const btnTopbarSync = document.getElementById('btn-topbar-sync');
     if (btnTopbarSync) {
         const hasUrl = state.teamInfo && state.teamInfo.gasApiUrl;
         btnTopbarSync.style.display = hasUrl ? 'inline-flex' : 'none';
-        btnTopbarSync.onclick = () => {
-            if (isCoach) {
-                syncPushGasCloud(false);
-            } else {
-                syncPullGasCloud(false);
-            }
-        };
+
+        if (isCoach) {
+            btnTopbarSync.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> <span>クラウド同期</span>';
+            btnTopbarSync.title = '手動でクラウドへ最新データを送信';
+            btnTopbarSync.onclick = () => syncPushGasCloud(false);
+        } else {
+            btnTopbarSync.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> <span>クラウド同期</span>';
+            btnTopbarSync.title = '手動でクラウドから最新データを取得';
+            btnTopbarSync.onclick = () => syncPullGasCloud(false);
+        }
     }
 
-    // Toggle sidebar library, data management, and settings link visibility for parent role
+    // (以下、既存の処理はそのまま)
     const settingsLink = document.querySelector('.nav-links li[data-route="settings"]');
-    if (settingsLink) {
-        settingsLink.style.display = isCoach ? 'flex' : 'none';
-    }
+    if (settingsLink) settingsLink.style.display = isCoach ? 'flex' : 'none';
 
     const libraryLink = document.querySelector('.nav-links li[data-route="library"]');
-    if (libraryLink) {
-        libraryLink.style.display = isCoach ? 'flex' : 'none';
-    }
+    if (libraryLink) libraryLink.style.display = isCoach ? 'flex' : 'none';
 
     const dataLink = document.querySelector('.nav-links li[data-route="data"]');
-    if (dataLink) {
-        dataLink.style.display = isCoach ? 'flex' : 'none';
-    }
+    if (dataLink) dataLink.style.display = isCoach ? 'flex' : 'none';
 
-    // ★ 追加：ボトムナビの表示切替（左ペインと完全同期）
     const bottomLibraryLink = document.querySelector('.bottom-nav .nav-item[data-route="library"]');
-    if (bottomLibraryLink) {
-        bottomLibraryLink.style.setProperty('display', isCoach ? 'flex' : 'none', 'important');
-    }
+    if (bottomLibraryLink) bottomLibraryLink.style.setProperty('display', isCoach ? 'flex' : 'none', 'important');
 
     const bottomSettingsLink = document.querySelector('.bottom-nav .nav-item[data-route="settings"]');
-    if (bottomSettingsLink) {
-        bottomSettingsLink.style.setProperty('display', isCoach ? 'flex' : 'none', 'important');
-    }
-
+    if (bottomSettingsLink) bottomSettingsLink.style.setProperty('display', isCoach ? 'flex' : 'none', 'important');
 
     if (!isCoach && (state.currentRoute === 'settings' || state.currentRoute === 'library' || state.currentRoute === 'data')) {
         navigate('dashboard');
     }
 
-    // Toggle read-only attribute on IDP textareas
     const goalShort = document.getElementById('player-goal-short');
     const goalLong = document.getElementById('player-goal-long');
     if (goalShort) {
@@ -670,7 +653,6 @@ function updateRoleUI() {
         else goalLong.setAttribute('readonly', 'true');
     }
 
-    // Add or remove read-only CSS mode on body
     if (isCoach) {
         document.body.classList.remove('role-read-only');
     } else {
@@ -7065,23 +7047,44 @@ function drawCirclePreview(x1, y1, x2, y2) {
 function applyGridSnap(val, axis = 'x') {
     const cb = document.getElementById('canvas-snap-grid');
     if (cb && cb.checked) {
-        const center = (axis === 'x') ? 400 : 250;
-        return center + Math.round((val - center) / 20) * 20;
+        // 単純に最も近い20px刻みにスナップさせる（ズレの発生を防止）
+        return Math.round(val / 20) * 20;
     }
     return val;
 }
 
+// 共通：クリック/タッチ座標をCanvas内部解像度に正確に変換する関数
+function getCanvasPos(e) {
+    if (!canvas) return { x: 0, y: 0 };
+    const rect = canvas.getBoundingClientRect();
+
+    // イベントからクライアント座標を取得（マウス/タッチ両対応）
+    let clientX = e.clientX;
+    let clientY = e.clientY;
+    if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else if (e.changedTouches && e.changedTouches.length > 0) {
+        clientX = e.changedTouches[0].clientX;
+        clientY = e.changedTouches[0].clientY;
+    }
+
+    // CSS上の表示サイズと内部解像度(width/height)の比率を計算して正確な座標を返す
+    return {
+        x: (clientX - rect.left) * (canvas.width / rect.width),
+        y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+}
+
 function handleCanvasDblClick(e) {
     if (isPlaying) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (800 / rect.width);
-    const y = (e.clientY - rect.top) * (500 / rect.height);
+    const pos = getCanvasPos(e);
 
     for (let i = objects.length - 1; i >= 0; i--) {
         const obj = objects[i];
         if (obj.type === 'text') {
-            const dx = x - obj.x;
-            const dy = y - obj.y;
+            const dx = pos.x - obj.x;
+            const dy = pos.y - obj.y;
             ctx.font = 'bold 14px Inter, sans-serif';
             const tw = ctx.measureText(obj.text || '').width;
             if (Math.abs(dx) <= tw / 2 + 10 && Math.abs(dy) <= 15) {
@@ -7111,9 +7114,9 @@ function handleCanvasDblClick(e) {
 
 function handleMouseDown(e) {
     if (isPlaying) return;
-    const rect = canvas.getBoundingClientRect();
-    let x = (e.clientX - rect.left) * (800 / rect.width);
-    let y = (e.clientY - rect.top) * (500 / rect.height);
+    const pos = getCanvasPos(e);
+    let x = pos.x;
+    let y = pos.y;
 
     if (currentTool === 'select') {
         const prevSelected = selectedObject;
@@ -7145,7 +7148,6 @@ function handleMouseDown(e) {
             const obj = objects[i];
 
             if (obj.type === 'line' || obj.type === 'ladder') {
-                // Distance from point (x, y) to line segment (x1, y1)-(x2, y2)
                 const A = x - obj.x1;
                 const B = y - obj.y1;
                 const C = obj.x2 - obj.x1;
@@ -7302,7 +7304,6 @@ function handleMouseDown(e) {
             saveHistory();
             drawPitch(objects);
 
-            // Auto increment number box
             if (type === 'player' && elPlayerNumber && !isFormationMode) {
                 let n = parseInt(elPlayerNumber.value);
                 if (!isNaN(n)) elPlayerNumber.value = n + 1;
@@ -7313,9 +7314,9 @@ function handleMouseDown(e) {
 
 function handleMouseMove(e) {
     if (isPlaying) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) * (800 / rect.width);
-    const y = (e.clientY - rect.top) * (500 / rect.height);
+    const pos = getCanvasPos(e);
+    const x = pos.x;
+    const y = pos.y;
 
     if (draggedObject) {
         if (isResizing && draggedObject.type === 'minigoal') {
@@ -7368,9 +7369,9 @@ function handleMouseUp(e) {
         resizeHandle = null;
         drawPitch(objects);
     } else if (isDrawing && currentTool && (currentTool.startsWith('line-') || currentTool === 'ladder')) {
-        const rect = canvas.getBoundingClientRect();
-        const x = applyGridSnap((e.clientX - rect.left) * (canvas.width / rect.width), 'x');
-        const y = applyGridSnap((e.clientY - rect.top) * (canvas.height / rect.height), 'y');
+        const pos = getCanvasPos(e);
+        const x = applyGridSnap(pos.x, 'x');
+        const y = applyGridSnap(pos.y, 'y');
         if (Math.abs(x - startX) > 5 || Math.abs(y - startY) > 5) {
             if (currentTool === 'ladder') {
                 objects.push({ id: objectIdCounter++, type: 'ladder', x1: startX, y1: startY, x2: x, y2: y });
